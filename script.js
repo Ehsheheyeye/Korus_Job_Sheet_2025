@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Element Selectors ---
     const DOMElements = {
+        menuBtn: document.getElementById('menu-btn'), sidebar: document.getElementById('sidebar'),
+        sidebarOverlay: document.getElementById('sidebar-overlay'), sidebarCloseBtn: document.getElementById('sidebar-close-btn'),
+        mobilePageTitle: document.getElementById('mobile-page-title'),
         themeToggle: document.getElementById('theme-toggle'),
         // Job Sheet Form
         jobSheetNo: document.getElementById('job-sheet-no'), oldJobSheetNo: document.getElementById('old-job-sheet-no'),
@@ -83,8 +86,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 link.classList.add('active');
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 document.getElementById(`${page}-page`).classList.add('active');
+                
+                // Update mobile header title and close sidebar
+                DOMElements.mobilePageTitle.textContent = link.querySelector('span').textContent;
+                document.body.classList.remove('sidebar-open');
             });
         });
+        
+        // Mobile sidebar toggle
+        DOMElements.menuBtn.addEventListener('click', () => document.body.classList.add('sidebar-open'));
+        DOMElements.sidebarOverlay.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
+        DOMElements.sidebarCloseBtn.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
     }
 
     function setupClock() {
@@ -375,20 +387,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function downloadAsExcel() {
         const dataToExport = allJobSheets.map(job => ({
-            "Job No": job.jobSheetNo,
-            "Old Job No": job.oldJobSheetNo,
-            "Date": formatDate(job.date),
-            "Customer Name": job.customerName,
-            "Mobile": job.customerMobile,
-            "Alt Mobile": job.altMobile,
-            "Device Type": job.deviceType,
-            "Brand": job.brandName,
-            "Problems": job.reportedProblems.join(', '),
-            "Accessories": job.accessories,
-            "Current Status": job.currentStatus,
-            "Final Status": job.finalStatus,
-            "Customer Status": job.customerStatus,
-            "Estimate Amount": job.estimateAmount,
+            "Job No": job.jobSheetNo, "Old Job No": job.oldJobSheetNo, "Date": formatDate(job.date),
+            "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
+            "Device Type": job.deviceType, "Brand": job.brandName, "Problems": job.reportedProblems.join(', '),
+            "Accessories": job.accessories, "Current Status": job.currentStatus, "Final Status": job.finalStatus,
+            "Customer Status": job.customerStatus, "Estimate Amount": job.estimateAmount,
         }));
         const worksheet = XLSX.utils.json_to_sheet(dataToExport);
         const workbook = XLSX.utils.book_new();
