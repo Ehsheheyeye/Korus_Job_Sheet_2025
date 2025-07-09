@@ -15,10 +15,11 @@
 
     <div class="app-layout">
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" alt="Korus Computers Logo" class="logo-img">
                 <h1>Korus Computers</h1>
+                <button class="sidebar-close-btn" id="sidebar-close-btn">&times;</button>
             </div>
             <nav class="sidebar-nav">
                 <a href="#" class="nav-link active" data-page="dashboard">
@@ -50,6 +51,14 @@
 
         <!-- Main Content Area -->
         <main class="main-content">
+            <!-- Mobile Header -->
+            <header class="mobile-header">
+                <button class="menu-btn" id="menu-btn">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
+                <h1 id="mobile-page-title">Dashboard</h1>
+            </header>
+
             <!-- Page: Dashboard -->
             <div id="dashboard-page" class="page active">
                 <header class="page-header"><h1>Dashboard</h1></header>
@@ -62,32 +71,34 @@
                 </div>
                 <div class="recent-jobs-container card">
                     <h2>Recent Job Sheets</h2>
-                    <table class="data-table">
-                        <thead><tr><th>Job #</th><th>Customer</th><th>Device</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="recent-jobs-table-body"></tbody>
-                    </table>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead><tr><th>Job #</th><th>Customer</th><th>Device</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody id="recent-jobs-table-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- Page: Job Sheet Entry -->
             <div id="job-sheet-page" class="page">
                  <header class="page-header">
-                    <h1>Job Sheet Entry</h1>
-                    <button id="new-job-btn" class="action-btn primary-btn">+ New Job / Clear Form</button>
+                    <h1>Job Sheet</h1>
+                    <button id="new-job-btn" class="action-btn primary-btn">+ New</button>
                 </header>
                 <div class="form-grid">
                     <div class="card form-section">
                         <h2>Job & Customer Details</h2>
                         <div class="form-stack">
                             <div class="grid-3-col">
-                                <input id="job-sheet-no" type="text" placeholder="Enter Job No" class="input-field">
-                                <input id="old-job-sheet-no" type="text" placeholder="Old Job Sheet No (Optional)" class="input-field">
+                                <input id="job-sheet-no" type="number" placeholder="Job No" class="input-field">
+                                <input id="old-job-sheet-no" type="number" placeholder="Old Job No" class="input-field">
                                 <input id="date" type="date" class="input-field">
                             </div>
                             <input id="customer-name" type="text" placeholder="e.g., Rushikesh Khode" class="input-field">
                             <div class="grid-2-col">
                                 <input id="customer-mobile" type="tel" placeholder="e.g., 7276324318" class="input-field">
-                                <input id="alt-mobile" type="tel" placeholder="Alternative Mobile (Optional)" class="input-field">
+                                <input id="alt-mobile" type="tel" placeholder="Alt. Mobile" class="input-field">
                             </div>
                         </div>
                     </div>
@@ -133,33 +144,30 @@
                 <header class="page-header">
                     <h1>All Job Entries</h1>
                     <div class="header-actions">
-                        <input id="all-jobs-search-box" type="text" placeholder="Search all jobs..." class="search-input">
-                        <button id="download-excel-btn" class="action-btn primary-btn">Download Excel</button>
+                        <input id="all-jobs-search-box" type="text" placeholder="Search..." class="search-input">
+                        <button id="download-excel-btn" class="action-btn primary-btn">Excel</button>
                     </div>
                 </header>
                 <div class="card table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Job #</th>
-                                <th>Date</th>
-                                <th>Customer</th>
-                                <th>Mobile</th>
-                                <th>Device</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="all-jobs-table-body"></tbody>
-                    </table>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Job #</th><th>Date</th><th>Customer</th><th>Mobile</th>
+                                    <th>Device</th><th>Status</th><th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-jobs-table-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
             <!-- Page: Inward/Outward -->
             <div id="inward-outward-page" class="page">
                 <header class="page-header">
-                    <h1>Inward / Outward Records</h1>
-                    <input id="inward-outward-search-box" type="text" placeholder="Search by Party, Material..." class="search-input">
+                    <h1>Inward/Outward</h1>
+                    <input id="inward-outward-search-box" type="text" placeholder="Search..." class="search-input">
                 </header>
                 <div class="inward-outward-layout">
                     <div class="card form-section">
@@ -170,7 +178,7 @@
                                 <input id="party-name" type="text" placeholder="Select or type new party" class="input-field" autocomplete="off">
                             </div>
                             <label for="material-desc">Material Description</label>
-                            <textarea id="material-desc" placeholder="e.g., HP Laptop 15s, SN: 12345 for screen replacement" class="input-field" rows="4"></textarea>
+                            <textarea id="material-desc" placeholder="e.g., HP Laptop 15s, SN: 12345" class="input-field" rows="4"></textarea>
                             <label>Outward Date</label>
                             <input id="outward-date" type="date" class="input-field">
                             <label>Inward Date (when returned)</label>
@@ -181,18 +189,17 @@
                     </div>
                     <div class="card table-container">
                         <h2>All Outward Records</h2>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Party Name</th>
-                                    <th>Material</th>
-                                    <th>Outward Date</th>
-                                    <th>Inward Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="outward-records-table-body"></tbody>
-                        </table>
+                        <div class="table-wrapper">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Party Name</th><th>Material</th>
+                                        <th>Outward Date</th><th>Inward Date</th><th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="outward-records-table-body"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -202,6 +209,7 @@
             </footer>
         </main>
     </div>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
     <!-- Success Modal -->
     <div id="success-modal" class="modal-overlay"><div class="modal-content"><div class="modal-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div><p id="success-message"></p></div></div>
