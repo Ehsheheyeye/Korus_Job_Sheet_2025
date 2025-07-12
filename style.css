@@ -209,7 +209,7 @@ textarea.input-field { resize: vertical; }
     margin-top: 2rem; transition: all var(--transition-speed) ease;
 }
 
-/* --- RESPONSIVE STYLES --- */
+/* --- RESPONSIVE STYLES (THE FIX IS HERE) --- */
 @media (max-width: 1024px) {
     .sidebar {
         position: fixed; top: 0; left: 0; height: 100%;
@@ -237,19 +237,23 @@ textarea.input-field { resize: vertical; }
     .menu-btn svg { width: 1.5rem; height: 1.5rem; }
     #mobile-page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
     
-    /* Hide desktop header by default on mobile */
-    .page-header { display: none; } 
+    /* By default, hide the desktop header on mobile */
+    .page-header { 
+        display: none; 
+    }
     
-    /* Show specific headers on mobile */
+    /* Then, specifically show the headers on pages that need action buttons */
     #job-sheet-page .page-header,
     #all-jobs-page .page-header,
     #inward-outward-page .page-header {
         display: flex;
     }
     
+    /* On mobile, the page title is already in the top bar (mobile-header).
+       So, we hide the h1 inside these specific headers to avoid showing the title twice. */
     #all-jobs-page .page-header h1,
     #inward-outward-page .page-header h1 {
-        display: none; /* Hide h1 inside these specific headers to avoid duplication */
+        display: none;
     }
 
     .form-grid, .inward-outward-layout { grid-template-columns: 1fr; }
