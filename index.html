@@ -8,13 +8,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <!-- Library for Excel Export -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 
     <div class="app-layout">
-        <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" alt="Korus Computers Logo" class="logo-img">
@@ -49,9 +47,7 @@
             </div>
         </aside>
 
-        <!-- Main Content Area -->
         <main class="main-content">
-            <!-- Mobile Header -->
             <header class="mobile-header">
                 <button class="menu-btn" id="menu-btn">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
@@ -59,7 +55,6 @@
                 <h1 id="mobile-page-title">Dashboard</h1>
             </header>
 
-            <!-- Page: Dashboard -->
             <div id="dashboard-page" class="page active">
                 <header class="page-header"><h1>Dashboard</h1></header>
                 <div class="stats-grid">
@@ -80,7 +75,6 @@
                 </div>
             </div>
 
-            <!-- Page: Job Sheet Entry -->
             <div id="job-sheet-page" class="page">
                  <header class="page-header">
                     <h1>Job Sheet</h1>
@@ -139,7 +133,6 @@
                 </div>
             </div>
             
-            <!-- Page: All Job Entries -->
             <div id="all-jobs-page" class="page">
                 <header class="page-header">
                     <h1>All Job Entries</h1>
@@ -163,11 +156,13 @@
                 </div>
             </div>
 
-            <!-- Page: Inward/Outward -->
             <div id="inward-outward-page" class="page">
                 <header class="page-header">
                     <h1>Inward/Outward</h1>
-                    <input id="inward-outward-search-box" type="text" placeholder="Search..." class="search-input">
+                     <div class="header-actions">
+                        <input id="inward-outward-search-box" type="text" placeholder="Search..." class="search-input">
+                        <button id="download-inward-outward-excel-btn" class="action-btn primary-btn">Excel</button>
+                    </div>
                 </header>
                 <div class="inward-outward-layout">
                     <div class="card form-section">
@@ -211,10 +206,8 @@
     </div>
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <!-- Success Modal -->
     <div id="success-modal" class="modal-overlay"><div class="modal-content"><div class="modal-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div><p id="success-message"></p></div></div>
 
-    <!-- Firebase and App Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="script.js"></script>
