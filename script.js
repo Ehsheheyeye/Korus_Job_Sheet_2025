@@ -88,13 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 document.getElementById(`${page}-page`).classList.add('active');
                 
-                // Update mobile header title and close sidebar
                 DOMElements.mobilePageTitle.textContent = link.querySelector('span').textContent;
                 document.body.classList.remove('sidebar-open');
             });
         });
         
-        // Mobile sidebar toggle
         DOMElements.menuBtn.addEventListener('click', () => document.body.classList.add('sidebar-open'));
         DOMElements.sidebarOverlay.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
         DOMElements.sidebarCloseBtn.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
@@ -109,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dateEl.textContent = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
         }
         update();
-        setInterval(update, 60000); // Update every minute
+        setInterval(update, 60000);
     }
     
     function setupTheme() {
@@ -125,11 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMElements.newJobBtn.addEventListener('click', clearJobSheetForm);
         DOMElements.saveOutwardBtn.addEventListener('click', saveOutwardRecord);
         DOMElements.cancelOutwardEditBtn.addEventListener('click', clearOutwardForm);
+        
+        // Search Listeners
         DOMElements.allJobsSearchBox.addEventListener('input', handleAllJobsSearch);
         DOMElements.inwardOutwardSearchBox.addEventListener('input', handleOutwardSearch);
+        
+        // Excel Download Listeners
         DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
         DOMElements.downloadInwardOutwardExcelBtn.addEventListener('click', downloadInwardOutwardAsExcel);
         
+        // Autocomplete setup
         setupAutocomplete(DOMElements.brandName, brandSuggestions);
         setupAutocomplete(DOMElements.partyName, partySuggestions);
     }
@@ -151,8 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setInitialDate() {
-        DOMElements.date.value = new Date().toISOString().split('T')[0];
-        DOMElements.outwardDate.value = new Date().toISOString().split('T')[0];
+        const today = new Date().toISOString().split('T')[0];
+        DOMElements.date.value = today;
+        DOMElements.outwardDate.value = today;
     }
 
     // --- Data Loading & Handling ---
@@ -286,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMElements.saveOutwardBtn.classList.remove('update-btn');
         DOMElements.cancelOutwardEditBtn.style.display = 'none';
         [DOMElements.partyName, DOMElements.materialDesc, DOMElements.inwardDate].forEach(el => el.value = '');
-        DOMElements.outwardDate.value = new Date().toISOString().split('T')[0];
+        setInitialDate();
     }
     
     function renderOutwardTable(records) {
@@ -305,14 +309,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleOutwardSearch() {
         const term = DOMElements.inwardOutwardSearchBox.value.toLowerCase();
-        const filtered = !term ? allOutwardRecords : allOutwardRecords.filter(r => r.partyName.toLowerCase().includes(term) || r.material.toLowerCase().includes(term));
+        const filtered = !term ? allOutwardRecords : allOutwardRecords.filter(r => 
+            (r.partyName && r.partyName.toLowerCase().includes(term)) || 
+            (r.material && r.material.toLowerCase().includes(term))
+        );
         renderOutwardTable(filtered);
     }
     
     async function saveOutwardRecord() {
         const recordData = {
-            partyName: DOMElements.partyName.value.trim(), material: DOMElements.materialDesc.value.trim(),
-            outwardDate: DOMElements.outwardDate.value, inwardDate: DOMElements.inwardDate.value || null,
+            partyName: DOMElements.partyName.value.trim(),
+            material: DOMElements.materialDesc.value.trim(),
+            outwardDate: DOMElements.outwardDate.value,
+            inwardDate: DOMElements.inwardDate.value || null,
         };
         if (!recordData.partyName || !recordData.material) { alert("Party Name and Material are required."); return; }
         
@@ -353,7 +362,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Utility & Helper Functions ---
     function formatDate(dateString) {
         if (!dateString) return '';
-        const [year, month, day] = dateString.split('-');
+        const date = new Date(dateString);
+        // Add a day to counteract timezone issues where it might show the previous day
+        date.setDate(date.getDate() + 1);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
         return `${day}-${month}-${year}`;
     }
 
