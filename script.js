@@ -62,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelOutwardEditBtn: document.getElementById('cancel-outward-edit-btn'),
         outwardRecordsTableBody: document.getElementById('outward-records-table-body'),
         inwardOutwardSearchBox: document.getElementById('inward-outward-search-box'),
+        downloadInwardOutwardExcelBtn: document.getElementById('download-inward-outward-excel-btn'),
     };
     
     // --- Application Initialization ---
@@ -126,7 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMElements.cancelOutwardEditBtn.addEventListener('click', clearOutwardForm);
         DOMElements.allJobsSearchBox.addEventListener('input', handleAllJobsSearch);
         DOMElements.inwardOutwardSearchBox.addEventListener('input', handleOutwardSearch);
-        DOMElements.downloadExcelBtn.addEventListener('click', downloadAsExcel);
+        DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
+        DOMElements.downloadInwardOutwardExcelBtn.addEventListener('click', downloadInwardOutwardAsExcel);
         
         setupAutocomplete(DOMElements.brandName, brandSuggestions);
         setupAutocomplete(DOMElements.partyName, partySuggestions);
@@ -385,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => modal.classList.remove('visible'), 2000);
     }
 
-    function downloadAsExcel() {
+    function downloadJobsAsExcel() {
         const dataToExport = allJobSheets.map(job => ({
             "Job No": job.jobSheetNo, "Old Job No": job.oldJobSheetNo, "Date": formatDate(job.date),
             "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
@@ -399,6 +401,21 @@ document.addEventListener('DOMContentLoaded', () => {
         XLSX.writeFile(workbook, "Korus_Job_Sheets.xlsx");
         showSuccessModal("Downloading Excel file...");
     }
+
+    function downloadInwardOutwardAsExcel() {
+        const dataToExport = allOutwardRecords.map(r => ({
+            "Party Name": r.partyName,
+            "Material": r.material,
+            "Outward Date": formatDate(r.outwardDate),
+            "Inward Date": r.inwardDate ? formatDate(r.inwardDate) : 'Pending',
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "InwardOutward");
+        XLSX.writeFile(workbook, "Korus_Inward_Outward.xlsx");
+        showSuccessModal("Downloading Excel file...");
+    }
+
 
     // --- Expose functions to global scope ---
     window.app = { editJob, deleteJob, editOutward, deleteOutward };
