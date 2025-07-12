@@ -237,20 +237,19 @@ textarea.input-field { resize: vertical; }
     .menu-btn svg { width: 1.5rem; height: 1.5rem; }
     #mobile-page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
     
-    /* By default, hide the desktop header on mobile */
-    .page-header { 
-        display: none; 
+    /* Hide all desktop-style page headers by default on mobile */
+    main.main-content .page .page-header {
+        display: none;
     }
-    
-    /* Then, specifically show the headers on pages that need action buttons */
-    #job-sheet-page .page-header,
-    #all-jobs-page .page-header,
-    #inward-outward-page .page-header {
+
+    /* Forcefully show the headers on pages that need action buttons */
+    main.main-content #all-jobs-page.page .page-header,
+    main.main-content #inward-outward-page.page .page-header,
+    main.main-content #job-sheet-page.page .page-header {
         display: flex;
     }
     
-    /* On mobile, the page title is already in the top bar (mobile-header).
-       So, we hide the h1 inside these specific headers to avoid showing the title twice. */
+    /* Hide the h1 inside the headers we just showed to prevent duplicate titles */
     #all-jobs-page .page-header h1,
     #inward-outward-page .page-header h1 {
         display: none;
