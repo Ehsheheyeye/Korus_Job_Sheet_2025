@@ -416,7 +416,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showSuccessModal("Downloading Excel file...");
     }
 
-
     // --- Expose functions to global scope ---
     window.app = { editJob, deleteJob, editOutward, deleteOutward };
 
