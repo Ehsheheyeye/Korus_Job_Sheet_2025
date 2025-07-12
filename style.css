@@ -78,9 +78,9 @@ body.dark #theme-icon-moon { display: block; }
 
 /* --- MAIN CONTENT & CARDS --- */
 .mobile-header { display: none; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
 .page-header h1 { font-size: 2rem; font-weight: 800; margin: 0; }
-.header-actions { display: flex; gap: 1rem; }
+.header-actions { display: flex; gap: 1rem; align-items: center; }
 .card {
     background-color: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;
     box-shadow: var(--shadow); margin-bottom: 1.5rem;
@@ -237,17 +237,27 @@ textarea.input-field { resize: vertical; }
     .menu-btn svg { width: 1.5rem; height: 1.5rem; }
     #mobile-page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
     
-    .page-header { display: none; } /* Hide desktop header */
-    .mobile-header + .page .page-header { display: flex; } /* Show on pages if needed */
-    #dashboard-page .page-header { display: none; } /* Hide on dashboard */
+    /* Hide desktop header by default on mobile */
+    .page-header { display: none; } 
+    
+    /* Show specific headers on mobile */
+    #job-sheet-page .page-header,
+    #all-jobs-page .page-header,
+    #inward-outward-page .page-header {
+        display: flex;
+    }
+    
+    #all-jobs-page .page-header h1,
+    #inward-outward-page .page-header h1 {
+        display: none; /* Hide h1 inside these specific headers to avoid duplication */
+    }
 
     .form-grid, .inward-outward-layout { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
     .main-content { padding: 1rem; }
-    .grid-3-col { grid-template-columns: 1fr; }
-    .grid-2-col { grid-template-columns: 1fr; }
-    .header-actions { flex-direction: column; align-items: stretch; }
+    .grid-3-col, .grid-2-col { grid-template-columns: 1fr; }
+    .header-actions { flex-direction: column; align-items: stretch; width: 100%; }
     .search-input { width: 100%; }
 }
