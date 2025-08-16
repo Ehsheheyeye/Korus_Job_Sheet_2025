@@ -1,16 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Firebase Configuration ---
+    // This is the updated configuration
     const firebaseConfig = {
-        apiKey: "AIzaSyCGVEkMAIcK1u2vrA20GPXKDvCZl6an_XM",
-        authDomain: "korus-computer-jobs-eb87a.firebaseapp.com",
-        projectId: "korus-computer-jobs-eb87a",
-        storageBucket: "korus-computer-jobs-eb87a.firebasestorage.app",
-        messagingSenderId: "298166399936",
-        appId: "1:298166399936:web:842d18f13383597d290e25",
-        measurementId: "G-1CPWT857ES"
+        apiKey: "AIzaSyAlaRNwoERMLqCGvcSrAB9IHRK7GncKD4s",
+        authDomain: "korus-job-dashboard.firebaseapp.com",
+        projectId: "korus-job-dashboard",
+        storageBucket: "korus-job-dashboard.firebasestorage.app",
+        messagingSenderId: "433518743960",
+        appId: "1:433518743960:web:f33bf1af978b14e9f85bed"
     };
 
     // --- Initialize Firebase ---
+    // Kept the original initialization style to match the rest of your code
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentEditingOutwardId = null;
     let allJobSheets = [];
     let allOutwardRecords = [];
-    
+
     // --- Pre-populated Data ---
     const initialBrandOptions = ["Dell", "HP", "Lenovo", "ASUS", "Acer", "Intex", "I-Ball", "Artist", "Lapcare", "EVM", "Crucial", "Logitech", "Apple (MacBook)", "MSI", "Samsung", "Avita", "Fujitsu", "LG", "Toshiba", "HCL", "Redmi", "Sony", "OnePlus", "TCL", "Panasonic", "Sansui", "BenQ", "Zebronics", "ViewSonic", "AOC", "Philips", "Gigabyte", "Cooler Master", "Foxin", "Western Digital (WD)", "Seagate", "Kingston", "XPG", "ADATA", "SanDisk", "Intel", "Ant Esports", "Antec", "Deepcool", "Circle", "Frontech", "Enter", "Canon", "Epson", "Brother", "TVS", "Zebra", "Xerox", "Kyocera", "Ricoh", "Pantum", "Delta", "Vertiv", "12A", "88A", "78A", "925A", "337A", "ProDot"];
     const initialPartyOptions = ["Rahul Sir", "Shree Enterprises", "San infotech", "Audio video care", "Rx service centre", "Nate", "DSK", "Crucial service centre", "Rashi Peripheral", "SR enterprises", "Cache technology", "perfect computers", "EVM service centre", "navkar enterprises"];
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inwardOutwardSearchBox: document.getElementById('inward-outward-search-box'),
         downloadInwardOutwardExcelBtn: document.getElementById('download-inward-outward-excel-btn'),
     };
-    
+
     // --- Application Initialization ---
     function init() {
         setupNavigation();
@@ -87,12 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 link.classList.add('active');
                 document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                 document.getElementById(`${page}-page`).classList.add('active');
-                
+
                 DOMElements.mobilePageTitle.textContent = link.querySelector('span').textContent;
                 document.body.classList.remove('sidebar-open');
             });
         });
-        
+
         DOMElements.menuBtn.addEventListener('click', () => document.body.classList.add('sidebar-open'));
         DOMElements.sidebarOverlay.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
         DOMElements.sidebarCloseBtn.addEventListener('click', () => document.body.classList.remove('sidebar-open'));
@@ -109,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
         update();
         setInterval(update, 60000);
     }
-    
+
     function setupTheme() {
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
         DOMElements.themeToggle.addEventListener('click', () => {
@@ -117,26 +118,26 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
         });
     }
-    
+
     function setupEventListeners() {
         DOMElements.saveRecordBtn.addEventListener('click', saveJobSheet);
         DOMElements.newJobBtn.addEventListener('click', clearJobSheetForm);
         DOMElements.saveOutwardBtn.addEventListener('click', saveOutwardRecord);
         DOMElements.cancelOutwardEditBtn.addEventListener('click', clearOutwardForm);
-        
+
         // Search Listeners
         DOMElements.allJobsSearchBox.addEventListener('input', handleAllJobsSearch);
         DOMElements.inwardOutwardSearchBox.addEventListener('input', handleOutwardSearch);
-        
+
         // Excel Download Listeners
         DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
         DOMElements.downloadInwardOutwardExcelBtn.addEventListener('click', downloadInwardOutwardAsExcel);
-        
+
         // Autocomplete setup
         setupAutocomplete(DOMElements.brandName, brandSuggestions);
         setupAutocomplete(DOMElements.partyName, partySuggestions);
     }
-    
+
     function populateSelects() {
         populateOptions(DOMElements.deviceType, deviceTypeOptions, "Select Device Type");
         populateOptions(DOMElements.currentStatus, currentStatusOptions, "Select Current Status");
@@ -148,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         select.innerHTML = `<option disabled selected value="">${defaultText}</option>`;
         options.forEach(o => select.innerHTML += `<option value="${o}">${o}</option>`);
     }
-    
+
     function populateCheckboxes() {
         DOMElements.reportedProblems.innerHTML = problemOptions.map(p => `<div><input type="checkbox" id="problem-${p.replace(/\s+/g, '-')}" value="${p}"><label for="problem-${p.replace(/\s+/g, '-')}">${p}</label></div>`).join('');
     }
@@ -176,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         brandSuggestions = await loadSuggestions('brands', initialBrandOptions);
         partySuggestions = await loadSuggestions('parties', initialPartyOptions);
     }
-    
+
     async function loadSuggestions(collectionName, initialArray) {
         const snapshot = await db.collection(collectionName).get();
         const dbSuggestions = snapshot.docs.map(doc => doc.data().name);
@@ -190,12 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMElements.workingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Working').length;
         DOMElements.deliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Delivered').length;
         DOMElements.pendingInwardStat.textContent = allOutwardRecords.filter(r => !r.inwardDate).length;
-        
+
         renderRecentJobsTable(allJobSheets.slice(0, 5));
     }
-    
+
     function renderRecentJobsTable(jobs) {
-        DOMElements.recentJobsTableBody.innerHTML = jobs.length === 0 ? `<tr><td colspan="5" style="text-align:center; padding: 1rem;">No jobs found.</td></tr>` : 
+        DOMElements.recentJobsTableBody.innerHTML = jobs.length === 0 ? `<tr><td colspan="5" style="text-align:center; padding: 1rem;">No jobs found.</td></tr>` :
         jobs.map(job => `<tr><td>${job.jobSheetNo}</td><td>${job.customerName}</td><td>${job.deviceType}</td><td>${job.currentStatus}</td><td class="table-actions"><button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button><button title="Delete" class="delete-btn" onclick="window.app.deleteJob('${job.id}')">🗑️</button></td></tr>`).join('');
     }
 
@@ -214,10 +215,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </td>
             </tr>`).join('');
     }
-    
+
     function handleAllJobsSearch() {
         const term = DOMElements.allJobsSearchBox.value.toLowerCase();
-        const filtered = !term ? allJobSheets : allJobSheets.filter(job => 
+        const filtered = !term ? allJobSheets : allJobSheets.filter(job =>
             Object.values(job).some(val => String(val).toLowerCase().includes(term))
         );
         renderAllJobsTable(filtered);
@@ -263,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.nav-link[data-page="dashboard"]').click();
         } catch (error) { console.error("Error saving job sheet: ", error); alert("Error saving record."); }
     }
-    
+
     function editJob(id) {
         const job = allJobSheets.find(j => j.id === id);
         if (!job) return;
@@ -274,14 +275,14 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMElements.saveRecordBtn.classList.add('update-btn');
         document.querySelector('.nav-link[data-page="job-sheet"]').click();
     }
-    
+
     async function deleteJob(id) {
         if (confirm("Delete this job sheet?")) {
             await db.collection("jobSheets").doc(id).delete();
             showSuccessModal("Job Sheet Deleted!");
         }
     }
-    
+
     // --- Inward/Outward Logic ---
     function clearOutwardForm() {
         currentEditingOutwardId = null;
@@ -292,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
         [DOMElements.partyName, DOMElements.materialDesc, DOMElements.inwardDate].forEach(el => el.value = '');
         setInitialDate();
     }
-    
+
     function renderOutwardTable(records) {
         DOMElements.outwardRecordsTableBody.innerHTML = records.map(r => `
             <tr>
@@ -309,13 +310,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleOutwardSearch() {
         const term = DOMElements.inwardOutwardSearchBox.value.toLowerCase();
-        const filtered = !term ? allOutwardRecords : allOutwardRecords.filter(r => 
-            (r.partyName && r.partyName.toLowerCase().includes(term)) || 
+        const filtered = !term ? allOutwardRecords : allOutwardRecords.filter(r =>
+            (r.partyName && r.partyName.toLowerCase().includes(term)) ||
             (r.material && r.material.toLowerCase().includes(term))
         );
         renderOutwardTable(filtered);
     }
-    
+
     async function saveOutwardRecord() {
         const recordData = {
             partyName: DOMElements.partyName.value.trim(),
@@ -324,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inwardDate: DOMElements.inwardDate.value || null,
         };
         if (!recordData.partyName || !recordData.material) { alert("Party Name and Material are required."); return; }
-        
+
         try {
             if (currentEditingOutwardId) {
                 await db.collection("outwardJobs").doc(currentEditingOutwardId).update(recordData);
@@ -337,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearOutwardForm();
         } catch (error) { console.error("Error saving outward record: ", error); }
     }
-    
+
     function editOutward(id) {
         const record = allOutwardRecords.find(r => r.id === id);
         if (!record) return;
@@ -351,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMElements.saveOutwardBtn.classList.add('update-btn');
         DOMElements.cancelOutwardEditBtn.style.display = 'block';
     }
-    
+
     async function deleteOutward(id) {
         if (confirm("Delete this outward record?")) {
             await db.collection("outwardJobs").doc(id).delete();
@@ -393,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.addEventListener('click', e => { if (e.target.dataset.value) { input.value = e.target.dataset.value; container.innerHTML = ''; } });
         document.addEventListener('click', e => { if (e.target !== input) container.innerHTML = ''; });
     }
-    
+
     function showSuccessModal(message) {
         const modal = document.getElementById('success-modal');
         document.getElementById('success-message').textContent = message;
