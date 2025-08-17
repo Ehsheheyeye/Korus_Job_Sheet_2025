@@ -1,4 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- CONFIGURATION ---
+    // PASTE the Web app URL you copied from Google Apps Script here.
+    const SECURE_HELPER_URL = "https://script.google.com/macros/s/AKfycbyYWO6SDLx6Pm4r4ULtXaO5RBuXodUM_KeV3Neagm0Z6JSndMfJvjWU3nl7b4kNsndS/exec";
+
+    // Create a secret key. This must EXACTLY match the API_SECRET_KEY in your Google Apps Script.
+    const API_SECRET_KEY = "YourSuperSecretPassword123!";
+
+    // Your Super Admin Email.
+    const SUPER_ADMIN_EMAIL = "koruskiran@gmail.com"; 
+
     // --- Firebase Configuration ---
     const firebaseConfig = {
         apiKey: "AIzaSyAlaRNwoERMLqCGvcSrAB9IHRK7GncKD4s",
@@ -9,10 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
         appId: "1:433518743960:web:f33bf1af978b14e9f85bed"
     };
 
-    // --- SUPER ADMIN CONFIGURATION ---
-    const SUPER_ADMIN_EMAIL = "koruskiran@gmail.com"; // Your correct admin email
+    // --- DO NOT EDIT BELOW THIS LINE ---
 
-    // --- Initialize Firebase App ---
     const primaryApp = firebase.initializeApp(firebaseConfig);
     const primaryAuth = primaryApp.auth();
     const db = primaryApp.firestore();
@@ -21,13 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const secondaryApp = firebase.initializeApp(secondaryAppConfig, "secondary");
     const secondaryAuth = secondaryApp.auth();
 
-    // --- Element Selectors ---
     const logoutBtn = document.getElementById('logout-btn');
     const createUserForm = document.getElementById('create-user-form');
     const userListBody = document.getElementById('user-list-body');
     const feedbackMessage = document.getElementById('feedback-message');
 
-    // --- Authentication Gate ---
     primaryAuth.onAuthStateChanged(user => {
         if (user && user.email === SUPER_ADMIN_EMAIL) {
             loadUsers();
@@ -36,31 +42,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Event Listeners ---
     logoutBtn.addEventListener('click', () => primaryAuth.signOut());
     createUserForm.addEventListener('submit', handleFormSubmit);
-    // ... (other listeners from admin.html if you add them back)
 
-    // --- Functions ---
     async function handleFormSubmit(e) {
         e.preventDefault();
         const phoneNumber = document.getElementById('phone-number').value.trim();
         const password = document.getElementById('password').value.trim();
-        
-        if (!validateInput(phoneNumber, password)) return;
+        if (password.length < 6) {
+             showFeedback('Password must be at least 6 characters long.', 'error');
+             return;
+        }
         await createNewUser(phoneNumber, password);
-    }
-
-    function validateInput(phone, pass) {
-        if (isNaN(phone) || phone.length < 10) {
-            showFeedback('Please enter a valid 10-digit phone number.', 'error');
-            return false;
-        }
-        if (pass.length < 6) {
-            showFeedback('Password must be at least 6 characters long.', 'error');
-            return false;
-        }
-        return true;
     }
     
     async function createNewUser(phoneNumber, password) {
@@ -73,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 uid: uid,
                 phoneNumber: phoneNumber,
                 password: password,
-                status: 'active', // NEW: Set status to active
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
@@ -81,12 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
             createUserForm.reset();
             secondaryAuth.signOut();
         } catch (error) {
-            if (error.code == 'auth/email-already-in-use') {
-                showFeedback('This phone number is already registered.', 'error');
-            } else {
-                showFeedback('An error occurred. Please try again.', 'error');
-                console.error("Create User Error:", error);
-            }
+            showFeedback('This phone number is already registered.', 'error');
             secondaryAuth.signOut();
         }
     }
@@ -94,41 +81,45 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadUsers() {
         db.collection('users').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
             let usersHTML = '';
-            if (snapshot.empty) {
-                usersHTML = '<tr><td colspan="4">No users found.</td></tr>';
-            } else {
-                snapshot.forEach(doc => {
-                    const user = doc.data();
-                    const statusClass = user.status === 'active' ? 'status-active' : 'status-inactive';
-                    const actionButton = user.status === 'active' 
-                        ? `<button class="delete-btn" title="Disable User" onclick="app.toggleUserStatus('${doc.id}', '${user.phoneNumber}', 'inactive')">❌ Disable</button>`
-                        : `<button class="edit-btn" title="Enable User" onclick="app.toggleUserStatus('${doc.id}', '${user.phoneNumber}', 'active')">✅ Enable</button>`;
-
-                    usersHTML += `
-                        <tr class="${statusClass}">
-                            <td>${user.phoneNumber}</td>
-                            <td>${user.password}</td>
-                            <td><span class="status-pill">${user.status}</span></td>
-                            <td class="actions-cell">
-                                ${actionButton}
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
+            snapshot.forEach(doc => {
+                const user = doc.data();
+                usersHTML += `
+                    <tr>
+                        <td>${user.phoneNumber}</td>
+                        <td>${user.password}</td>
+                        <td class="actions-cell">
+                            <button class="delete-btn" title="Delete" onclick="app.deleteUser('${doc.id}', '${user.uid}', '${user.phoneNumber}')">🗑️ Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
             userListBody.innerHTML = usersHTML;
         });
     }
 
-    async function toggleUserStatus(docId, phone, newStatus) {
-        const action = newStatus === 'inactive' ? 'disable' : 'enable';
-        if (confirm(`Are you sure you want to ${action} user ${phone}?`)) {
+    async function deleteUser(docId, uid, phone) {
+        if (confirm(`Are you sure you want to PERMANENTLY delete user ${phone}? This cannot be undone.`)) {
+            showFeedback(`Deleting user ${phone}... Please wait.`, 'success');
             try {
-                await db.collection('users').doc(docId).update({ status: newStatus });
-                showFeedback(`User ${phone} has been ${action}d.`, 'success');
+                const response = await fetch(SECURE_HELPER_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Use no-cors for simple requests to Apps Script
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        secretKey: API_SECRET_KEY,
+                        action: 'deleteUser',
+                        uid: uid,
+                        docId: docId
+                    })
+                });
+                
+                // Since 'no-cors' prevents reading the response, we just assume success if no network error.
+                // Firestore's onSnapshot will automatically update the UI.
+                showFeedback(`User ${phone} has been permanently deleted.`, 'success');
+
             } catch (error) {
-                console.error(`Error ${action}ing user:`, error);
-                showFeedback(`Could not ${action} user. Please try again.`, 'error');
+                console.error("Error calling secure helper:", error);
+                showFeedback('An error occurred. The user may not be fully deleted.', 'error');
             }
         }
     }
@@ -136,13 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function showFeedback(message, type) {
         feedbackMessage.textContent = message;
         feedbackMessage.className = `message ${type}`;
-        setTimeout(() => {
-            feedbackMessage.textContent = '';
-            feedbackMessage.className = 'message';
-        }, 4000);
+        setTimeout(() => { feedbackMessage.textContent = ''; feedbackMessage.className = 'message';}, 4000);
     }
 
-    window.app = {
-        toggleUserStatus
-    };
+    window.app = { deleteUser };
 });
