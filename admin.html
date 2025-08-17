@@ -20,11 +20,11 @@
         </header>
 
         <main class="admin-main">
-            <!-- Left Side: Create User Form -->
             <div class="card create-user-card">
                 <h2 id="form-title">Create New User</h2>
-                <form id="create-user-form">
-                    <input type="hidden" id="edit-user-id">
+                <form id="user-form">
+                    <input type="hidden" id="edit-doc-id">
+                    <input type="hidden" id="edit-uid">
                     <div class="input-group">
                         <label for="phone-number">User's Phone Number</label>
                         <input type="tel" id="phone-number" placeholder="e.g., 7276324318" required>
@@ -42,7 +42,6 @@
                 </form>
             </div>
 
-            <!-- Right Side: User List -->
             <div class="card user-list-card">
                 <h2>Manage Users</h2>
                 <div class="table-wrapper">
@@ -55,15 +54,13 @@
                             </tr>
                         </thead>
                         <tbody id="user-list-body">
-                            <!-- User rows will be inserted here by JavaScript -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
