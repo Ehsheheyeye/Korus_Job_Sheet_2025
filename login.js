@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- SUPER ADMIN CONFIGURATION ---
     // IMPORTANT: Set your Super Admin email here. This MUST match the user you created in Firebase.
-    const SUPER_ADMIN_EMAIL = "admin@korus.com"; // You can change this to your actual admin email
+    const SUPER_ADMIN_EMAIL = "rushikeshkhode2626@gmail.com"; // You can change this to your actual admin email
 
     // If a user is already logged in, redirect them.
     auth.onAuthStateChanged(user => {
@@ -64,3 +64,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 });
+
