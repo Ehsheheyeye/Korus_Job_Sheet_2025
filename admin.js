@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- CONFIGURATION ---
-    const SECURE_HELPER_URL = "https://script.google.com/macros/s/AKfycbyYWO6SDLx6Pm4r4ULtXaO5RBuXodUM_KeV3Neagm0Z6JSndMfJvjWU3nl7b4kNsndS/exec";
+    const SECURE_HELPER_URL = "https://script.google.com/macros/s/AKfycbyk-_PZNQpsYkAbOcg6_JjsYCiZ25L8PDiJ-EbH_RdijxIpS42KBns0pZtF652AE0BW/exec";
     const API_SECRET_KEY = "YourSuperSecretPassword123!";
     const SUPER_ADMIN_EMAIL = "koruskiran@gmail.com"; 
 
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.userListBody.innerHTML = '';
             snapshot.forEach(doc => {
                 const user = doc.data();
-                if (!user.uid) return; // Skip entries that might be malformed
+                if (!user.uid) return;
                 DOMElements.userListBody.innerHTML += `
                     <tr>
                         <td>${user.phoneNumber}</td>
@@ -86,12 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (docId) { // EDIT mode
-            const payload = {
-                action: 'updateUser',
-                uid: uid,
-                docId: docId,
-                newPassword: password
-            };
+            const payload = { action: 'updateUser', uid: uid, docId: docId, newPassword: password };
             showFeedback('Updating user... Please wait.', 'success');
             callSecureHelper(payload);
         } else { // CREATE mode
@@ -136,11 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function deleteUser(docId, uid, phone) {
         if (confirm(`Are you sure you want to PERMANENTLY delete user ${phone}? This cannot be undone.`)) {
-            const payload = {
-                action: 'deleteUser',
-                uid: uid,
-                docId: docId
-            };
+            const payload = { action: 'deleteUser', uid: uid, docId: docId };
             showFeedback(`Deleting user ${phone}... Please wait.`, 'success');
             callSecureHelper(payload);
         }
@@ -164,8 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
         form.submit();
         document.body.removeChild(form);
         
-        // The UI will update automatically via the onSnapshot listener.
-        // We just reset the form after a short delay for a good user experience.
         setTimeout(() => {
             if (payload.action === 'updateUser') {
                 showFeedback('User password updated!', 'success');
@@ -173,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                  showFeedback('User permanently deleted!', 'success');
             }
-        }, 2000); // Wait 2 seconds
+        }, 2500);
     }
     
     function resetForm() {
