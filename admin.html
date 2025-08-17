@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="admin.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="admin-container">
@@ -20,20 +20,45 @@
         </header>
 
         <main class="admin-main">
+            <!-- Left Side: Create User Form -->
             <div class="card create-user-card">
-                <h2>Create New User</h2>
+                <h2 id="form-title">Create New User</h2>
                 <form id="create-user-form">
+                    <input type="hidden" id="edit-user-id">
                     <div class="input-group">
                         <label for="phone-number">User's Phone Number</label>
                         <input type="tel" id="phone-number" placeholder="e.g., 7276324318" required>
                     </div>
                     <div class="input-group">
                         <label for="password">Set Password</label>
-                        <input type="password" id="password" placeholder="Min. 6 characters" required>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" placeholder="Min. 6 characters" required>
+                            <button type="button" class="toggle-password" id="toggle-password-btn">👁️</button>
+                        </div>
                     </div>
-                    <button type="submit" class="action-btn">Create User</button>
+                    <button type="submit" id="submit-btn" class="action-btn">Create User</button>
+                    <button type="button" id="cancel-edit-btn" class="secondary-btn" style="display: none;">Cancel Edit</button>
                     <p id="feedback-message" class="message"></p>
                 </form>
+            </div>
+
+            <!-- Right Side: User List -->
+            <div class="card user-list-card">
+                <h2>Manage Users</h2>
+                <div class="table-wrapper">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Phone Number</th>
+                                <th>Password</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-list-body">
+                            <!-- User rows will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
@@ -41,6 +66,7 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="admin.js"></script>
 </body>
 </html>
