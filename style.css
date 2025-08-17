@@ -121,7 +121,7 @@ textarea.input-field { resize: vertical; }
 .form-section.full-width { grid-column: 1 / -1; }
 .grid-2-col, .grid-3-col, .status-grid { display: grid; gap: 1.5rem; }
 .grid-2-col { grid-template-columns: 1fr 1fr; }
-.grid-3-col { grid-template-columns: 1fr 1fr 1fr; }
+.grid-3-col { grid-template-columns: 1fr 1fr; }
 .status-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 1rem; }
 
 .form-stack { display: flex; flex-direction: column; gap: 1rem; }
@@ -140,6 +140,25 @@ textarea.input-field { resize: vertical; }
 .estimate-input span { padding-left: 1rem; color: var(--text-secondary); }
 .estimate-input input { border: none; background: transparent; color: var(--text-primary); }
 .estimate-input input:focus { outline: none; box-shadow: none; }
+
+/* --- NEW STYLES FOR ENGINEER CHECKBOXES --- */
+.engineer-checkboxes {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    padding-top: 0.5rem; /* Adjust alignment with amount input */
+}
+.engineer-checkboxes div {
+    display: flex;
+    align-items: center;
+}
+.engineer-checkboxes input {
+    margin-right: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent-color);
+}
+/* ------------------------------------------- */
 
 /* --- BUTTONS --- */
 .action-btn {
