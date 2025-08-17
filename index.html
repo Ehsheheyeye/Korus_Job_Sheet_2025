@@ -11,8 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-
-    <div class="app-layout">
+    <div id="loader" style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 1.5rem; font-family: 'Inter', sans-serif;">Loading Dashboard...</div>
+    <div class="app-layout" style="display: none;">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" alt="Korus Computers Logo" class="logo-img">
@@ -44,6 +44,7 @@
                     <svg id="theme-icon-sun" class="theme-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
                     <svg id="theme-icon-moon" class="theme-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                 </button>
+                <button id="logout-btn" class="action-btn secondary-btn" style="width: 100%; margin-top: 1rem;">Logout</button>
             </div>
         </aside>
 
@@ -125,6 +126,19 @@
                         <div class="estimate-input">
                             <span>₹</span>
                             <input id="estimate-amount" type="number" placeholder="0" class="input-field">
+                        </div>
+                    </div>
+                    <div class="card form-section">
+                        <h2>Engineer Name</h2>
+                        <div class="engineer-checkboxes">
+                            <div>
+                                <input type="checkbox" id="engineer-kundan" value="Kundan Sir">
+                                <label for="engineer-kundan">Kundan Sir</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="engineer-rushi" value="Rushi">
+                                <label for="engineer-rushi">Rushi</label>
+                            </div>
                         </div>
                     </div>
                     <div class="form-section full-width">
@@ -209,9 +223,9 @@
     <div id="success-modal" class="modal-overlay"><div class="modal-content"><div class="modal-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div><p id="success-message"></p></div></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="script.js"></script>
 
 </body>
 </html>
-
