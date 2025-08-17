@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- SUPER ADMIN CONFIGURATION ---
-    const SUPER_ADMIN_EMAIL = "admin@korus.com"; // Must be the same as in login.js
+    const SUPER_ADMIN_EMAIL = "rushikeshkhode2626@gmail.com"; // Must be the same as in login.js
 
     // --- Initialize Primary Firebase App ---
     const primaryApp = firebase.initializeApp(firebaseConfig);
@@ -98,4 +98,5 @@ document.addEventListener('DOMContentLoaded', () => {
         feedbackMessage.textContent = message;
         feedbackMessage.className = `message ${type}`;
     }
+
 });
