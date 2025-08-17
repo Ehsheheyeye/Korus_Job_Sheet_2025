@@ -14,38 +14,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const auth = firebase.auth();
 
     const loginForm = document.getElementById('login-form');
-    const emailInput = document.getElementById('email');
+    const userInput = document.getElementById('user-id'); // Changed from 'email'
     const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
 
-    // If user is already logged in, redirect them to the dashboard
+    // --- SUPER ADMIN CONFIGURATION ---
+    // IMPORTANT: Set your Super Admin email here. This MUST match the user you created in Firebase.
+    const SUPER_ADMIN_EMAIL = "admin@korus.com"; // You can change this to your actual admin email
+
+    // If a user is already logged in, redirect them.
     auth.onAuthStateChanged(user => {
         if (user) {
-            window.location.href = 'index.html';
+            if (user.email === SUPER_ADMIN_EMAIL) {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'index.html';
+            }
         }
     });
 
     loginForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Prevent the form from submitting the traditional way
-
-        const email = emailInput.value;
+        e.preventDefault();
+        const userIdValue = userInput.value.trim();
         const password = passwordInput.value;
-        errorMessage.textContent = ''; // Clear previous errors
+        errorMessage.textContent = '';
 
-        // This makes the login persistent (remembers the user)
+        let emailToLogin;
+        // Check if the input is the Super Admin's email
+        if (userIdValue === SUPER_ADMIN_EMAIL) {
+            emailToLogin = userIdValue;
+        } else if (!isNaN(userIdValue) && userIdValue.length > 5) {
+            // If it's a number (phone number), convert it to the email format we use
+            emailToLogin = `${userIdValue}@korus.local`;
+        } else {
+            errorMessage.textContent = 'Please enter a valid Phone No. or Admin Email.';
+            return;
+        }
+
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .then(() => {
-                // Now, sign in the user
-                return auth.signInWithEmailAndPassword(email, password);
+                return auth.signInWithEmailAndPassword(emailToLogin, password);
             })
             .then((userCredential) => {
-                // Signed in successfully
-                // The onAuthStateChanged listener will handle the redirect
+                // Success! The onAuthStateChanged listener above will handle the redirect.
             })
             .catch((error) => {
-                // Handle Errors here.
                 console.error("Login Error:", error);
-                errorMessage.textContent = 'Invalid email or password.';
+                errorMessage.textContent = 'Invalid credentials. Please try again.';
             });
     });
 });
