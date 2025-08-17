@@ -10,15 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- SUPER ADMIN CONFIGURATION ---
-    // Make sure this matches the email you set in login.js and created in Firebase Auth
-    const SUPER_ADMIN_EMAIL = "koruskiran@gmail.com"; 
+    const SUPER_ADMIN_EMAIL = "koruskiran@gmail.com"; // Your correct admin email
 
-    // --- Initialize Primary Firebase App ---
+    // --- Initialize Firebase App ---
     const primaryApp = firebase.initializeApp(firebaseConfig);
     const primaryAuth = primaryApp.auth();
-    const db = primaryApp.firestore(); // Initialize Firestore
+    const db = primaryApp.firestore();
 
-    // --- Initialize a Secondary Firebase App for user creation ---
     const secondaryAppConfig = { ...firebaseConfig, name: "secondary" };
     const secondaryApp = firebase.initializeApp(secondaryAppConfig, "secondary");
     const secondaryAuth = secondaryApp.auth();
@@ -26,62 +24,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Element Selectors ---
     const logoutBtn = document.getElementById('logout-btn');
     const createUserForm = document.getElementById('create-user-form');
-    const phoneNumberInput = document.getElementById('phone-number');
-    const passwordInput = document.getElementById('password');
-    const feedbackMessage = document.getElementById('feedback-message');
     const userListBody = document.getElementById('user-list-body');
-    const formTitle = document.getElementById('form-title');
-    const submitBtn = document.getElementById('submit-btn');
-    const cancelEditBtn = document.getElementById('cancel-edit-btn');
-    const editUserIdInput = document.getElementById('edit-user-id');
-    const togglePasswordBtn = document.getElementById('toggle-password-btn');
+    const feedbackMessage = document.getElementById('feedback-message');
 
-    // --- Authentication Gate for Admin Page ---
+    // --- Authentication Gate ---
     primaryAuth.onAuthStateChanged(user => {
         if (user && user.email === SUPER_ADMIN_EMAIL) {
-            // User is the admin, load the user list
             loadUsers();
         } else {
-            // If not the admin or not logged in, redirect to login page
             window.location.href = 'login.html';
         }
     });
 
     // --- Event Listeners ---
     logoutBtn.addEventListener('click', () => primaryAuth.signOut());
-
-    togglePasswordBtn.addEventListener('click', () => {
-        const isPassword = passwordInput.type === 'password';
-        passwordInput.type = isPassword ? 'text' : 'password';
-        togglePasswordBtn.textContent = isPassword ? '🙈' : '👁️';
-    });
-
     createUserForm.addEventListener('submit', handleFormSubmit);
-    cancelEditBtn.addEventListener('click', resetForm);
+    // ... (other listeners from admin.html if you add them back)
 
     // --- Functions ---
     async function handleFormSubmit(e) {
         e.preventDefault();
-        const phoneNumber = phoneNumberInput.value.trim();
-        const password = passwordInput.value.trim();
-        const editingId = editUserIdInput.value;
-
-        if (!validateInput(phoneNumber, password)) return;
-
-        // If we are editing, we delete the old user first, then create a new one.
-        if (editingId) {
-            try {
-                // For simplicity, we just delete the record from our list (Firestore).
-                // The actual auth user will be orphaned, but this is the trade-off for the free plan.
-                await db.collection('users').doc(editingId).delete();
-            } catch (error) {
-                console.error("Error deleting old user during edit:", error);
-                showFeedback('Error updating user. Please try again.', 'error');
-                return;
-            }
-        }
+        const phoneNumber = document.getElementById('phone-number').value.trim();
+        const password = document.getElementById('password').value.trim();
         
-        // Create the new user in Firebase Auth and our Firestore list
+        if (!validateInput(phoneNumber, password)) return;
         await createNewUser(phoneNumber, password);
     }
 
@@ -102,18 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const userCredential = await secondaryAuth.createUserWithEmailAndPassword(email, password);
             const uid = userCredential.user.uid;
-
-            // Now, save the user info (including password) to Firestore
+            
             await db.collection('users').add({
                 uid: uid,
                 phoneNumber: phoneNumber,
-                password: password, // Storing password for admin to see
+                password: password,
+                status: 'active', // NEW: Set status to active
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            showFeedback(`User ${phoneNumber} created/updated successfully!`, 'success');
-            resetForm();
-            secondaryAuth.signOut(); // Sign out from the secondary instance
+            showFeedback(`User ${phoneNumber} created successfully!`, 'success');
+            createUserForm.reset();
+            secondaryAuth.signOut();
         } catch (error) {
             if (error.code == 'auth/email-already-in-use') {
                 showFeedback('This phone number is already registered.', 'error');
@@ -129,17 +95,22 @@ document.addEventListener('DOMContentLoaded', () => {
         db.collection('users').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
             let usersHTML = '';
             if (snapshot.empty) {
-                usersHTML = '<tr><td colspan="3">No users found. Create one to get started!</td></tr>';
+                usersHTML = '<tr><td colspan="4">No users found.</td></tr>';
             } else {
                 snapshot.forEach(doc => {
                     const user = doc.data();
+                    const statusClass = user.status === 'active' ? 'status-active' : 'status-inactive';
+                    const actionButton = user.status === 'active' 
+                        ? `<button class="delete-btn" title="Disable User" onclick="app.toggleUserStatus('${doc.id}', '${user.phoneNumber}', 'inactive')">❌ Disable</button>`
+                        : `<button class="edit-btn" title="Enable User" onclick="app.toggleUserStatus('${doc.id}', '${user.phoneNumber}', 'active')">✅ Enable</button>`;
+
                     usersHTML += `
-                        <tr>
+                        <tr class="${statusClass}">
                             <td>${user.phoneNumber}</td>
                             <td>${user.password}</td>
+                            <td><span class="status-pill">${user.status}</span></td>
                             <td class="actions-cell">
-                                <button class="edit-btn" title="Edit" onclick="app.editUser('${doc.id}', '${user.phoneNumber}', '${user.password}')">✏️</button>
-                                <button class="delete-btn" title="Delete" onclick="app.deleteUser('${doc.id}', '${user.phoneNumber}')">🗑️</button>
+                                ${actionButton}
                             </td>
                         </tr>
                     `;
@@ -149,37 +120,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function editUser(docId, phone, pass) {
-        formTitle.textContent = 'Edit User';
-        submitBtn.textContent = 'Update User';
-        cancelEditBtn.style.display = 'inline-block';
-        
-        editUserIdInput.value = docId;
-        phoneNumberInput.value = phone;
-        passwordInput.value = pass;
-        
-        window.scrollTo(0, 0); // Scroll to top to see the form
-    }
-
-    async function deleteUser(docId, phone) {
-        if (confirm(`Are you sure you want to delete user ${phone}? This cannot be undone.`)) {
+    async function toggleUserStatus(docId, phone, newStatus) {
+        const action = newStatus === 'inactive' ? 'disable' : 'enable';
+        if (confirm(`Are you sure you want to ${action} user ${phone}?`)) {
             try {
-                await db.collection('users').doc(docId).delete();
-                showFeedback(`User ${phone} has been deleted.`, 'success');
-                // Note: This only removes them from the list. The user still exists in Firebase Auth.
+                await db.collection('users').doc(docId).update({ status: newStatus });
+                showFeedback(`User ${phone} has been ${action}d.`, 'success');
             } catch (error) {
-                console.error("Error deleting user: ", error);
-                showFeedback('Could not delete user. Please try again.', 'error');
+                console.error(`Error ${action}ing user:`, error);
+                showFeedback(`Could not ${action} user. Please try again.`, 'error');
             }
         }
-    }
-
-    function resetForm() {
-        formTitle.textContent = 'Create New User';
-        submitBtn.textContent = 'Create User';
-        cancelEditBtn.style.display = 'none';
-        createUserForm.reset();
-        editUserIdInput.value = '';
     }
 
     function showFeedback(message, type) {
@@ -191,10 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 4000);
     }
 
-    // Expose functions to be called from HTML
     window.app = {
-        editUser,
-        deleteUser
+        toggleUserStatus
     };
 });
-
