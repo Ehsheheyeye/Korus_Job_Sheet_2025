@@ -197,5 +197,3 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteUser
     };
 });
-
-
