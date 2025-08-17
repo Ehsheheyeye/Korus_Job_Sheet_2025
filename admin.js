@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- SUPER ADMIN CONFIGURATION ---
     // Make sure this matches the email you set in login.js and created in Firebase Auth
-    const SUPER_ADMIN_EMAIL = "admin@korus.com"; 
+    const SUPER_ADMIN_EMAIL = "rushikeshkhode2626@gmail.com"; 
 
     // --- Initialize Primary Firebase App ---
     const primaryApp = firebase.initializeApp(firebaseConfig);
@@ -197,3 +197,4 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteUser
     };
 });
+
