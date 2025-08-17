@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- SUPER ADMIN CONFIGURATION ---
     // IMPORTANT: CHANGE THIS LINE TO MATCH YOUR EMAIL IN FIREBASE
-    const SUPER_ADMIN_EMAIL = "rushikeshkhode2626@gmail.com"; 
+    const SUPER_ADMIN_EMAIL = "koruskiran@gmail.com"; 
 
     // If a user is already logged in, redirect them.
     auth.onAuthStateChanged(user => {
@@ -64,3 +64,4 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 });
+
