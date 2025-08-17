@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.userListBody.innerHTML = '';
             snapshot.forEach(doc => {
                 const user = doc.data();
+                if (!user.uid) return; // Skip entries that might be malformed
                 DOMElements.userListBody.innerHTML += `
                     <tr>
                         <td>${user.phoneNumber}</td>
@@ -84,26 +85,23 @@ document.addEventListener('DOMContentLoaded', () => {
             return showFeedback('Password must be at least 6 characters long.', 'error');
         }
 
-        if (docId) { // If docId exists, we are in EDIT mode
-            showFeedback('Updating user... Please wait.', 'success');
+        if (docId) { // EDIT mode
             const payload = {
-                secretKey: API_SECRET_KEY,
                 action: 'updateUser',
                 uid: uid,
                 docId: docId,
                 newPassword: password
             };
-            // Note: We don't update the phone number as it's the primary ID
-            await callSecureHelper(payload);
-
-        } else { // Otherwise, we are in CREATE mode
+            showFeedback('Updating user... Please wait.', 'success');
+            callSecureHelper(payload);
+        } else { // CREATE mode
             if (phoneNumber.length < 10 || isNaN(phoneNumber)) {
                 return showFeedback('Please enter a valid phone number.', 'error');
             }
             await createNewUser(phoneNumber, password);
         }
     }
-
+    
     async function createNewUser(phoneNumber, password) {
         showFeedback('Creating user... Please wait.', 'success');
         const email = `${phoneNumber}@korus.local`;
@@ -123,61 +121,59 @@ document.addEventListener('DOMContentLoaded', () => {
             secondaryAuth.signOut();
         }
     }
-    
+
     function editUser(docId, uid, phone, pass) {
         DOMElements.formTitle.textContent = 'Edit User';
         DOMElements.submitBtn.textContent = 'Update Password';
         DOMElements.cancelEditBtn.style.display = 'block';
         DOMElements.phoneNumberInput.value = phone;
-        DOMElements.phoneNumberInput.disabled = true; // Prevent changing phone number
+        DOMElements.phoneNumberInput.disabled = true;
         DOMElements.passwordInput.value = pass;
         DOMElements.editDocId.value = docId;
         DOMElements.editUid.value = uid;
         window.scrollTo(0, 0);
     }
     
-    async function deleteUser(docId, uid, phone) {
+    function deleteUser(docId, uid, phone) {
         if (confirm(`Are you sure you want to PERMANENTLY delete user ${phone}? This cannot be undone.`)) {
-            showFeedback(`Deleting user ${phone}... Please wait.`, 'success');
             const payload = {
-                secretKey: API_SECRET_KEY,
                 action: 'deleteUser',
                 uid: uid,
                 docId: docId
             };
-            await callSecureHelper(payload);
+            showFeedback(`Deleting user ${phone}... Please wait.`, 'success');
+            callSecureHelper(payload);
         }
     }
 
-    async function callSecureHelper(payload) {
-        try {
-            const response = await fetch(SECURE_HELPER_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload),
-                headers: { 'Content-Type': 'application/json' }
-            });
+    function callSecureHelper(payload) {
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = SECURE_HELPER_URL;
+        form.target = 'hidden_iframe';
 
-            // This fetch will fail because of CORS, but it triggers the script.
-            // This is a known workaround for simple web app calls to Google Apps Script.
-            // The UI will update automatically because of Firestore's live listener (onSnapshot).
-            if (payload.action === 'deleteUser') {
-                 showFeedback('User permanently deleted!', 'success');
-            } else if (payload.action === 'updateUser') {
-                 showFeedback('User password updated!', 'success');
-                 resetForm();
-            }
-
-        } catch (error) {
-            // This catch block will almost always run because of the CORS issue.
-            // We can treat this as a "success" because the request was sent.
-            console.log("Request sent to secure helper. UI will update on success.", error);
-            if (payload.action === 'deleteUser') {
-                 showFeedback('User permanently deleted!', 'success');
-            } else if (payload.action === 'updateUser') {
-                 showFeedback('User password updated!', 'success');
-                 resetForm();
-            }
+        const data = { ...payload, secretKey: API_SECRET_KEY };
+        for (const key in data) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = data[key];
+            form.appendChild(input);
         }
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+        
+        // The UI will update automatically via the onSnapshot listener.
+        // We just reset the form after a short delay for a good user experience.
+        setTimeout(() => {
+            if (payload.action === 'updateUser') {
+                showFeedback('User password updated!', 'success');
+                resetForm();
+            } else {
+                 showFeedback('User permanently deleted!', 'success');
+            }
+        }, 2000); // Wait 2 seconds
     }
     
     function resetForm() {
@@ -193,7 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function showFeedback(message, type) {
         DOMElements.feedbackMessage.textContent = message;
         DOMElements.feedbackMessage.className = `message ${type}`;
-        setTimeout(() => { DOMElements.feedbackMessage.textContent = ''; DOMElements.feedbackMessage.className = 'message';}, 4000);
+        setTimeout(() => {
+            if (DOMElements.feedbackMessage.textContent === message) {
+                DOMElements.feedbackMessage.textContent = '';
+                DOMElements.feedbackMessage.className = 'message';
+            }
+        }, 5000);
     }
 
     window.app = { deleteUser, editUser };
