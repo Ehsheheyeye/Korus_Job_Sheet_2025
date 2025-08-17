@@ -231,3 +231,32 @@ input:focus {
         max-height: none;
     }
 }
+
+/* Add these styles to the end of admin.css */
+.status-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-active .status-pill {
+    background-color: #dcfce7; /* Green */
+    color: #166534;
+}
+
+.status-inactive .status-pill {
+    background-color: #fee2e2; /* Red */
+    color: #991b1b;
+}
+
+.status-inactive td {
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.actions-cell .edit-btn { color: #16a34a; }
+.actions-cell .edit-btn:hover { color: #15803d; }
+.actions-cell .delete-btn { color: #ef4444; }
+.actions-cell .delete-btn:hover { color: #dc2626; }
