@@ -14,13 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const auth = firebase.auth();
 
     const loginForm = document.getElementById('login-form');
-    const userInput = document.getElementById('user-id'); // Changed from 'email'
+    const userInput = document.getElementById('user-id');
     const passwordInput = document.getElementById('password');
     const errorMessage = document.getElementById('error-message');
 
     // --- SUPER ADMIN CONFIGURATION ---
-    // IMPORTANT: Set your Super Admin email here. This MUST match the user you created in Firebase.
-    const SUPER_ADMIN_EMAIL = "rushikeshkhode2626@gmail.com"; // You can change this to your actual admin email
+    // IMPORTANT: CHANGE THIS LINE TO MATCH YOUR EMAIL IN FIREBASE
+    const SUPER_ADMIN_EMAIL = "rushikeshkhode2626@gmail.com"; 
 
     // If a user is already logged in, redirect them.
     auth.onAuthStateChanged(user => {
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let emailToLogin;
         // Check if the input is the Super Admin's email
-        if (userIdValue === SUPER_ADMIN_EMAIL) {
+        if (userIdValue.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) { // Made it case-insensitive to be safer
             emailToLogin = userIdValue;
         } else if (!isNaN(userIdValue) && userIdValue.length > 5) {
             // If it's a number (phone number), convert it to the email format we use
@@ -64,4 +64,3 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     });
 });
-
