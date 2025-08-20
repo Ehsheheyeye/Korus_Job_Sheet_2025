@@ -78,6 +78,46 @@ body.dark #theme-icon-moon { display: block; }
 
 /* --- MAIN CONTENT & CARDS --- */
 .mobile-header { display: none; }
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+.main-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0;
+}
+.user-profile-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--bg-secondary);
+    padding: 0.5rem 0.5rem 0.5rem 1rem;
+    border-radius: 50px;
+    box-shadow: var(--shadow);
+    transition: background-color var(--transition-speed) ease;
+}
+#welcome-message {
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: color var(--transition-speed) ease;
+}
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.user-icon {
+    width: 24px;
+    height: 24px;
+}
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
 .page-header h1 { font-size: 2rem; font-weight: 800; margin: 0; }
 .header-actions { display: flex; gap: 1rem; align-items: center; }
@@ -141,24 +181,11 @@ textarea.input-field { resize: vertical; }
 .estimate-input input { border: none; background: transparent; color: var(--text-primary); }
 .estimate-input input:focus { outline: none; box-shadow: none; }
 
-/* --- NEW STYLES FOR ENGINEER CHECKBOXES --- */
 .engineer-checkboxes {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-    padding-top: 0.5rem; /* Adjust alignment with amount input */
+    display: flex; gap: 1.5rem; align-items: center; padding-top: 0.5rem;
 }
-.engineer-checkboxes div {
-    display: flex;
-    align-items: center;
-}
-.engineer-checkboxes input {
-    margin-right: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    accent-color: var(--accent-color);
-}
-/* ------------------------------------------- */
+.engineer-checkboxes div { display: flex; align-items: center; }
+.engineer-checkboxes input { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
 
 /* --- BUTTONS --- */
 .action-btn {
@@ -228,7 +255,26 @@ textarea.input-field { resize: vertical; }
     margin-top: 2rem; transition: all var(--transition-speed) ease;
 }
 
-/* --- RESPONSIVE STYLES (THE FIX IS HERE) --- */
+/* --- RESPONSIVE STYLES --- */
+@media (min-width: 1025px) {
+    /* Hide the individual page headers on desktop, since we have the new main one */
+    .page .page-header {
+        display: none;
+    }
+    /* ...but show them on pages that have action buttons */
+    #all-jobs-page .page-header,
+    #inward-outward-page .page-header,
+    #job-sheet-page .page-header {
+        display: flex;
+    }
+    /* And hide the h1 title inside those to avoid duplicates */
+    #all-jobs-page .page-header h1,
+    #inward-outward-page .page-header h1,
+    #job-sheet-page .page-header h1 {
+        display: none;
+    }
+}
+
 @media (max-width: 1024px) {
     .sidebar {
         position: fixed; top: 0; left: 0; height: 100%;
@@ -244,6 +290,11 @@ textarea.input-field { resize: vertical; }
     body.sidebar-open .sidebar-overlay { opacity: 1; visibility: visible; }
     .sidebar-close-btn { display: block; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; }
     
+    /* Hide the new main header on mobile */
+    .main-header {
+        display: none;
+    }
+    
     .mobile-header {
         display: flex; align-items: center; gap: 1rem;
         margin-bottom: 1.5rem;
@@ -256,22 +307,15 @@ textarea.input-field { resize: vertical; }
     .menu-btn svg { width: 1.5rem; height: 1.5rem; }
     #mobile-page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
     
-    /* Hide all desktop-style page headers by default on mobile */
-    main.main-content .page .page-header {
+    /* On mobile, only hide the dashboard's old header. The others have action buttons. */
+    #dashboard-page .page-header {
         display: none;
-    }
-
-    /* Forcefully show the headers on pages that need action buttons */
-    main.main-content #all-jobs-page.page .page-header,
-    main.main-content #inward-outward-page.page .page-header,
-    main.main-content #job-sheet-page.page .page-header {
-        display: flex;
     }
     
-    /* Hide the h1 inside the headers we just showed to prevent duplicate titles */
     #all-jobs-page .page-header h1,
-    #inward-outward-page .page-header h1 {
-        display: none;
+    #inward-outward-page .page-header h1,
+    #job-sheet-page .page-header h1 {
+        display: none; /* Hide h1 to prevent duplicate title with mobile header */
     }
 
     .form-grid, .inward-outward-layout { grid-template-columns: 1fr; }
