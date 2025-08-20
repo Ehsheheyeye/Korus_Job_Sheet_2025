@@ -59,6 +59,9 @@
             <header class="main-header">
                 <h1 id="desktop-page-title">Dashboard</h1>
                 
+                <div id="job-sheet-header-actions" class="header-actions" style="display: none;">
+                    <button id="new-job-btn" class="action-btn primary-btn">+ New</button>
+                </div>
                 <div id="all-jobs-header-actions" class="header-actions" style="display: none;">
                     <input id="all-jobs-search-box" type="text" placeholder="Search All Jobs..." class="search-input">
                     <button id="download-excel-btn" class="action-btn primary-btn">Excel</button>
@@ -67,6 +70,8 @@
                     <input id="inward-outward-search-box" type="text" placeholder="Search Outward Records..." class="search-input">
                     <button id="download-inward-outward-excel-btn" class="action-btn primary-btn">Excel</button>
                 </div>
+
+                <div class="header-spacer"></div>
 
                 <div class="user-profile-area">
                     <span id="welcome-message">Welcome, User</span>
@@ -99,10 +104,6 @@
             </div>
 
             <div id="job-sheet-page" class="page">
-                 <header class="page-header">
-                    <h1>Job Sheet</h1>
-                    <button id="new-job-btn" class="action-btn primary-btn">+ New</button>
-                </header>
                 <div class="form-grid">
                     <div class="card form-section">
                         <h2>Job & Customer Details</h2>
