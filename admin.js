@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cancelEditBtn: document.getElementById('cancel-edit-btn'),
         editDocId: document.getElementById('edit-doc-id'),
         editUid: document.getElementById('edit-uid'),
+        displayNameInput: document.getElementById('display-name'),
         phoneNumberInput: document.getElementById('phone-number'),
         passwordInput: document.getElementById('password'),
         togglePasswordBtn: document.getElementById('toggle-password-btn'),
@@ -62,10 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!user.uid) return;
                 DOMElements.userListBody.innerHTML += `
                     <tr>
+                        <td>${user.displayName || 'N/A'}</td>
                         <td>${user.phoneNumber}</td>
                         <td>${user.password}</td>
                         <td class="actions-cell">
-                            <button class="edit-btn" title="Edit" onclick="app.editUser('${doc.id}', '${user.uid}', '${user.phoneNumber}', '${user.password}')">✏️ Edit</button>
+                            <button class="edit-btn" title="Edit" onclick="app.editUser('${doc.id}', '${user.uid}', '${user.displayName || ''}', '${user.phoneNumber}', '${user.password}')">✏️ Edit</button>
                             <button class="delete-btn" title="Delete" onclick="app.deleteUser('${doc.id}', '${user.uid}', '${user.phoneNumber}')">🗑️ Delete</button>
                         </td>
                     </tr>
@@ -76,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleFormSubmit(e) {
         e.preventDefault();
+        const displayName = DOMElements.displayNameInput.value.trim();
         const phoneNumber = DOMElements.phoneNumberInput.value.trim();
         const password = DOMElements.passwordInput.value.trim();
         const docId = DOMElements.editDocId.value;
@@ -90,25 +93,29 @@ document.addEventListener('DOMContentLoaded', () => {
             showFeedback('Updating user... Please wait.', 'success');
             callSecureHelper(payload);
         } else { // CREATE mode
-            if (phoneNumber.length < 10 || isNaN(phoneNumber)) {
-                return showFeedback('Please enter a valid phone number.', 'error');
+            if (!displayName) {
+                return showFeedback('Please enter the user\'s full name.', 'error');
             }
-            await createNewUser(phoneNumber, password);
+            if (phoneNumber.length < 10 || isNaN(phoneNumber)) {
+                return showFeedback('Please enter a valid 10-digit phone number.', 'error');
+            }
+            await createNewUser(displayName, phoneNumber, password);
         }
     }
     
-    async function createNewUser(phoneNumber, password) {
+    async function createNewUser(displayName, phoneNumber, password) {
         showFeedback('Creating user... Please wait.', 'success');
         const email = `${phoneNumber}@korus.local`;
         try {
             const userCredential = await secondaryAuth.createUserWithEmailAndPassword(email, password);
             await db.collection('users').add({
                 uid: userCredential.user.uid,
+                displayName: displayName,
                 phoneNumber: phoneNumber,
                 password: password,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            showFeedback(`User ${phoneNumber} created successfully!`, 'success');
+            showFeedback(`User ${displayName} created successfully!`, 'success');
             resetForm();
         } catch (error) {
             showFeedback('This phone number is already registered.', 'error');
@@ -117,10 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function editUser(docId, uid, phone, pass) {
+    function editUser(docId, uid, name, phone, pass) {
         DOMElements.formTitle.textContent = 'Edit User';
         DOMElements.submitBtn.textContent = 'Update Password';
         DOMElements.cancelEditBtn.style.display = 'block';
+        DOMElements.displayNameInput.value = name;
+        DOMElements.displayNameInput.disabled = true;
         DOMElements.phoneNumberInput.value = phone;
         DOMElements.phoneNumberInput.disabled = true;
         DOMElements.passwordInput.value = pass;
@@ -169,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         DOMElements.formTitle.textContent = 'Create New User';
         DOMElements.submitBtn.textContent = 'Create User';
         DOMElements.cancelEditBtn.style.display = 'none';
+        DOMElements.displayNameInput.disabled = false;
         DOMElements.phoneNumberInput.disabled = false;
         DOMElements.userForm.reset();
         DOMElements.editDocId.value = '';
