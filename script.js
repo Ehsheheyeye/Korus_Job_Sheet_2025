@@ -14,12 +14,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const auth = firebase.auth();
 
+    // --- NEW function to load user profile ---
+    async function loadUserProfile(user) {
+        const welcomeMessageEl = document.getElementById('welcome-message');
+        if (!welcomeMessageEl) return; // Exit if element doesn't exist
+        try {
+            // Query the 'users' collection to find the document with the matching UID
+            const querySnapshot = await db.collection('users').where('uid', '==', user.uid).limit(1).get();
+            
+            if (!querySnapshot.empty) {
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+                const userName = userData.displayName || 'User'; // Use displayName from DB
+                // Split to get the first name for a shorter greeting
+                const firstName = userName.split(' ')[0];
+                welcomeMessageEl.textContent = `Welcome, ${firstName}`;
+            } else {
+                console.warn("User document not found in Firestore for UID:", user.uid);
+                welcomeMessageEl.textContent = 'Welcome, User';
+            }
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+            welcomeMessageEl.textContent = 'Welcome, User';
+        }
+    }
+
     // --- AUTHENTICATION GATE ---
     auth.onAuthStateChanged(user => {
         if (user) {
             // User is signed in, show the main app.
             document.getElementById('loader').style.display = 'none';
             document.querySelector('.app-layout').style.display = 'flex';
+            loadUserProfile(user); // Load the user's name
             initializeApp();
         } else {
             // No user is signed in, redirect to login page.
@@ -51,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
             menuBtn: document.getElementById('menu-btn'), sidebar: document.getElementById('sidebar'),
             sidebarOverlay: document.getElementById('sidebar-overlay'), sidebarCloseBtn: document.getElementById('sidebar-close-btn'),
             mobilePageTitle: document.getElementById('mobile-page-title'),
+            desktopPageTitle: document.getElementById('desktop-page-title'), // New
             themeToggle: document.getElementById('theme-toggle'),
             logoutBtn: document.getElementById('logout-btn'),
             // Job Sheet Form
@@ -61,8 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
             reportedProblems: document.getElementById('reported-problems'), accessories: document.getElementById('accessories'),
             currentStatus: document.getElementById('current-status'), finalStatus: document.getElementById('final-status'),
             customerStatus: document.getElementById('customer-status'), estimateAmount: document.getElementById('estimate-amount'),
-            engineerKundan: document.getElementById('engineer-kundan'), // New
-            engineerRushi: document.getElementById('engineer-rushi'), // New
+            engineerKundan: document.getElementById('engineer-kundan'), 
+            engineerRushi: document.getElementById('engineer-rushi'),
             saveRecordBtn: document.getElementById('save-record-btn'), newJobBtn: document.getElementById('new-job-btn'),
             // Dashboard
             totalJobsStat: document.getElementById('total-jobs-stat'), pendingJobsStat: document.getElementById('pending-jobs-stat'),
@@ -105,7 +132,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
                     document.getElementById(`${page}-page`).classList.add('active');
 
-                    DOMElements.mobilePageTitle.textContent = link.querySelector('span').textContent;
+                    const pageTitle = link.querySelector('span').textContent;
+                    DOMElements.mobilePageTitle.textContent = pageTitle;
+                    DOMElements.desktopPageTitle.textContent = pageTitle; // Update desktop title
                     document.body.classList.remove('sidebar-open');
                 });
             });
@@ -252,8 +281,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fieldsToClear.forEach(el => el.value = '');
             [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
             document.querySelectorAll('#reported-problems input').forEach(cb => cb.checked = false);
-            DOMElements.engineerKundan.checked = false; // New
-            DOMElements.engineerRushi.checked = false;  // New
+            DOMElements.engineerKundan.checked = false;
+            DOMElements.engineerRushi.checked = false;
             setInitialDate();
             DOMElements.saveRecordBtn.textContent = 'Save Record';
             DOMElements.saveRecordBtn.classList.remove('update-btn');
@@ -273,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 accessories: DOMElements.accessories.value.trim(), currentStatus: DOMElements.currentStatus.value,
                 finalStatus: DOMElements.finalStatus.value, customerStatus: DOMElements.customerStatus.value,
                 estimateAmount: parseFloat(DOMElements.estimateAmount.value) || 0,
-                engineers: engineers // New
+                engineers: engineers
             };
 
             if (!jobData.jobSheetNo || !jobData.customerName || !jobData.customerMobile) { alert("Job Sheet No, Customer Name, and Mobile are required."); return; }
@@ -300,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.keys(DOMElements).forEach(key => { if(job[key] !== undefined && DOMElements[key]?.tagName !== 'DIV') DOMElements[key].value = job[key] });
             document.querySelectorAll('#reported-problems input').forEach(cb => { cb.checked = job.reportedProblems?.includes(cb.value); });
             
-            // New: Populate engineer checkboxes
             DOMElements.engineerKundan.checked = job.engineers?.includes("Kundan Sir") || false;
             DOMElements.engineerRushi.checked = job.engineers?.includes("Rushi") || false;
 
@@ -442,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Device Type": job.deviceType, "Brand": job.brandName, "Problems": job.reportedProblems.join(', '),
                 "Accessories": job.accessories, "Current Status": job.currentStatus, "Final Status": job.finalStatus,
                 "Customer Status": job.customerStatus, 
-                "Engineer(s)": job.engineers ? job.engineers.join(', ') : '', // New
+                "Engineer(s)": job.engineers ? job.engineers.join(', ') : '',
                 "Estimate Amount": job.estimateAmount,
             }));
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -473,4 +501,3 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
-
