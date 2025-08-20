@@ -80,14 +80,21 @@ body.dark #theme-icon-moon { display: block; }
 .mobile-header { display: none; }
 .main-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 .main-header h1 {
     font-size: 2rem;
     font-weight: 800;
     margin: 0;
+    flex-shrink: 0;
+}
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-grow: 1; /* Pushes user profile to the right */
 }
 .user-profile-area {
     display: flex;
@@ -98,6 +105,7 @@ body.dark #theme-icon-moon { display: block; }
     border-radius: 50px;
     box-shadow: var(--shadow);
     transition: background-color var(--transition-speed) ease;
+    flex-shrink: 0;
 }
 #welcome-message {
     font-weight: 500;
@@ -105,22 +113,15 @@ body.dark #theme-icon-moon { display: block; }
     transition: color var(--transition-speed) ease;
 }
 .user-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: var(--accent-color);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 40px; height: 40px; border-radius: 50%;
+    background-color: var(--accent-color); color: white;
+    display: flex; align-items: center; justify-content: center;
 }
-.user-icon {
-    width: 24px;
-    height: 24px;
-}
+.user-icon { width: 24px; height: 24px; }
+
 .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
 .page-header h1 { font-size: 2rem; font-weight: 800; margin: 0; }
-.header-actions { display: flex; gap: 1rem; align-items: center; }
+
 .card {
     background-color: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;
     box-shadow: var(--shadow); margin-bottom: 1.5rem;
@@ -152,7 +153,7 @@ label {
     outline: none; border-color: var(--accent-color);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 30%, transparent);
 }
-.search-input { width: 300px; }
+.search-input { max-width: 400px; }
 textarea.input-field { resize: vertical; }
 
 .form-grid, .inward-outward-layout { display: grid; gap: 1.5rem; }
@@ -192,6 +193,7 @@ textarea.input-field { resize: vertical; }
     padding: 0.75rem 1.5rem; border: none; border-radius: 8px;
     font-size: 1rem; font-weight: 600; cursor: pointer;
     transition: transform 0.1s ease, background-color 0.2s ease;
+    white-space: nowrap;
 }
 .action-btn:hover { transform: translateY(-1px); }
 .primary-btn { background-color: var(--accent-color); color: white; }
@@ -202,9 +204,13 @@ textarea.input-field { resize: vertical; }
 .update-btn { background-color: #f59e0b; }
 .update-btn:hover { background-color: #d97706; }
 
-/* --- TABLES --- */
+/* --- TABLES & PAGINATION --- */
 .table-wrapper { overflow-x: auto; }
-.data-table { width: 100%; border-collapse: collapse; text-align: left; }
+.data-table {
+    width: 100%; border-collapse: collapse; text-align: left;
+    table-layout: fixed; /* Better column control */
+    word-wrap: break-word;
+}
 .data-table th, .data-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
 .data-table th { font-weight: 600; color: var(--text-secondary); }
 .data-table tbody tr { transition: background-color 0.2s ease; }
@@ -212,6 +218,32 @@ textarea.input-field { resize: vertical; }
 .table-actions button { background: none; border: none; cursor: pointer; padding: 0.25rem; margin-right: 0.5rem; color: var(--text-secondary); font-size: 1.1rem; }
 .table-actions button:hover { color: var(--accent-color); }
 .table-actions .delete-btn:hover { color: var(--danger-color); }
+
+/* Column Widths for All Jobs Table */
+#all-jobs-page .data-table th:nth-child(1), #all-jobs-page .data-table td:nth-child(1) { width: 8%; } /* Job # */
+#all-jobs-page .data-table th:nth-child(2), #all-jobs-page .data-table td:nth-child(2) { width: 12%; } /* Date */
+#all-jobs-page .data-table th:nth-child(4), #all-jobs-page .data-table td:nth-child(4) { width: 13%; } /* Mobile */
+#all-jobs-page .data-table th:nth-child(6), #all-jobs-page .data-table td:nth-child(6) { width: 15%; } /* Status */
+#all-jobs-page .data-table th:nth-child(7), #all-jobs-page .data-table td:nth-child(7) { width: 10%; text-align: center;} /* Actions */
+
+/* Column Widths for Inward/Outward Table */
+#inward-outward-page .data-table th:nth-child(2), #inward-outward-page .data-table td:nth-child(2) { white-space: normal; } /* Allow Material to wrap */
+#inward-outward-page .data-table th:nth-child(3), #inward-outward-page .data-table td:nth-child(3) { width: 15%; } /* Outward Date */
+#inward-outward-page .data-table th:nth-child(4), #inward-outward-page .data-table td:nth-child(4) { width: 15%; } /* Inward Date */
+#inward-outward-page .data-table th:nth-child(5), #inward-outward-page .data-table td:nth-child(5) { width: 12%; text-align: center; } /* Actions */
+
+.pagination-controls {
+    display: flex; justify-content: flex-end; align-items: center;
+    padding: 1rem 0 0 0; gap: 0.75rem; color: var(--text-secondary);
+}
+.pagination-controls button {
+    padding: 0.5rem 1rem; font-size: 0.875rem;
+}
+.pagination-controls button:disabled {
+    opacity: 0.5; cursor: not-allowed; background-color: var(--secondary-color);
+    transform: none;
+}
+.pagination-info { font-size: 0.875rem; font-weight: 500; }
 
 /* --- AUTOCOMPLETE --- */
 .autocomplete { position: relative; width: 100%; }
@@ -256,25 +288,6 @@ textarea.input-field { resize: vertical; }
 }
 
 /* --- RESPONSIVE STYLES --- */
-@media (min-width: 1025px) {
-    /* Hide the individual page headers on desktop, since we have the new main one */
-    .page .page-header {
-        display: none;
-    }
-    /* ...but show them on pages that have action buttons */
-    #all-jobs-page .page-header,
-    #inward-outward-page .page-header,
-    #job-sheet-page .page-header {
-        display: flex;
-    }
-    /* And hide the h1 title inside those to avoid duplicates */
-    #all-jobs-page .page-header h1,
-    #inward-outward-page .page-header h1,
-    #job-sheet-page .page-header h1 {
-        display: none;
-    }
-}
-
 @media (max-width: 1024px) {
     .sidebar {
         position: fixed; top: 0; left: 0; height: 100%;
@@ -290,10 +303,7 @@ textarea.input-field { resize: vertical; }
     body.sidebar-open .sidebar-overlay { opacity: 1; visibility: visible; }
     .sidebar-close-btn { display: block; background: none; border: none; color: white; font-size: 2rem; cursor: pointer; }
     
-    /* Hide the new main header on mobile */
-    .main-header {
-        display: none;
-    }
+    .main-header { display: none; }
     
     .mobile-header {
         display: flex; align-items: center; gap: 1rem;
@@ -307,14 +317,12 @@ textarea.input-field { resize: vertical; }
     .menu-btn svg { width: 1.5rem; height: 1.5rem; }
     #mobile-page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
     
-    /* On mobile, only hide the dashboard's old header. The others have action buttons. */
-    #dashboard-page .page-header {
-        display: none;
-    }
-    
+    /* Show page headers on mobile as they contain action buttons/search */
+    .page-header { display: flex; }
     #all-jobs-page .page-header h1,
     #inward-outward-page .page-header h1,
-    #job-sheet-page .page-header h1 {
+    #job-sheet-page .page-header h1,
+    #dashboard-page .page-header h1 {
         display: none; /* Hide h1 to prevent duplicate title with mobile header */
     }
 
@@ -325,5 +333,6 @@ textarea.input-field { resize: vertical; }
     .main-content { padding: 1rem; }
     .grid-3-col, .grid-2-col { grid-template-columns: 1fr; }
     .header-actions { flex-direction: column; align-items: stretch; width: 100%; }
-    .search-input { width: 100%; }
+    .search-input { width: 100%; max-width: 100%; }
+    .pagination-controls { justify-content: center; }
 }
