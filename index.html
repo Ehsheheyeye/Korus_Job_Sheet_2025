@@ -58,30 +58,40 @@
             
             <header class="main-header">
                 <h1 id="desktop-page-title">Dashboard</h1>
+                
+                <div id="all-jobs-header-actions" class="header-actions" style="display: none;">
+                    <input id="all-jobs-search-box" type="text" placeholder="Search All Jobs..." class="search-input">
+                    <button id="download-excel-btn" class="action-btn primary-btn">Excel</button>
+                </div>
+                <div id="inward-outward-header-actions" class="header-actions" style="display: none;">
+                    <input id="inward-outward-search-box" type="text" placeholder="Search Outward Records..." class="search-input">
+                    <button id="download-inward-outward-excel-btn" class="action-btn primary-btn">Excel</button>
+                </div>
+
                 <div class="user-profile-area">
                     <span id="welcome-message">Welcome, User</span>
                     <div class="user-avatar">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="user-icon">
-                          <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
                         </svg>
                     </div>
                 </div>
             </header>
 
             <div id="dashboard-page" class="page active">
-                <header class="page-header"><h1>Dashboard</h1></header>
                 <div class="stats-grid">
                     <div class="stat-card"><h3>Total Jobs</h3><p id="total-jobs-stat">0</p></div>
                     <div class="stat-card"><h3>Pending Diagnosis</h3><p id="pending-jobs-stat">0</p></div>
                     <div class="stat-card"><h3>Working</h3><p id="working-jobs-stat">0</p></div>
                     <div class="stat-card"><h3>Delivered</h3><p id="delivered-jobs-stat">0</p></div>
                     <div class="stat-card"><h3>Pending Inward</h3><p id="pending-inward-stat">0</p></div>
+                    <div class="stat-card"><h3>Rahul Sir Pending</h3><p id="rahul-sir-pending-stat">0</p></div>
                 </div>
                 <div class="recent-jobs-container card">
                     <h2>Recent Job Sheets</h2>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>Job #</th><th>Customer</th><th>Device</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Job #</th><th>Customer</th><th>Device</th><th>Status</th><th>Last Updated</th><th>Actions</th></tr></thead>
                             <tbody id="recent-jobs-table-body"></tbody>
                         </table>
                     </div>
@@ -160,13 +170,6 @@
             </div>
             
             <div id="all-jobs-page" class="page">
-                <header class="page-header">
-                    <h1>All Job Entries</h1>
-                    <div class="header-actions">
-                        <input id="all-jobs-search-box" type="text" placeholder="Search..." class="search-input">
-                        <button id="download-excel-btn" class="action-btn primary-btn">Excel</button>
-                    </div>
-                </header>
                 <div class="card table-container">
                     <div class="table-wrapper">
                         <table class="data-table">
@@ -179,17 +182,11 @@
                             <tbody id="all-jobs-table-body"></tbody>
                         </table>
                     </div>
+                    <div id="all-jobs-pagination" class="pagination-controls"></div>
                 </div>
             </div>
 
             <div id="inward-outward-page" class="page">
-                <header class="page-header">
-                    <h1>Inward/Outward</h1>
-                     <div class="header-actions">
-                        <input id="inward-outward-search-box" type="text" placeholder="Search..." class="search-input">
-                        <button id="download-inward-outward-excel-btn" class="action-btn primary-btn">Excel</button>
-                    </div>
-                </header>
                 <div class="inward-outward-layout">
                     <div class="card form-section">
                          <h2 id="outward-form-title">New Outward Entry</h2>
@@ -221,6 +218,7 @@
                                 <tbody id="outward-records-table-body"></tbody>
                             </table>
                         </div>
+                        <div id="inward-outward-pagination" class="pagination-controls"></div>
                     </div>
                 </div>
             </div>
