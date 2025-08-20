@@ -88,21 +88,22 @@ document.addEventListener('DOMContentLoaded', () => {
             totalJobsStat: document.getElementById('total-jobs-stat'), pendingJobsStat: document.getElementById('pending-jobs-stat'),
             workingJobsStat: document.getElementById('working-jobs-stat'), deliveredJobsStat: document.getElementById('delivered-jobs-stat'),
             pendingInwardStat: document.getElementById('pending-inward-stat'),
-            rahulSirPendingStat: document.getElementById('rahul-sir-pending-stat'), // New stat card
+            rahulSirPendingStat: document.getElementById('rahul-sir-pending-stat'),
             recentJobsTableBody: document.getElementById('recent-jobs-table-body'),
-            allJobsHeaderActions: document.getElementById('all-jobs-header-actions'), // Header actions
+            jobSheetHeaderActions: document.getElementById('job-sheet-header-actions'),
+            allJobsHeaderActions: document.getElementById('all-jobs-header-actions'),
             allJobsSearchBox: document.getElementById('all-jobs-search-box'), downloadExcelBtn: document.getElementById('download-excel-btn'),
             allJobsTableBody: document.getElementById('all-jobs-table-body'),
-            allJobsPagination: document.getElementById('all-jobs-pagination'), // Pagination container
+            allJobsPagination: document.getElementById('all-jobs-pagination'),
             outwardFormTitle: document.getElementById('outward-form-title'), partyName: document.getElementById('party-name'),
             materialDesc: document.getElementById('material-desc'), outwardDate: document.getElementById('outward-date'),
             inwardDate: document.getElementById('inward-date'), saveOutwardBtn: document.getElementById('save-outward-btn'),
             cancelOutwardEditBtn: document.getElementById('cancel-outward-edit-btn'),
             outwardRecordsTableBody: document.getElementById('outward-records-table-body'),
-            inwardOutwardHeaderActions: document.getElementById('inward-outward-header-actions'), // Header actions
+            inwardOutwardHeaderActions: document.getElementById('inward-outward-header-actions'),
             inwardOutwardSearchBox: document.getElementById('inward-outward-search-box'),
             downloadInwardOutwardExcelBtn: document.getElementById('download-inward-outward-excel-btn'),
-            inwardOutwardPagination: document.getElementById('inward-outward-pagination'), // Pagination container
+            inwardOutwardPagination: document.getElementById('inward-outward-pagination'),
         };
 
         function init() {
@@ -130,10 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     DOMElements.mobilePageTitle.textContent = pageTitle;
                     DOMElements.desktopPageTitle.textContent = pageTitle;
                     
-                    // Show/hide page-specific header actions
+                    DOMElements.jobSheetHeaderActions.style.display = 'none';
                     DOMElements.allJobsHeaderActions.style.display = 'none';
                     DOMElements.inwardOutwardHeaderActions.style.display = 'none';
-                    if (page === 'all-jobs') {
+                    if (page === 'job-sheet') {
+                        DOMElements.jobSheetHeaderActions.style.display = 'flex';
+                    } else if (page === 'all-jobs') {
                         DOMElements.allJobsHeaderActions.style.display = 'flex';
                     } else if (page === 'inward-outward') {
                         DOMElements.inwardOutwardHeaderActions.style.display = 'flex';
@@ -203,16 +206,13 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.outwardDate.value = today;
         }
 
-        // --- Data Loading & Handling ---
         async function loadInitialData() {
-            // Listener for all job sheets, sorted by job number
             db.collection("jobSheets").orderBy("jobSheetNo", "desc").onSnapshot(snap => {
                 allJobSheets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 updateDashboardStats();
-                handleAllJobsSearch(); // Initial render with pagination
+                handleAllJobsSearch();
             });
 
-            // Separate listener for recent jobs, sorted by last update time
             db.collection("jobSheets").orderBy("updatedAt", "desc").limit(5).onSnapshot(snap => {
                 const recentJobs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderRecentJobsTable(recentJobs);
@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             db.collection("outwardJobs").orderBy("outwardDate", "desc").onSnapshot(snap => {
                 allOutwardRecords = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 updateDashboardStats();
-                handleOutwardSearch(); // Initial render with pagination
+                handleOutwardSearch();
             });
 
             brandSuggestions = await loadSuggestions('brands', initialBrandOptions);
@@ -247,10 +247,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function renderRecentJobsTable(jobs) {
             DOMElements.recentJobsTableBody.innerHTML = jobs.length === 0 ? `<tr><td colspan="6" style="text-align:center; padding: 1rem;">No recent activity.</td></tr>` :
-            jobs.map(job => `<tr><td>${job.jobSheetNo}</td><td>${job.customerName}</td><td>${job.deviceType}</td><td>${job.currentStatus}</td><td>${formatTimestamp(job.updatedAt)}</td><td class="table-actions"><button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button><button title="Delete" class="delete-btn" onclick="window.app.deleteJob('${job.id}')">🗑️</button></td></tr>`).join('');
+            jobs.map(job => `
+                <tr>
+                    <td>${job.jobSheetNo}</td>
+                    <td title="${job.customerName}">${job.customerName}</td>
+                    <td title="${job.deviceType}">${job.deviceType}</td>
+                    <td>${job.currentStatus}</td>
+                    <td>${formatTimestamp(job.updatedAt)}</td>
+                    <td class="table-actions">
+                        <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
+                        <button title="Delete" class="delete-btn" onclick="window.app.deleteJob('${job.id}')">🗑️</button>
+                    </td>
+                </tr>`).join('');
         }
 
-        // --- All Jobs Pagination & Rendering ---
         function renderAllJobsTable() {
             const startIndex = (allJobsCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
@@ -258,9 +268,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             DOMElements.allJobsTableBody.innerHTML = pageItems.map(job => `
                 <tr>
-                    <td>${job.jobSheetNo}</td><td>${formatDate(job.date)}</td>
-                    <td>${job.customerName}</td><td>${job.customerMobile}</td>
-                    <td>${job.deviceType}</td><td>${job.currentStatus}</td>
+                    <td>${job.jobSheetNo}</td>
+                    <td>${formatDate(job.date)}</td>
+                    <td title="${job.customerName}">${job.customerName}</td>
+                    <td title="${job.customerMobile}">${job.customerMobile}</td>
+                    <td title="${job.deviceType}">${job.deviceType}</td>
+                    <td>${job.currentStatus}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
                         <button title="Delete" class="delete-btn" onclick="window.app.deleteJob('${job.id}')">🗑️</button>
@@ -286,10 +299,8 @@ document.addEventListener('DOMContentLoaded', () => {
             renderAllJobsTable();
         }
 
-        // --- Job Sheet Form Logic ---
         function clearJobSheetForm() {
             currentEditingJobId = null;
-            document.getElementById('job-sheet-page').querySelector('form, .form-grid').reset(); // Simplified reset
             const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.accessories, DOMElements.estimateAmount];
             fieldsToClear.forEach(el => el.value = '');
             [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
@@ -316,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 finalStatus: DOMElements.finalStatus.value, customerStatus: DOMElements.customerStatus.value,
                 estimateAmount: parseFloat(DOMElements.estimateAmount.value) || 0,
                 engineers: engineers,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp() // Always update timestamp
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
             if (!jobData.jobSheetNo || !jobData.customerName || !jobData.customerMobile) { alert("Job Sheet No, Customer Name, and Mobile are required."); return; }
@@ -326,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await db.collection("jobSheets").doc(currentEditingJobId).update(jobData);
                     showSuccessModal("Record Updated!");
                 } else {
-                    jobData.createdAt = firebase.firestore.FieldValue.serverTimestamp(); // Set created time only on new records
+                    jobData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
                     await db.collection("jobSheets").add(jobData);
                     showSuccessModal("Record Saved!");
                 }
@@ -360,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // --- Inward/Outward Pagination & Rendering ---
         function renderOutwardTable() {
             const startIndex = (outwardCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
@@ -368,8 +378,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             DOMElements.outwardRecordsTableBody.innerHTML = pageItems.map(r => `
                 <tr>
-                    <td>${r.partyName}</td><td>${r.material}</td>
-                    <td>${formatDate(r.outwardDate)}</td><td>${r.inwardDate ? formatDate(r.inwardDate) : 'Pending'}</td>
+                    <td title="${r.partyName}">${r.partyName}</td>
+                    <td title="${r.material}">${r.material}</td>
+                    <td>${formatDate(r.outwardDate)}</td>
+                    <td>${r.inwardDate ? formatDate(r.inwardDate) : 'Pending'}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editOutward('${r.id}')">✏️</button>
                         <button class="delete-btn" title="Delete" onclick="window.app.deleteOutward('${r.id}')">🗑️</button>
@@ -432,7 +444,8 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.outwardFormTitle.textContent = 'Edit Outward Entry';
             DOMElements.partyName.value = record.partyName; DOMElements.materialDesc.value = record.material;
             DOMElements.outwardDate.value = record.outwardDate; DOMElements.inwardDate.value = record.inwardDate || '';
-            DOMElements.saveOutwardBtn.textContent = 'Update Record'; DOMElements.saveOutwardBtn.classList.add('update-btn');
+            DOMElements.saveOutwardBtn.textContent = 'Update Record';
+            DOMElements.saveOutwardBtn.classList.add('update-btn');
             DOMElements.cancelOutwardEditBtn.style.display = 'block';
         }
 
@@ -443,7 +456,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // --- Utility & Helper Functions ---
         function renderPagination(container, totalItems, currentPage, handlerName) {
             if (totalItems <= itemsPerPage) { container.innerHTML = ''; return; }
             const totalPages = Math.ceil(totalItems / itemsPerPage);
