@@ -26,7 +26,11 @@
                     <input type="hidden" id="edit-doc-id">
                     <input type="hidden" id="edit-uid">
                     <div class="input-group">
-                        <label for="phone-number">User's Phone Number</label>
+                        <label for="display-name">User's Full Name</label>
+                        <input type="text" id="display-name" placeholder="e.g., Rushi Khode" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="phone-number">User's Phone Number (Login ID)</label>
                         <input type="tel" id="phone-number" placeholder="e.g., 7276324318" required>
                     </div>
                     <div class="input-group">
@@ -48,6 +52,7 @@
                     <table class="user-table">
                         <thead>
                             <tr>
+                                <th>Full Name</th>
                                 <th>Phone Number</th>
                                 <th>Password</th>
                                 <th>Actions</th>
