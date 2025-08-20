@@ -94,7 +94,9 @@ body.dark #theme-icon-moon { display: block; }
     display: flex;
     gap: 1rem;
     align-items: center;
-    flex-grow: 1; /* Pushes user profile to the right */
+}
+.header-spacer {
+    flex-grow: 1; /* This pushes the user profile to the far right */
 }
 .user-profile-area {
     display: flex;
@@ -118,9 +120,6 @@ body.dark #theme-icon-moon { display: block; }
     display: flex; align-items: center; justify-content: center;
 }
 .user-icon { width: 24px; height: 24px; }
-
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-.page-header h1 { font-size: 2rem; font-weight: 800; margin: 0; }
 
 .card {
     background-color: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;
@@ -208,13 +207,22 @@ textarea.input-field { resize: vertical; }
 .table-wrapper { overflow-x: auto; }
 .data-table {
     width: 100%; border-collapse: collapse; text-align: left;
-    table-layout: fixed; /* Better column control */
+    table-layout: fixed;
     word-wrap: break-word;
 }
-.data-table th, .data-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+.data-table th, .data-table td { 
+    padding: 0.75rem 1rem; 
+    border-bottom: 1px solid var(--border-color); 
+}
+.data-table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .data-table th { font-weight: 600; color: var(--text-secondary); }
 .data-table tbody tr { transition: background-color 0.2s ease; }
 .data-table tbody tr:hover { background-color: color-mix(in srgb, var(--border-color) 50%, transparent); }
+.table-actions { overflow: visible; } /* Ensure edit/delete icons are always visible */
 .table-actions button { background: none; border: none; cursor: pointer; padding: 0.25rem; margin-right: 0.5rem; color: var(--text-secondary); font-size: 1.1rem; }
 .table-actions button:hover { color: var(--accent-color); }
 .table-actions .delete-btn:hover { color: var(--danger-color); }
@@ -227,7 +235,6 @@ textarea.input-field { resize: vertical; }
 #all-jobs-page .data-table th:nth-child(7), #all-jobs-page .data-table td:nth-child(7) { width: 10%; text-align: center;} /* Actions */
 
 /* Column Widths for Inward/Outward Table */
-#inward-outward-page .data-table th:nth-child(2), #inward-outward-page .data-table td:nth-child(2) { white-space: normal; } /* Allow Material to wrap */
 #inward-outward-page .data-table th:nth-child(3), #inward-outward-page .data-table td:nth-child(3) { width: 15%; } /* Outward Date */
 #inward-outward-page .data-table th:nth-child(4), #inward-outward-page .data-table td:nth-child(4) { width: 15%; } /* Inward Date */
 #inward-outward-page .data-table th:nth-child(5), #inward-outward-page .data-table td:nth-child(5) { width: 12%; text-align: center; } /* Actions */
@@ -317,15 +324,6 @@ textarea.input-field { resize: vertical; }
     .menu-btn svg { width: 1.5rem; height: 1.5rem; }
     #mobile-page-title { font-size: 1.5rem; font-weight: 700; margin: 0; }
     
-    /* Show page headers on mobile as they contain action buttons/search */
-    .page-header { display: flex; }
-    #all-jobs-page .page-header h1,
-    #inward-outward-page .page-header h1,
-    #job-sheet-page .page-header h1,
-    #dashboard-page .page-header h1 {
-        display: none; /* Hide h1 to prevent duplicate title with mobile header */
-    }
-
     .form-grid, .inward-outward-layout { grid-template-columns: 1fr; }
 }
 
