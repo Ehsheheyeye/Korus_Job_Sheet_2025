@@ -87,12 +87,15 @@ document.addEventListener('DOMContentLoaded', () => {
             saveRecordBtn: document.getElementById('save-record-btn'), newJobBtn: document.getElementById('new-job-btn'),
             totalJobsStat: document.getElementById('total-jobs-stat'), pendingJobsStat: document.getElementById('pending-jobs-stat'),
             workingJobsStat: document.getElementById('working-jobs-stat'), deliveredJobsStat: document.getElementById('delivered-jobs-stat'),
+            notDeliveredJobsStat: document.getElementById('not-delivered-jobs-stat'),
             pendingInwardStat: document.getElementById('pending-inward-stat'),
             rahulSirPendingStat: document.getElementById('rahul-sir-pending-stat'),
             recentJobsTableBody: document.getElementById('recent-jobs-table-body'),
             jobSheetHeaderActions: document.getElementById('job-sheet-header-actions'),
             allJobsHeaderActions: document.getElementById('all-jobs-header-actions'),
-            allJobsSearchBox: document.getElementById('all-jobs-search-box'), downloadExcelBtn: document.getElementById('download-excel-btn'),
+            jobNoSearchBox: document.getElementById('job-no-search-box'),
+            mobileNoSearchBox: document.getElementById('mobile-no-search-box'),
+            downloadExcelBtn: document.getElementById('download-excel-btn'),
             allJobsTableBody: document.getElementById('all-jobs-table-body'),
             allJobsPagination: document.getElementById('all-jobs-pagination'),
             outwardFormTitle: document.getElementById('outward-form-title'), partyName: document.getElementById('party-name'),
@@ -176,12 +179,36 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.saveOutwardBtn.addEventListener('click', saveOutwardRecord);
             DOMElements.cancelOutwardEditBtn.addEventListener('click', clearOutwardForm);
             DOMElements.logoutBtn.addEventListener('click', () => auth.signOut());
-            DOMElements.allJobsSearchBox.addEventListener('input', handleAllJobsSearch);
-            DOMElements.inwardOutwardSearchBox.addEventListener('input', handleOutwardSearch);
+            DOMElements.jobNoSearchBox.addEventListener('input', () => handleAllJobsSearch(null));
+            DOMElements.mobileNoSearchBox.addEventListener('input', () => handleAllJobsSearch(null));
+            DOMElements.inwardOutwardSearchBox.addEventListener('input', () => handleOutwardSearch(null));
             DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
             DOMElements.downloadInwardOutwardExcelBtn.addEventListener('click', downloadInwardOutwardAsExcel);
             setupAutocomplete(DOMElements.brandName, brandSuggestions);
             setupAutocomplete(DOMElements.partyName, partySuggestions);
+            setupDashboardCardClickListeners();
+        }
+
+        function setupDashboardCardClickListeners() {
+            document.querySelectorAll('.clickable-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const filterType = card.dataset.filterType;
+                    const filterValue = card.dataset.filterValue;
+
+                    if (filterType === 'inward-outward') {
+                        const outwardFilter = { value: filterValue };
+                        document.querySelector('.nav-link[data-page="inward-outward"]').click();
+                        DOMElements.inwardOutwardSearchBox.value = '';
+                        handleOutwardSearch(outwardFilter);
+                    } else {
+                        const jobFilter = { type: filterType, value: filterValue };
+                        document.querySelector('.nav-link[data-page="all-jobs"]').click();
+                        DOMElements.jobNoSearchBox.value = '';
+                        DOMElements.mobileNoSearchBox.value = '';
+                        handleAllJobsSearch(jobFilter);
+                    }
+                });
+            });
         }
 
         function populateSelects() {
@@ -239,6 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.pendingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Pending Diagnosis').length;
             DOMElements.workingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Working').length;
             DOMElements.deliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Delivered').length;
+            DOMElements.notDeliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Not Delivered').length;
             
             const pendingInwards = allOutwardRecords.filter(r => !r.inwardDate);
             DOMElements.pendingInwardStat.textContent = pendingInwards.length;
@@ -282,11 +310,35 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPagination(DOMElements.allJobsPagination, filteredJobs.length, allJobsCurrentPage, 'changeAllJobsPage');
         }
 
-        function handleAllJobsSearch() {
-            const term = DOMElements.allJobsSearchBox.value.toLowerCase();
-            filteredJobs = !term ? allJobSheets : allJobSheets.filter(job =>
-                Object.values(job).some(val => String(val).toLowerCase().includes(term))
-            );
+        function handleAllJobsSearch(dashboardFilter = null) {
+            const jobNoTerm = DOMElements.jobNoSearchBox.value.trim();
+            const mobileTerm = DOMElements.mobileNoSearchBox.value.trim();
+            
+            let tempFilteredJobs = allJobSheets;
+
+            // Apply dashboard filter first, if it exists
+            if (dashboardFilter) {
+                if (dashboardFilter.value !== 'all') {
+                    if (dashboardFilter.type === 'currentStatus') {
+                        tempFilteredJobs = tempFilteredJobs.filter(job => job.currentStatus === dashboardFilter.value);
+                    } else if (dashboardFilter.type === 'finalStatus') {
+                        tempFilteredJobs = tempFilteredJobs.filter(job => job.finalStatus === dashboardFilter.value);
+                    }
+                }
+            }
+
+            // Then apply filters from search boxes
+            if (jobNoTerm) {
+                tempFilteredJobs = tempFilteredJobs.filter(job => String(job.jobSheetNo).includes(jobNoTerm));
+            }
+            if (mobileTerm) {
+                tempFilteredJobs = tempFilteredJobs.filter(job => 
+                    (job.customerMobile && String(job.customerMobile).includes(mobileTerm)) ||
+                    (job.altMobile && String(job.altMobile).includes(mobileTerm))
+                );
+            }
+            
+            filteredJobs = tempFilteredJobs;
             allJobsCurrentPage = 1;
             renderAllJobsTable();
         }
@@ -390,12 +442,28 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPagination(DOMElements.inwardOutwardPagination, filteredOutwards.length, outwardCurrentPage, 'changeOutwardPage');
         }
 
-        function handleOutwardSearch() {
+        function handleOutwardSearch(dashboardFilter = null) {
             const term = DOMElements.inwardOutwardSearchBox.value.toLowerCase();
-            filteredOutwards = !term ? allOutwardRecords : allOutwardRecords.filter(r =>
-                (r.partyName && r.partyName.toLowerCase().includes(term)) ||
-                (r.material && r.material.toLowerCase().includes(term))
-            );
+            let tempFilteredOutwards = allOutwardRecords;
+
+            // Apply dashboard filter
+            if (dashboardFilter) {
+                if (dashboardFilter.value === 'pending-inward') {
+                    tempFilteredOutwards = tempFilteredOutwards.filter(r => !r.inwardDate);
+                } else if (dashboardFilter.value === 'rahul-sir-pending') {
+                    tempFilteredOutwards = tempFilteredOutwards.filter(r => r.partyName === 'Rahul Sir' && !r.inwardDate);
+                }
+            }
+
+            // Apply search box filter
+            if (term) {
+                tempFilteredOutwards = tempFilteredOutwards.filter(r =>
+                    (r.partyName && r.partyName.toLowerCase().includes(term)) ||
+                    (r.material && r.material.toLowerCase().includes(term))
+                );
+            }
+
+            filteredOutwards = tempFilteredOutwards;
             outwardCurrentPage = 1;
             renderOutwardTable();
         }
