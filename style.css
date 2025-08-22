@@ -130,7 +130,20 @@ body.dark #theme-icon-moon { display: block; }
 
 /* --- DASHBOARD --- */
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-.stat-card { background-color: var(--bg-secondary); border-radius: 12px; padding: 1.5rem; box-shadow: var(--shadow); transition: background-color var(--transition-speed) ease; }
+.stat-card {
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    transition: background-color var(--transition-speed) ease, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.stat-card.clickable-card {
+    cursor: pointer;
+}
+.stat-card.clickable-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
 .stat-card h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
 .stat-card p { margin: 0; font-size: 2.5rem; font-weight: 800; color: var(--accent-color); }
 
