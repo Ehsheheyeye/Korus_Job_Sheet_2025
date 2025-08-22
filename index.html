@@ -63,7 +63,8 @@
                     <button id="new-job-btn" class="action-btn primary-btn">+ New</button>
                 </div>
                 <div id="all-jobs-header-actions" class="header-actions" style="display: none;">
-                    <input id="all-jobs-search-box" type="text" placeholder="Search All Jobs..." class="search-input">
+                    <input id="job-no-search-box" type="text" placeholder="Search by Job No..." class="search-input">
+                    <input id="mobile-no-search-box" type="text" placeholder="Search by Mobile..." class="search-input">
                     <button id="download-excel-btn" class="action-btn primary-btn">Excel</button>
                 </div>
                 <div id="inward-outward-header-actions" class="header-actions" style="display: none;">
@@ -85,12 +86,27 @@
 
             <div id="dashboard-page" class="page active">
                 <div class="stats-grid">
-                    <div class="stat-card"><h3>Total Jobs</h3><p id="total-jobs-stat">0</p></div>
-                    <div class="stat-card"><h3>Pending Diagnosis</h3><p id="pending-jobs-stat">0</p></div>
-                    <div class="stat-card"><h3>Working</h3><p id="working-jobs-stat">0</p></div>
-                    <div class="stat-card"><h3>Delivered</h3><p id="delivered-jobs-stat">0</p></div>
-                    <div class="stat-card"><h3>Pending Inward</h3><p id="pending-inward-stat">0</p></div>
-                    <div class="stat-card"><h3>Rahul Sir Pending</h3><p id="rahul-sir-pending-stat">0</p></div>
+                    <div class="stat-card clickable-card" data-filter-type="all" data-filter-value="all">
+                        <h3>Total Jobs</h3><p id="total-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Pending Diagnosis">
+                        <h3>Pending Diagnosis</h3><p id="pending-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Working">
+                        <h3>Working</h3><p id="working-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Delivered">
+                        <h3>Delivered</h3><p id="delivered-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Not Delivered">
+                        <h3>Not Delivered</h3><p id="not-delivered-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="inward-outward" data-filter-value="pending-inward">
+                        <h3>Pending Inward</h3><p id="pending-inward-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="inward-outward" data-filter-value="rahul-sir-pending">
+                        <h3>Rahul Sir Pending</h3><p id="rahul-sir-pending-stat">0</p>
+                    </div>
                 </div>
                 <div class="recent-jobs-container card">
                     <h2>Recent Job Sheets</h2>
