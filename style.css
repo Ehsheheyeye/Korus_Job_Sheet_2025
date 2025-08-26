@@ -149,8 +149,11 @@ body.dark #theme-icon-moon { display: block; }
 
 /* --- FORMS & INPUTS --- */
 label {
-    font-size: 0.875rem; font-weight: 500; color: var(--text-secondary);
-    margin-bottom: 0.25rem; display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem; /* Adjusted for better visibility */
+    display: block;
 }
 .input-field, .select-field, .search-input {
     width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border-color);
@@ -181,7 +184,7 @@ textarea.input-field { resize: vertical; }
 .status-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
 .form-stack { display: flex; flex-direction: column; gap: 1rem; }
-.form-stack > div > label { margin-bottom: -0.5rem; }
+/* REMOVED problematic style that was hiding labels */
 
 .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
 .checkbox-grid div { display: flex; align-items: center; }
