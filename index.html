@@ -89,16 +89,16 @@
                     <div class="stat-card clickable-card" data-filter-type="all" data-filter-value="all">
                         <h3>Total Jobs</h3><p id="total-jobs-stat">0</p>
                     </div>
-                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Pending Diagnosis">
-                        <h3>Pending Diagnosis</h3><p id="pending-jobs-stat">0</p>
+                    <div class="stat-card clickable-card" data-filter-type="jobStatus" data-filter-value="Pending">
+                        <h3>Pending</h3><p id="pending-jobs-stat">0</p>
                     </div>
-                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Working">
+                    <div class="stat-card clickable-card" data-filter-type="jobStatus" data-filter-value="Working">
                         <h3>Working</h3><p id="working-jobs-stat">0</p>
                     </div>
-                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Delivered">
+                    <div class="stat-card clickable-card" data-filter-type="jobStatus" data-filter-value="Delivered / Completed">
                         <h3>Delivered</h3><p id="delivered-jobs-stat">0</p>
                     </div>
-                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Not Delivered">
+                    <div class="stat-card clickable-card" data-filter-type="jobStatus" data-filter-value="NotDelivered">
                         <h3>Not Delivered</h3><p id="not-delivered-jobs-stat">0</p>
                     </div>
                     <div class="stat-card clickable-card" data-filter-type="inward-outward" data-filter-value="pending-inward">
@@ -151,20 +151,59 @@
                         <h2>Reported Problems</h2>
                         <div id="reported-problems" class="checkbox-grid"></div>
                     </div>
+
                     <div class="card form-section full-width">
-                        <h2>Service Notes & Status</h2>
-                        <textarea id="accessories" placeholder="e.g., Charger Included, Password: 1234" class="input-field" rows="3"></textarea>
-                        <div class="status-grid">
-                            <select id="current-status" class="select-field"></select>
-                            <select id="final-status" class="select-field"></select>
-                            <select id="customer-status" class="select-field"></select>
+                        <h2>Engineer's Log & Actions</h2>
+                        <div class="form-stack">
+                            <div>
+                                <label for="action-tags-input">Action Tags (press Enter or comma to add)</label>
+                                <div class="autocomplete">
+                                    <div id="action-tags-container" class="tags-container">
+                                        <input id="action-tags-input" type="text" placeholder="e.g., OS Installation, Toner Refill..." autocomplete="off">
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="service-log">Service Log / Notes</label>
+                                <textarea id="service-log" placeholder="e.g., Cleaned dust from fan. Customer confirmed no data backup needed." class="input-field" rows="3"></textarea>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="card form-section full-width">
+                        <h2>Parts & Materials Used</h2>
+                        <div class="table-wrapper">
+                            <table class="materials-table">
+                                <thead>
+                                    <tr>
+                                        <th>Part Name</th>
+                                        <th>Details / Specification</th>
+                                        <th>Qty</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="materials-table-body">
+                                    </tbody>
+                            </table>
+                        </div>
+                        <button id="add-material-btn" class="action-btn secondary-btn" style="margin-top: 1rem;">+ Add Material</button>
+                    </div>
+
                     <div class="card form-section">
-                        <h2>Estimate Amount</h2>
-                        <div class="estimate-input">
-                            <span>₹</span>
-                            <input id="estimate-amount" type="number" placeholder="0" class="input-field">
+                        <h2>Status & Estimate</h2>
+                        <div class="form-stack">
+                             <div>
+                                <label for="job-status">Job Status</label>
+                                <select id="job-status" class="select-field"></select>
+                            </div>
+                            <div>
+                                <label for="estimate-amount">Estimate Amount</label>
+                                <div class="estimate-input">
+                                    <span>₹</span>
+                                    <input id="estimate-amount" type="number" placeholder="0" class="input-field">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="card form-section">
@@ -180,6 +219,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="form-section full-width">
                         <button id="save-record-btn" class="action-btn primary-btn large-btn">Save Record</button>
                     </div>
