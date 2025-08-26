@@ -96,7 +96,7 @@ body.dark #theme-icon-moon { display: block; }
     align-items: center;
 }
 .header-spacer {
-    flex-grow: 1; /* This pushes the user profile to the far right */
+    flex-grow: 1;
 }
 .user-profile-area {
     display: flex;
@@ -123,7 +123,7 @@ body.dark #theme-icon-moon { display: block; }
 
 .card {
     background-color: var(--bg-secondary); border-radius: 12px; padding: 1.5rem;
-    box-shadow: var(--shadow); margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
     transition: background-color var(--transition-speed) ease;
 }
 .card h2 { font-size: 1.25rem; font-weight: 600; margin: 0 0 1.5rem 0; }
@@ -168,20 +168,27 @@ label {
 .search-input { max-width: 400px; }
 textarea.input-field { resize: vertical; }
 
-.form-grid, .inward-outward-layout { display: grid; gap: 1.5rem; }
-.form-grid { grid-template-columns: 1fr 1fr; }
-.inward-outward-layout { grid-template-columns: 380px 1fr; }
+.form-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: min-content; /* Key change for compact layout */
+}
+.inward-outward-layout { display: grid; gap: 1.5rem; grid-template-columns: 380px 1fr; }
 .form-section.full-width { grid-column: 1 / -1; }
-.grid-2-col, .grid-3-col { display: grid; gap: 1.5rem; }
+.grid-2-col, .grid-3-col, .status-grid { display: grid; gap: 1rem; }
 .grid-2-col { grid-template-columns: 1fr 1fr; }
-.grid-3-col { grid-template-columns: 1fr 1fr; }
+.grid-3-col { grid-template-columns: repeat(3, 1fr); }
+.status-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.final-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+
 
 .form-stack { display: flex; flex-direction: column; gap: 1rem; }
-.form-stack > div > label { margin-bottom: 0.5rem; }
+.form-stack > label, .form-stack > div > label { margin-bottom: -0.5rem; }
 
 .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
 .checkbox-grid div { display: flex; align-items: center; }
-.checkbox-grid input { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
+.checkbox-grid input[type="checkbox"] { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
 
 .estimate-input {
     display: flex; align-items: center; background-color: var(--bg-primary);
@@ -194,39 +201,13 @@ textarea.input-field { resize: vertical; }
 .estimate-input input:focus { outline: none; box-shadow: none; }
 
 .engineer-checkboxes {
-    display: flex; flex-direction: column; gap: 1rem; align-items: flex-start; padding-top: 0.5rem;
+    display: flex; gap: 1.5rem; align-items: center; padding-top: 0.5rem;
 }
 .engineer-checkboxes div { display: flex; align-items: center; }
-.engineer-checkboxes input { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
+.engineer-checkboxes input[type="checkbox"] { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
 
-/* --- NEW: ACTION TAGS STYLES --- */
-.tags-container {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
-    width: 100%; padding: 0.5rem; border: 1px solid var(--border-color);
-    background-color: var(--bg-primary); border-radius: 8px;
-    transition: all var(--transition-speed) ease; box-sizing: border-box;
-}
-.tags-container:focus-within {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 30%, transparent);
-}
-.tags-container input {
-    flex-grow: 1; border: none; background: transparent;
-    padding: 0.25rem; font-size: 1rem; min-width: 150px;
-    color: var(--text-primary);
-}
-.tags-container input:focus { outline: none; box-shadow: none; }
-.tag {
-    display: inline-flex; align-items: center; background-color: var(--accent-color);
-    color: white; padding: 0.25rem 0.75rem; border-radius: 6px;
-    font-size: 0.875rem; font-weight: 500;
-}
-.tag .remove-tag-btn {
-    margin-left: 0.5rem; background: none; border: none; color: white;
-    cursor: pointer; font-size: 1rem; padding: 0; line-height: 1;
-}
 
-/* --- NEW: MATERIALS TABLE STYLES --- */
+/* --- MATERIALS TABLE STYLES --- */
 .materials-table { width: 100%; border-collapse: collapse; }
 .materials-table th, .materials-table td { padding: 0.5rem; border-bottom: 1px solid var(--border-color); text-align: left; }
 .materials-table th { font-weight: 600; font-size: 0.875rem; color: var(--text-secondary); }
@@ -244,7 +225,7 @@ textarea.input-field { resize: vertical; }
     cursor: pointer; font-size: 1.25rem;
 }
 
-/* --- BUTTONS --- */
+/* --- BUTTONS & ACTIONS --- */
 .action-btn {
     padding: 0.75rem 1.5rem; border: none; border-radius: 8px;
     font-size: 1rem; font-weight: 600; cursor: pointer;
@@ -259,6 +240,12 @@ textarea.input-field { resize: vertical; }
 .large-btn { padding: 1rem 2rem; font-size: 1.125rem; }
 .update-btn { background-color: #f59e0b; }
 .update-btn:hover { background-color: #d97706; }
+.action-footer {
+    display: flex;
+    justify-content: center;
+    padding-top: 1rem;
+}
+
 
 /* --- TABLES & PAGINATION --- */
 .table-wrapper { overflow-x: auto; }
@@ -279,22 +266,20 @@ textarea.input-field { resize: vertical; }
 .data-table th { font-weight: 600; color: var(--text-secondary); }
 .data-table tbody tr { transition: background-color 0.2s ease; }
 .data-table tbody tr:hover { background-color: color-mix(in srgb, var(--border-color) 50%, transparent); }
-.table-actions { overflow: visible; } /* Ensure edit/delete icons are always visible */
+.table-actions { overflow: visible; }
 .table-actions button { background: none; border: none; cursor: pointer; padding: 0.25rem; margin-right: 0.5rem; color: var(--text-secondary); font-size: 1.1rem; }
 .table-actions button:hover { color: var(--accent-color); }
 .table-actions .delete-btn:hover { color: var(--danger-color); }
 
-/* Column Widths for All Jobs Table */
-#all-jobs-page .data-table th:nth-child(1), #all-jobs-page .data-table td:nth-child(1) { width: 8%; } /* Job # */
-#all-jobs-page .data-table th:nth-child(2), #all-jobs-page .data-table td:nth-child(2) { width: 12%; } /* Date */
-#all-jobs-page .data-table th:nth-child(4), #all-jobs-page .data-table td:nth-child(4) { width: 13%; } /* Mobile */
-#all-jobs-page .data-table th:nth-child(6), #all-jobs-page .data-table td:nth-child(6) { width: 15%; } /* Status */
-#all-jobs-page .data-table th:nth-child(7), #all-jobs-page .data-table td:nth-child(7) { width: 10%; text-align: center;} /* Actions */
+#all-jobs-page .data-table th:nth-child(1) { width: 8%; }
+#all-jobs-page .data-table th:nth-child(2) { width: 12%; }
+#all-jobs-page .data-table th:nth-child(4) { width: 13%; }
+#all-jobs-page .data-table th:nth-child(6) { width: 15%; }
+#all-jobs-page .data-table th:nth-child(7) { width: 10%; text-align: center;}
 
-/* Column Widths for Inward/Outward Table */
-#inward-outward-page .data-table th:nth-child(3), #inward-outward-page .data-table td:nth-child(3) { width: 15%; } /* Outward Date */
-#inward-outward-page .data-table th:nth-child(4), #inward-outward-page .data-table td:nth-child(4) { width: 15%; } /* Inward Date */
-#inward-outward-page .data-table th:nth-child(5), #inward-outward-page .data-table td:nth-child(5) { width: 12%; text-align: center; } /* Actions */
+#inward-outward-page .data-table th:nth-child(3) { width: 15%; }
+#inward-outward-page .data-table th:nth-child(4) { width: 15%; }
+#inward-outward-page .data-table th:nth-child(5) { width: 12%; text-align: center; }
 
 .pagination-controls {
     display: flex; justify-content: flex-end; align-items: center;
