@@ -172,19 +172,16 @@ textarea.input-field { resize: vertical; }
     display: grid;
     gap: 1.5rem;
     grid-template-columns: 1fr 1fr;
-    grid-auto-rows: min-content; /* Key change for compact layout */
 }
 .inward-outward-layout { display: grid; gap: 1.5rem; grid-template-columns: 380px 1fr; }
 .form-section.full-width { grid-column: 1 / -1; }
-.grid-2-col, .grid-3-col, .status-grid { display: grid; gap: 1rem; }
+.grid-2-col, .grid-3-col { display: grid; gap: 1rem; }
 .grid-2-col { grid-template-columns: 1fr 1fr; }
-.grid-3-col { grid-template-columns: repeat(3, 1fr); }
-.status-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-.final-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-
+.grid-3-col { grid-template-columns: 1fr 1fr 1fr; }
+.status-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
 .form-stack { display: flex; flex-direction: column; gap: 1rem; }
-.form-stack > label, .form-stack > div > label { margin-bottom: -0.5rem; }
+.form-stack > div > label { margin-bottom: -0.5rem; }
 
 .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
 .checkbox-grid div { display: flex; align-items: center; }
@@ -206,6 +203,33 @@ textarea.input-field { resize: vertical; }
 .engineer-checkboxes div { display: flex; align-items: center; }
 .engineer-checkboxes input[type="checkbox"] { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
 
+
+/* --- ACTION TAGS STYLES --- */
+.tags-container {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem;
+    width: 100%; padding: 0.5rem; border: 1px solid var(--border-color);
+    background-color: var(--bg-primary); border-radius: 8px;
+    transition: all var(--transition-speed) ease; box-sizing: border-box;
+}
+.tags-container:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 30%, transparent);
+}
+.tags-container input {
+    flex-grow: 1; border: none; background: transparent;
+    padding: 0.25rem; font-size: 1rem; min-width: 150px;
+    color: var(--text-primary);
+}
+.tags-container input:focus { outline: none; box-shadow: none; }
+.tag {
+    display: inline-flex; align-items: center; background-color: var(--accent-color);
+    color: white; padding: 0.25rem 0.75rem; border-radius: 6px;
+    font-size: 0.875rem; font-weight: 500;
+}
+.tag .remove-tag-btn {
+    margin-left: 0.5rem; background: none; border: none; color: white;
+    cursor: pointer; font-size: 1rem; padding: 0; line-height: 1;
+}
 
 /* --- MATERIALS TABLE STYLES --- */
 .materials-table { width: 100%; border-collapse: collapse; }
@@ -243,7 +267,6 @@ textarea.input-field { resize: vertical; }
 .action-footer {
     display: flex;
     justify-content: center;
-    padding-top: 1rem;
 }
 
 
