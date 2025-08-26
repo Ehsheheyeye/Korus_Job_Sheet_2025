@@ -89,16 +89,16 @@
                     <div class="stat-card clickable-card" data-filter-type="all" data-filter-value="all">
                         <h3>Total Jobs</h3><p id="total-jobs-stat">0</p>
                     </div>
-                    <div class="stat-card clickable-card" data-filter-type="jobStatus" data-filter-value="Pending">
-                        <h3>Pending</h3><p id="pending-jobs-stat">0</p>
+                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Pending Diagnosis">
+                        <h3>Pending Diagnosis</h3><p id="pending-jobs-stat">0</p>
                     </div>
-                    <div class="stat-card clickable-card" data-filter-type="jobStatus" data-filter-value="Working">
+                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Working">
                         <h3>Working</h3><p id="working-jobs-stat">0</p>
                     </div>
-                    <div class="stat-card clickable-card" data-filter-type="jobStatus" data-filter-value="Delivered / Completed">
+                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Delivered">
                         <h3>Delivered</h3><p id="delivered-jobs-stat">0</p>
                     </div>
-                    <div class="stat-card clickable-card" data-filter-type="jobStatus" data-filter-value="NotDelivered">
+                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Not Delivered">
                         <h3>Not Delivered</h3><p id="not-delivered-jobs-stat">0</p>
                     </div>
                     <div class="stat-card clickable-card" data-filter-type="inward-outward" data-filter-value="pending-inward">
@@ -156,16 +156,12 @@
                         <h2>Engineer's Log & Actions</h2>
                         <div class="form-stack">
                             <div>
-                                <label for="action-tags-input">Action Tags (press Enter or comma to add)</label>
-                                <div class="autocomplete">
-                                    <div id="action-tags-container" class="tags-container">
-                                        <input id="action-tags-input" type="text" placeholder="e.g., OS Installation, Toner Refill..." autocomplete="off">
-                                    </div>
-                                </div>
+                                <label>Actions Taken</label>
+                                <div id="actions-taken" class="checkbox-grid"></div>
                             </div>
-                            <div>
-                                <label for="service-log">Service Log / Notes</label>
-                                <textarea id="service-log" placeholder="e.g., Cleaned dust from fan. Customer confirmed no data backup needed." class="input-field" rows="3"></textarea>
+                             <div>
+                                <label for="other-actions">Other Actions / Service Notes</label>
+                                <textarea id="other-actions" placeholder="e.g., Included charger, Password is 1234. Customer confirmed backup." class="input-field" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -183,44 +179,47 @@
                                         <th></th>
                                     </tr>
                                 </thead>
-                                <tbody id="materials-table-body">
-                                    </tbody>
+                                <tbody id="materials-table-body"></tbody>
                             </table>
                         </div>
                         <button id="add-material-btn" class="action-btn secondary-btn" style="margin-top: 1rem;">+ Add Material</button>
                     </div>
-
-                    <div class="card form-section">
-                        <h2>Status & Estimate</h2>
-                        <div class="form-stack">
-                             <div>
-                                <label for="job-status">Job Status</label>
-                                <select id="job-status" class="select-field"></select>
+                    
+                    <div class="card form-section full-width">
+                        <h2>Final Status & Details</h2>
+                        <div class="final-details-grid">
+                            <div class="form-stack">
+                                <label>Status</label>
+                                <div class="status-grid">
+                                    <select id="current-status" class="select-field"></select>
+                                    <select id="final-status" class="select-field"></select>
+                                    <select id="customer-status" class="select-field"></select>
+                                </div>
                             </div>
-                            <div>
+                            <div class="form-stack">
                                 <label for="estimate-amount">Estimate Amount</label>
                                 <div class="estimate-input">
                                     <span>₹</span>
                                     <input id="estimate-amount" type="number" placeholder="0" class="input-field">
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card form-section">
-                        <h2>Engineer Name</h2>
-                        <div class="engineer-checkboxes">
-                            <div>
-                                <input type="checkbox" id="engineer-kundan" value="Kundan Sir">
-                                <label for="engineer-kundan">Kundan Sir</label>
-                            </div>
-                            <div>
-                                <input type="checkbox" id="engineer-rushi" value="Rushi">
-                                <label for="engineer-rushi">Rushi</label>
+                             <div class="form-stack">
+                                <label>Engineer Name</label>
+                                <div class="engineer-checkboxes">
+                                    <div>
+                                        <input type="checkbox" id="engineer-kundan" value="Kundan Sir">
+                                        <label for="engineer-kundan">Kundan Sir</label>
+                                    </div>
+                                    <div>
+                                        <input type="checkbox" id="engineer-rushi" value="Rushi">
+                                        <label for="engineer-rushi">Rushi</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-section full-width">
+                    <div class="form-section full-width action-footer">
                         <button id="save-record-btn" class="action-btn primary-btn large-btn">Save Record</button>
                     </div>
                 </div>
