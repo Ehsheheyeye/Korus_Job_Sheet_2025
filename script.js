@@ -61,13 +61,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Pre-populated Data ---
         const initialBrandOptions = ["Dell", "HP", "Lenovo", "ASUS", "Acer", "Intex", "I-Ball", "Artist", "Lapcare", "EVM", "Crucial", "Logitech", "Apple (MacBook)", "MSI", "Samsung", "Avita", "Fujitsu", "LG", "Toshiba", "HCL", "Redmi", "Sony", "OnePlus", "TCL", "Panasonic", "Sansui", "BenQ", "Zebronics", "ViewSonic", "AOC", "Philips", "Gigabyte", "Cooler Master", "Foxin", "Western Digital (WD)", "Seagate", "Kingston", "XPG", "ADATA", "SanDisk", "Intel", "Ant Esports", "Antec", "Deepcool", "Circle", "Frontech", "Enter", "Canon", "Epson", "Brother", "TVS", "Zebra", "Xerox", "Kyocera", "Ricoh", "Pantum", "Delta", "Vertiv", "12A", "88A", "78A", "925A", "337A", "ProDot"];
         const initialPartyOptions = ["Rahul Sir", "Shree Enterprises", "San infotech", "Audio video care", "Rx service centre", "Nate", "DSK", "Crucial service centre", "Rashi Peripheral", "SR enterprises", "Cache technology", "perfect computers", "EVM service centre", "navkar enterprises"];
+        const initialActionTags = ["OS Installation", "Windows 10", "Windows 11", "Software Installation", "Toner Refill (12A)", "Toner Refill (88A)", "Full Servicing", "Data Backup", "Password Crack", "Display Replacement", "Keyboard Replacement", "Battery Replacement", "Hinge Repair", "No Power Diagnosis", "Dead Issue Solved"];
+        const initialPartNames = ["SSD", "RAM", "Keyboard", "Battery", "Screen", "Toner", "Motherboard", "Adapter", "CPU Fan"];
+        
         let brandSuggestions = [...initialBrandOptions];
         let partySuggestions = [...initialPartyOptions];
-        const problemOptions = ["Formatting", "Dead / No Power", "No Display", "Software Installation", "Dump error", "Beep Sound", "Refiling", "Battery issue", "HDD / SSD issue", "Screen Issue", "Booting issue", "Head block", "Paper Jam", "Repairing", "Moulding / ABH", "Keyboard / Touchpad", "Repairing", "Replacement"];
+        let actionTagsSuggestions = [...initialActionTags];
+        let partNameSuggestions = [...initialPartNames];
+
+        const problemOptions = ["Formatting", "Dead / No Power", "No Display", "Software Installation", "Dump error", "Beep Sound", "Refiling", "Battery issue", "HDD / SSD issue", "Screen Issue", "Booting issue", "Head block", "Paper Jam", "Repairing", "Moulding / ABH", "Keyboard / Touchpad", "Replacement"];
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
-        const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement"];
-        const finalStatusOptions = ["Not Delivered", "Delivered"];
-        const customerStatusOptions = ["Not Called", "Called", "Called - No Response", "Called - Will Visit", "Called - Not pickup yet"];
+        
+        // NEW single job status
+        const jobStatusOptions = ["Pending Diagnosis", "Awaiting Customer Approval", "Awaiting Parts", "Work in Progress", "Repaired (Ready for Collection)", "Payment Pending", "Delivered / Completed", "Returned (Unrepaired)"];
+        const materialStatusOptions = ["Installed", "Ordered", "Pending", "Customer Provided", "Not Available"];
+
 
         // --- Element Selectors ---
         const DOMElements = {
@@ -80,9 +88,8 @@ document.addEventListener('DOMContentLoaded', () => {
             date: document.getElementById('date'), customerName: document.getElementById('customer-name'),
             customerMobile: document.getElementById('customer-mobile'), altMobile: document.getElementById('alt-mobile'),
             deviceType: document.getElementById('device-type'), brandName: document.getElementById('brand-name'),
-            reportedProblems: document.getElementById('reported-problems'), accessories: document.getElementById('accessories'),
-            currentStatus: document.getElementById('current-status'), finalStatus: document.getElementById('final-status'),
-            customerStatus: document.getElementById('customer-status'), estimateAmount: document.getElementById('estimate-amount'),
+            reportedProblems: document.getElementById('reported-problems'), 
+            estimateAmount: document.getElementById('estimate-amount'),
             engineerKundan: document.getElementById('engineer-kundan'), engineerRushi: document.getElementById('engineer-rushi'),
             saveRecordBtn: document.getElementById('save-record-btn'), newJobBtn: document.getElementById('new-job-btn'),
             totalJobsStat: document.getElementById('total-jobs-stat'), pendingJobsStat: document.getElementById('pending-jobs-stat'),
@@ -107,6 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
             inwardOutwardSearchBox: document.getElementById('inward-outward-search-box'),
             downloadInwardOutwardExcelBtn: document.getElementById('download-inward-outward-excel-btn'),
             inwardOutwardPagination: document.getElementById('inward-outward-pagination'),
+            
+            // NEW Elements
+            actionTagsContainer: document.getElementById('action-tags-container'),
+            actionTagsInput: document.getElementById('action-tags-input'),
+            serviceLog: document.getElementById('service-log'),
+            materialsTableBody: document.getElementById('materials-table-body'),
+            addMaterialBtn: document.getElementById('add-material-btn'),
+            jobStatus: document.getElementById('job-status'),
         };
 
         function init() {
@@ -184,8 +199,12 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.inwardOutwardSearchBox.addEventListener('input', () => handleOutwardSearch(null));
             DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
             DOMElements.downloadInwardOutwardExcelBtn.addEventListener('click', downloadInwardOutwardAsExcel);
+            
             setupAutocomplete(DOMElements.brandName, brandSuggestions);
             setupAutocomplete(DOMElements.partyName, partySuggestions);
+            setupActionTags(); // NEW
+            setupMaterialsTable(); // NEW
+
             setupDashboardCardClickListeners();
         }
 
@@ -213,9 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function populateSelects() {
             populateOptions(DOMElements.deviceType, deviceTypeOptions, "Select Device Type");
-            populateOptions(DOMElements.currentStatus, currentStatusOptions, "Select Current Status");
-            populateOptions(DOMElements.finalStatus, finalStatusOptions, "Select Final Status");
-            populateOptions(DOMElements.customerStatus, customerStatusOptions, "Select Customer Status");
+            populateOptions(DOMElements.jobStatus, jobStatusOptions, "Select Job Status");
         }
 
         function populateOptions(select, options, defaultText) {
@@ -253,24 +270,130 @@ document.addEventListener('DOMContentLoaded', () => {
 
             brandSuggestions = await loadSuggestions('brands', initialBrandOptions);
             partySuggestions = await loadSuggestions('parties', initialPartyOptions);
+            actionTagsSuggestions = await loadSuggestions('actionTags', initialActionTags);
+            partNameSuggestions = await loadSuggestions('partNames', initialPartNames);
         }
         
         async function loadSuggestions(collectionName, initialArray) {
-            const snapshot = await db.collection(collectionName).get();
-            const dbSuggestions = snapshot.docs.map(doc => doc.data().name);
-            return [...new Set([...initialArray, ...dbSuggestions])];
+            try {
+                const snapshot = await db.collection(collectionName).get();
+                const dbSuggestions = snapshot.docs.map(doc => doc.data().name);
+                return [...new Set([...initialArray, ...dbSuggestions])].sort();
+            } catch (error) {
+                console.error(`Error loading suggestions for ${collectionName}:`, error);
+                return initialArray.sort();
+            }
         }
 
         function updateDashboardStats() {
             DOMElements.totalJobsStat.textContent = allJobSheets.length;
-            DOMElements.pendingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Pending Diagnosis').length;
-            DOMElements.workingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Working').length;
-            DOMElements.deliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Delivered').length;
-            DOMElements.notDeliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Not Delivered').length;
+            const pendingStat = allJobSheets.filter(j => ["Pending Diagnosis", "Awaiting Customer Approval"].includes(j.jobStatus)).length;
+            const workingStat = allJobSheets.filter(j => ["Work in Progress", "Awaiting Parts", "Repaired (Ready for Collection)"].includes(j.jobStatus)).length;
+            const deliveredStat = allJobSheets.filter(j => j.jobStatus === 'Delivered / Completed').length;
             
+            DOMElements.pendingJobsStat.textContent = pendingStat;
+            DOMElements.workingJobsStat.textContent = workingStat;
+            DOMElements.deliveredJobsStat.textContent = deliveredStat;
+            DOMElements.notDeliveredJobsStat.textContent = allJobSheets.length - deliveredStat;
+
             const pendingInwards = allOutwardRecords.filter(r => !r.inwardDate);
             DOMElements.pendingInwardStat.textContent = pendingInwards.length;
             DOMElements.rahulSirPendingStat.textContent = pendingInwards.filter(r => r.partyName === 'Rahul Sir').length;
+        }
+
+        // --- NEW: ACTION TAGS LOGIC ---
+        function setupActionTags() {
+            setupAutocomplete(DOMElements.actionTagsInput, actionTagsSuggestions);
+            DOMElements.actionTagsInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const tagValue = DOMElements.actionTagsInput.value.trim();
+                    if (tagValue) {
+                        addTag(tagValue);
+                        DOMElements.actionTagsInput.value = '';
+                    }
+                }
+            });
+        }
+        
+        function addTag(text) {
+            const tagEl = document.createElement('span');
+            tagEl.className = 'tag';
+            tagEl.textContent = text;
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-tag-btn';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.onclick = () => tagEl.remove();
+            
+            tagEl.appendChild(removeBtn);
+            DOMElements.actionTagsContainer.insertBefore(tagEl, DOMElements.actionTagsInput);
+        }
+
+        function getTags() {
+            return Array.from(DOMElements.actionTagsContainer.querySelectorAll('.tag')).map(tagEl => tagEl.textContent.slice(0, -1));
+        }
+
+        function renderTags(tags = []) {
+            DOMElements.actionTagsContainer.querySelectorAll('.tag').forEach(t => t.remove());
+            tags.forEach(addTag);
+        }
+
+        // --- NEW: MATERIALS TABLE LOGIC ---
+        function setupMaterialsTable() {
+            DOMElements.addMaterialBtn.addEventListener('click', () => addMaterialRow());
+            DOMElements.materialsTableBody.addEventListener('click', (e) => {
+                if(e.target.classList.contains('remove-material-btn')) {
+                    e.target.closest('tr').remove();
+                }
+            });
+        }
+
+        function addMaterialRow(material = {}) {
+            const row = document.createElement('tr');
+            const uniqueId = `material-row-${Date.now()}-${Math.random()}`;
+
+            const statusOptionsHTML = materialStatusOptions.map(opt => 
+                `<option value="${opt}" ${material.status === opt ? 'selected' : ''}>${opt}</option>`
+            ).join('');
+
+            row.innerHTML = `
+                <td>
+                    <div class="autocomplete">
+                        <input type="text" class="input-field part-name" placeholder="e.g., SSD" value="${material.name || ''}" list="part-names-list-${uniqueId}">
+                    </div>
+                </td>
+                <td><input type="text" class="input-field part-details" placeholder="e.g., Samsung 256GB" value="${material.details || ''}"></td>
+                <td><input type="number" class="input-field part-qty" placeholder="1" value="${material.qty || '1'}"></td>
+                <td><select class="select-field part-status">${statusOptionsHTML}</select></td>
+                <td><button class="remove-material-btn">&times;</button></td>
+            `;
+            DOMElements.materialsTableBody.appendChild(row);
+
+            // Setup autocomplete for the new row's part name input
+            const partNameInput = row.querySelector('.part-name');
+            setupAutocomplete(partNameInput, partNameSuggestions);
+        }
+
+        function getMaterials() {
+            const materials = [];
+            DOMElements.materialsTableBody.querySelectorAll('tr').forEach(row => {
+                const name = row.querySelector('.part-name').value.trim();
+                const details = row.querySelector('.part-details').value.trim();
+                const qty = row.querySelector('.part-qty').value.trim();
+                const status = row.querySelector('.part-status').value;
+                if (name) {
+                    materials.push({ name, details, qty: parseInt(qty) || 1, status });
+                }
+            });
+            return materials;
+        }
+
+        function renderMaterialsTable(materials = []) {
+            DOMElements.materialsTableBody.innerHTML = '';
+            if (materials && materials.length > 0) {
+                materials.forEach(addMaterialRow);
+            }
         }
 
         function renderRecentJobsTable(jobs) {
@@ -280,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${job.jobSheetNo}</td>
                     <td title="${job.customerName}">${job.customerName}</td>
                     <td title="${job.deviceType}">${job.deviceType}</td>
-                    <td>${job.currentStatus}</td>
+                    <td>${job.jobStatus || 'N/A'}</td>
                     <td>${formatTimestamp(job.updatedAt)}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
@@ -301,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td title="${job.customerName}">${job.customerName}</td>
                     <td title="${job.customerMobile}">${job.customerMobile}</td>
                     <td title="${job.deviceType}">${job.deviceType}</td>
-                    <td>${job.currentStatus}</td>
+                    <td>${job.jobStatus || 'N/A'}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
                         <button title="Delete" class="delete-btn" onclick="window.app.deleteJob('${job.id}')">🗑️</button>
@@ -319,10 +442,16 @@ document.addEventListener('DOMContentLoaded', () => {
             // Apply dashboard filter first, if it exists
             if (dashboardFilter) {
                 if (dashboardFilter.value !== 'all') {
-                    if (dashboardFilter.type === 'currentStatus') {
-                        tempFilteredJobs = tempFilteredJobs.filter(job => job.currentStatus === dashboardFilter.value);
-                    } else if (dashboardFilter.type === 'finalStatus') {
-                        tempFilteredJobs = tempFilteredJobs.filter(job => job.finalStatus === dashboardFilter.value);
+                    if (dashboardFilter.type === 'jobStatus') {
+                        if (dashboardFilter.value === 'Pending') {
+                             tempFilteredJobs = tempFilteredJobs.filter(job => ["Pending Diagnosis", "Awaiting Customer Approval"].includes(job.jobStatus));
+                        } else if (dashboardFilter.value === 'Working') {
+                            tempFilteredJobs = tempFilteredJobs.filter(job => ["Work in Progress", "Awaiting Parts", "Repaired (Ready for Collection)"].includes(job.jobStatus));
+                        } else if (dashboardFilter.value === 'NotDelivered') {
+                            tempFilteredJobs = tempFilteredJobs.filter(job => job.jobStatus !== 'Delivered / Completed');
+                        } else {
+                            tempFilteredJobs = tempFilteredJobs.filter(job => job.jobStatus === dashboardFilter.value);
+                        }
                     }
                 }
             }
@@ -353,11 +482,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function clearJobSheetForm() {
             currentEditingJobId = null;
-            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.accessories, DOMElements.estimateAmount];
+            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.serviceLog, DOMElements.estimateAmount];
             fieldsToClear.forEach(el => el.value = '');
-            [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
+            
+            [DOMElements.deviceType, DOMElements.jobStatus].forEach(el => el.selectedIndex = 0);
+            
             document.querySelectorAll('#reported-problems input').forEach(cb => cb.checked = false);
             DOMElements.engineerKundan.checked = false; DOMElements.engineerRushi.checked = false;
+            
+            renderTags([]); // Clear tags
+            renderMaterialsTable([]); // Clear materials table
+
             setInitialDate();
             DOMElements.saveRecordBtn.textContent = 'Save Record';
             DOMElements.saveRecordBtn.classList.remove('update-btn');
@@ -368,6 +503,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (DOMElements.engineerKundan.checked) engineers.push("Kundan Sir");
             if (DOMElements.engineerRushi.checked) engineers.push("Rushi");
 
+            const actionTags = getTags();
+            const materials = getMaterials();
+
             const jobData = {
                 jobSheetNo: Number(DOMElements.jobSheetNo.value.trim() || 0),
                 oldJobSheetNo: DOMElements.oldJobSheetNo.value.trim(),
@@ -375,8 +513,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 customerMobile: DOMElements.customerMobile.value.trim(), altMobile: DOMElements.altMobile.value.trim(),
                 deviceType: DOMElements.deviceType.value, brandName: DOMElements.brandName.value.trim(),
                 reportedProblems: Array.from(document.querySelectorAll('#reported-problems input:checked')).map(cb => cb.value),
-                accessories: DOMElements.accessories.value.trim(), currentStatus: DOMElements.currentStatus.value,
-                finalStatus: DOMElements.finalStatus.value, customerStatus: DOMElements.customerStatus.value,
+                serviceLog: DOMElements.serviceLog.value.trim(), // new
+                actionTags: actionTags, // new
+                materials: materials, // new
+                jobStatus: DOMElements.jobStatus.value, // new
                 estimateAmount: parseFloat(DOMElements.estimateAmount.value) || 0,
                 engineers: engineers,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -393,7 +533,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     await db.collection("jobSheets").add(jobData);
                     showSuccessModal("Record Saved!");
                 }
+                
+                // Learn new suggestions
                 await addSuggestion(jobData.brandName, 'brands', brandSuggestions);
+                for (const tag of actionTags) { await addSuggestion(tag, 'actionTags', actionTagsSuggestions); }
+                for (const mat of materials) { await addSuggestion(mat.name, 'partNames', partNameSuggestions); }
+                
                 clearJobSheetForm();
                 document.querySelector('.nav-link[data-page="dashboard"]').click();
             } catch (error) { console.error("Error saving job sheet: ", error); alert("Error saving record."); }
@@ -403,14 +548,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const job = allJobSheets.find(j => j.id === id);
             if (!job) return;
             currentEditingJobId = id;
-            Object.keys(job).forEach(key => {
-                if(DOMElements[key] && DOMElements[key].tagName !== 'DIV') {
-                    DOMElements[key].value = job[key];
-                }
-            });
+            
+            // Populate standard fields
+            DOMElements.jobSheetNo.value = job.jobSheetNo || '';
+            DOMElements.oldJobSheetNo.value = job.oldJobSheetNo || '';
+            DOMElements.date.value = job.date || '';
+            DOMElements.customerName.value = job.customerName || '';
+            DOMElements.customerMobile.value = job.customerMobile || '';
+            DOMElements.altMobile.value = job.altMobile || '';
+            DOMElements.deviceType.value = job.deviceType || '';
+            DOMElements.brandName.value = job.brandName || '';
+            DOMElements.estimateAmount.value = job.estimateAmount || '';
+            
+            // Populate NEW fields
+            DOMElements.serviceLog.value = job.serviceLog || '';
+            DOMElements.jobStatus.value = job.jobStatus || '';
+            renderTags(job.actionTags);
+            renderMaterialsTable(job.materials);
+
+            // Populate checkboxes
             document.querySelectorAll('#reported-problems input').forEach(cb => { cb.checked = job.reportedProblems?.includes(cb.value); });
             DOMElements.engineerKundan.checked = job.engineers?.includes("Kundan Sir") || false;
             DOMElements.engineerRushi.checked = job.engineers?.includes("Rushi") || false;
+            
             DOMElements.saveRecordBtn.textContent = 'Update Record';
             DOMElements.saveRecordBtn.classList.add('update-btn');
             document.querySelector('.nav-link[data-page="job-sheet"]').click();
@@ -558,22 +718,41 @@ document.addEventListener('DOMContentLoaded', () => {
             const trimmedValue = value.trim();
             if (trimmedValue && !suggestionsArray.some(s => s.toLowerCase() === trimmedValue.toLowerCase())) {
                 try {
+                    // Use the value itself as the document ID for easy lookup and to prevent duplicates
                     await db.collection(collectionName).doc(trimmedValue.toLowerCase()).set({ name: trimmedValue });
                     suggestionsArray.push(trimmedValue);
+                    suggestionsArray.sort(); // Keep the array sorted
                 } catch (e) { console.error("Error adding suggestion:", e); }
             }
         }
 
         function setupAutocomplete(input, suggestionsArray) {
-            let container = document.createElement('div');
-            container.className = 'autocomplete-items';
-            input.parentNode.appendChild(container);
-            input.addEventListener('input', () => {
-                container.innerHTML = !input.value ? '' : suggestionsArray
+            let container = input.closest('.autocomplete').querySelector('.autocomplete-items');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'autocomplete-items';
+                input.parentNode.appendChild(container);
+            }
+            
+            const showSuggestions = () => {
+                 container.innerHTML = !input.value ? '' : suggestionsArray
                     .filter(item => item.toLowerCase().includes(input.value.toLowerCase()))
                     .map(item => `<div data-value="${item}">${item}</div>`).join('');
+            };
+
+            input.addEventListener('input', showSuggestions);
+            input.addEventListener('focus', showSuggestions);
+
+            container.addEventListener('click', e => { 
+                if (e.target.dataset.value) { 
+                    input.value = e.target.dataset.value; 
+                    container.innerHTML = ''; 
+                    if(input.id === 'action-tags-input') {
+                        addTag(input.value);
+                        input.value = '';
+                    }
+                } 
             });
-            container.addEventListener('click', e => { if (e.target.dataset.value) { input.value = e.target.dataset.value; container.innerHTML = ''; } });
             document.addEventListener('click', e => { if (e.target !== input) container.innerHTML = ''; });
         }
 
@@ -588,9 +767,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataToExport = allJobSheets.map(job => ({
                 "Job No": job.jobSheetNo, "Old Job No": job.oldJobSheetNo, "Date": formatDate(job.date),
                 "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
-                "Device Type": job.deviceType, "Brand": job.brandName, "Problems": job.reportedProblems.join(', '),
-                "Accessories": job.accessories, "Current Status": job.currentStatus, "Final Status": job.finalStatus,
-                "Customer Status": job.customerStatus, "Engineer(s)": job.engineers ? job.engineers.join(', ') : '',
+                "Device Type": job.deviceType, "Brand": job.brandName, "Problems": (job.reportedProblems || []).join(', '),
+                "Service Log": job.serviceLog,
+                "Action Tags": (job.actionTags || []).join(', '),
+                "Materials Used": (job.materials || []).map(m => `${m.qty}x ${m.name} (${m.details}) - ${m.status}`).join('; '),
+                "Job Status": job.jobStatus,
+                "Engineer(s)": job.engineers ? job.engineers.join(', ') : '',
                 "Estimate Amount": job.estimateAmount,
             }));
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
