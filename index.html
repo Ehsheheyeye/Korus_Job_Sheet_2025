@@ -147,6 +147,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="card form-section full-width">
                         <h2>Reported Problems</h2>
                         <div id="reported-problems" class="checkbox-grid"></div>
@@ -156,12 +157,16 @@
                         <h2>Engineer's Log & Actions</h2>
                         <div class="form-stack">
                             <div>
-                                <label>Actions Taken</label>
-                                <div id="actions-taken" class="checkbox-grid"></div>
+                                <label for="action-tags-input">Action Tags (press Enter or comma to add)</label>
+                                <div class="autocomplete">
+                                    <div id="action-tags-container" class="tags-container">
+                                        <input id="action-tags-input" type="text" placeholder="e.g., OS Installation, Toner Refill..." autocomplete="off">
+                                    </div>
+                                </div>
                             </div>
-                             <div>
-                                <label for="other-actions">Other Actions / Service Notes</label>
-                                <textarea id="other-actions" placeholder="e.g., Included charger, Password is 1234. Customer confirmed backup." class="input-field" rows="3"></textarea>
+                            <div>
+                                <label for="service-log">Service Log / Notes</label>
+                                <textarea id="service-log" placeholder="e.g., Cleaned dust from fan. Customer confirmed no data backup needed." class="input-field" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -172,11 +177,7 @@
                             <table class="materials-table">
                                 <thead>
                                     <tr>
-                                        <th>Part Name</th>
-                                        <th>Details / Specification</th>
-                                        <th>Qty</th>
-                                        <th>Status</th>
-                                        <th></th>
+                                        <th>Part Name</th><th>Details / Specification</th><th>Qty</th><th>Status</th><th></th>
                                     </tr>
                                 </thead>
                                 <tbody id="materials-table-body"></tbody>
@@ -186,35 +187,32 @@
                     </div>
                     
                     <div class="card form-section full-width">
-                        <h2>Final Status & Details</h2>
-                        <div class="final-details-grid">
-                            <div class="form-stack">
-                                <label>Status</label>
-                                <div class="status-grid">
-                                    <select id="current-status" class="select-field"></select>
-                                    <select id="final-status" class="select-field"></select>
-                                    <select id="customer-status" class="select-field"></select>
-                                </div>
+                        <h2>Service Status</h2>
+                        <div class="status-grid">
+                            <select id="current-status" class="select-field"></select>
+                            <select id="final-status" class="select-field"></select>
+                            <select id="customer-status" class="select-field"></select>
+                        </div>
+                    </div>
+
+                    <div class="card form-section">
+                        <h2>Estimate Amount</h2>
+                        <div class="estimate-input">
+                            <span>₹</span>
+                            <input id="estimate-amount" type="number" placeholder="0" class="input-field">
+                        </div>
+                    </div>
+                    
+                    <div class="card form-section">
+                        <h2>Engineer Name</h2>
+                        <div class="engineer-checkboxes">
+                            <div>
+                                <input type="checkbox" id="engineer-kundan" value="Kundan Sir">
+                                <label for="engineer-kundan">Kundan Sir</label>
                             </div>
-                            <div class="form-stack">
-                                <label for="estimate-amount">Estimate Amount</label>
-                                <div class="estimate-input">
-                                    <span>₹</span>
-                                    <input id="estimate-amount" type="number" placeholder="0" class="input-field">
-                                </div>
-                            </div>
-                             <div class="form-stack">
-                                <label>Engineer Name</label>
-                                <div class="engineer-checkboxes">
-                                    <div>
-                                        <input type="checkbox" id="engineer-kundan" value="Kundan Sir">
-                                        <label for="engineer-kundan">Kundan Sir</label>
-                                    </div>
-                                    <div>
-                                        <input type="checkbox" id="engineer-rushi" value="Rushi">
-                                        <label for="engineer-rushi">Rushi</label>
-                                    </div>
-                                </div>
+                            <div>
+                                <input type="checkbox" id="engineer-rushi" value="Rushi">
+                                <label for="engineer-rushi">Rushi</label>
                             </div>
                         </div>
                     </div>
