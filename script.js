@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const problemOptions = ["Dead / No Power", "No Display", "Dump error", "Beep Sound", "Battery issue", "HDD / SSD issue", "Screen Issue", "Booting issue", "Head block", "Paper Jam", "Moulding / ABH", "Keyboard / Touchpad"];
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
         
-        const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement"];
+        const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement", "Ready"];
         const finalStatusOptions = ["Not Delivered", "Delivered"];
         const customerStatusOptions = ["Not Called", "Called", "Called - No Response", "Called - Will Visit", "Called - Not pickup yet"];
         const materialStatusOptions = ["Installed", "Ordered", "Pending", "Customer Provided", "Not Available"];
@@ -785,3 +785,4 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
+
