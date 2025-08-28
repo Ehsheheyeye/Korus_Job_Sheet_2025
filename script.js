@@ -90,7 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
             reportedProblems: document.getElementById('reported-problems'), 
             estimateAmount: document.getElementById('estimate-amount'),
             engineerKundan: document.getElementById('engineer-kundan'), engineerRushi: document.getElementById('engineer-rushi'),
-            saveRecordBtn: document.getElementById('save-record-btn'), newJobBtn: document.getElementById('new-job-btn'),
+            saveRecordBtn: document.getElementById('save-record-btn'),
+            sendWhatsAppBtn: document.getElementById('send-whatsapp-btn'),
+            newJobBtn: document.getElementById('new-job-btn'),
             totalJobsStat: document.getElementById('total-jobs-stat'), pendingJobsStat: document.getElementById('pending-jobs-stat'),
             workingJobsStat: document.getElementById('working-jobs-stat'), deliveredJobsStat: document.getElementById('delivered-jobs-stat'),
             notDeliveredJobsStat: document.getElementById('not-delivered-jobs-stat'),
@@ -194,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function setupEventListeners() {
             DOMElements.saveRecordBtn.addEventListener('click', saveJobSheet);
+            DOMElements.sendWhatsAppBtn.addEventListener('click', sendWhatsAppMessage);
             DOMElements.newJobBtn.addEventListener('click', clearJobSheetForm);
             DOMElements.saveOutwardBtn.addEventListener('click', saveOutwardRecord);
             DOMElements.cancelOutwardEditBtn.addEventListener('click', clearOutwardForm);
@@ -486,12 +489,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function saveJobSheet() {
+            const jobSheetNo = Number(DOMElements.jobSheetNo.value.trim() || 0);
+
+            if (!currentEditingJobId && allJobSheets.some(job => job.jobSheetNo === jobSheetNo)) {
+                alert("Error: Job Sheet Number " + jobSheetNo + " already exists. Please use a different number.");
+                return;
+            }
+            
             const engineers = [];
             if (DOMElements.engineerKundan.checked) engineers.push("Kundan Sir");
             if (DOMElements.engineerRushi.checked) engineers.push("Rushi");
 
             const jobData = {
-                jobSheetNo: Number(DOMElements.jobSheetNo.value.trim() || 0),
+                jobSheetNo: jobSheetNo,
                 oldJobSheetNo: DOMElements.oldJobSheetNo.value.trim(),
                 date: DOMElements.date.value,
                 customerName: DOMElements.customerName.value.trim(),
@@ -530,6 +540,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearJobSheetForm();
                 document.querySelector('.nav-link[data-page="dashboard"]').click();
             } catch (error) { console.error("Error saving job sheet: ", error); alert("Error saving record."); }
+        }
+        
+        function sendWhatsAppMessage() {
+            const customerName = DOMElements.customerName.value.trim();
+            const jobSheetNo = DOMElements.jobSheetNo.value.trim();
+            const brandName = DOMElements.brandName.value.trim();
+            const deviceType = DOMElements.deviceType.value;
+            const estimateAmount = DOMElements.estimateAmount.value.trim();
+            const customerMobile = DOMElements.customerMobile.value.trim();
+
+            if (!customerMobile || !customerName || !jobSheetNo || !brandName || !deviceType || !estimateAmount) {
+                alert('Please fill all the required fields to send a WhatsApp message.');
+                return;
+            }
+
+            let phoneNumber = customerMobile;
+            if (phoneNumber.length === 10 && !phoneNumber.startsWith('91')) {
+                phoneNumber = '91' + phoneNumber;
+            }
+
+            const message = `Hello, ${customerName} 👋\n\nYour Job No: ${jobSheetNo}\nYour ${brandName} ${deviceType} is now ready ✅\n\n💰 Amount: ₹${estimateAmount}\n\n📍 Please collect your device between\n10:30 AM – 07:30 PM\n\nThank you,\nKorus Computers`;
+
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+            window.open(whatsappUrl, '_blank');
         }
 
         function editJob(id) {
@@ -785,4 +821,3 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
-
