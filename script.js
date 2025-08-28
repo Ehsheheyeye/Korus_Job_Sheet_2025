@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let allJobsCurrentPage = 1;
         let outwardCurrentPage = 1;
         const itemsPerPage = 10;
+        let currentJobRangeFilter = 'all'; 
 
         // --- Pre-populated Data ---
         const initialBrandOptions = ["Dell", "HP", "Lenovo", "ASUS", "Acer", "Intex", "I-Ball", "Artist", "Lapcare", "EVM", "Crucial", "Logitech", "Apple (MacBook)", "MSI", "Samsung", "Avita", "Fujitsu", "LG", "Toshiba", "HCL", "Redmi", "Sony", "OnePlus", "TCL", "Panasonic", "Sansui", "BenQ", "Zebronics", "ViewSonic", "AOC", "Philips", "Gigabyte", "Cooler Master", "Foxin", "Western Digital (WD)", "Seagate", "Kingston", "XPG", "ADATA", "SanDisk", "Intel", "Ant Esports", "Antec", "Deepcool", "Circle", "Frontech", "Enter", "Canon", "Epson", "Brother", "TVS", "Zebra", "Xerox", "Kyocera", "Ricoh", "Pantum", "Delta", "Vertiv", "12A", "88A", "78A", "925A", "337A", "ProDot"];
@@ -160,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else if (page === 'all-jobs') {
                         DOMElements.jobNoSearchBox.value = '';
                         DOMElements.mobileNoSearchBox.value = '';
-                        handleAllJobsSearch(null); // FIX: Reset filter on direct navigation
+                        handleAllJobsSearch(null); 
                         DOMElements.allJobsHeaderActions.style.display = 'flex';
                     } else if (page === 'inward-outward') {
                         DOMElements.inwardOutwardHeaderActions.style.display = 'flex';
@@ -262,6 +263,11 @@ document.addEventListener('DOMContentLoaded', () => {
         async function loadInitialData() {
             db.collection("jobSheets").orderBy("jobSheetNo", "desc").onSnapshot(snap => {
                 allJobSheets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // This client-side sort ensures correct numerical order (newest first)
+                allJobSheets.sort((a, b) => (b.jobSheetNo || 0) - (a.jobSheetNo || 0));
+
+                renderJobRangeFilters(); // Create the new filter buttons
                 updateDashboardStats();
                 handleAllJobsSearch(null);
             });
@@ -304,6 +310,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const pendingInwards = allOutwardRecords.filter(r => !r.inwardDate);
             DOMElements.pendingInwardStat.textContent = pendingInwards.length;
             DOMElements.rahulSirPendingStat.textContent = pendingInwards.filter(r => r.partyName === 'Rahul Sir').length;
+        }
+
+        function renderJobRangeFilters() {
+            const container = document.getElementById('job-range-filters');
+            if (!container) return;
+
+            const ranges = [...new Set(allJobSheets
+                .map(j => Math.floor(j.jobSheetNo / 100) * 100)
+                .filter(r => r > 0)
+            )].sort((a, b) => b - a);
+
+            let buttonsHTML = `<button class="job-range-filter-btn active" data-range="all">All</button>`;
+            
+            ranges.forEach(rangeStart => {
+                const rangeEnd = rangeStart + 99;
+                buttonsHTML += `<button class="job-range-filter-btn" data-range="${rangeStart}">${rangeStart}-${rangeEnd}</button>`;
+            });
+
+            container.innerHTML = buttonsHTML;
+
+            container.querySelectorAll('.job-range-filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    container.querySelector('.active')?.classList.remove('active');
+                    btn.classList.add('active');
+                    currentJobRangeFilter = btn.dataset.range === 'all' ? 'all' : parseInt(btn.dataset.range);
+                    handleAllJobsSearch(null); 
+                });
+            });
         }
 
         function setupActionTags() {
@@ -438,6 +472,13 @@ document.addEventListener('DOMContentLoaded', () => {
             let tempFilteredJobs = allJobSheets;
 
             if (dashboardFilter) {
+                currentJobRangeFilter = 'all';
+                const filterContainer = document.getElementById('job-range-filters');
+                if (filterContainer) {
+                    filterContainer.querySelector('.active')?.classList.remove('active');
+                    filterContainer.querySelector('[data-range="all"]')?.classList.add('active');
+                }
+                
                 if (dashboardFilter.value !== 'all') {
                     if (dashboardFilter.type === 'currentStatus') {
                         tempFilteredJobs = tempFilteredJobs.filter(job => job.currentStatus === dashboardFilter.value);
@@ -445,6 +486,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         tempFilteredJobs = tempFilteredJobs.filter(job => job.finalStatus === dashboardFilter.value);
                     }
                 }
+            }
+
+            if (currentJobRangeFilter !== 'all') {
+                const lowerBound = currentJobRangeFilter;
+                const upperBound = lowerBound + 99;
+                tempFilteredJobs = tempFilteredJobs.filter(job => job.jobSheetNo >= lowerBound && job.jobSheetNo <= upperBound);
             }
 
             if (jobNoTerm) {
@@ -560,14 +607,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 phoneNumber = '91' + phoneNumber;
             }
 
-            // Encode only the user-provided parts of the message
             const encodedCustomerName = encodeURIComponent(customerName);
             const encodedJobSheetNo = encodeURIComponent(jobSheetNo);
             const encodedBrandName = encodeURIComponent(brandName);
             const encodedDeviceType = encodeURIComponent(deviceType);
             const encodedEstimateAmount = encodeURIComponent(`₹${estimateAmount}`);
 
-            // Manually build the message with pre-encoded emojis and newlines (%0A)
             const textParts = [
                 `Hello, ${encodedCustomerName} %F0%9F%91%8B`, // 👋
                 ``,
@@ -583,10 +628,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 `Korus Computers`
             ];
 
-            const finalMessage = textParts.join('%0A'); // Join each line with an encoded newline
-
+            const finalMessage = textParts.join('%0A');
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${finalMessage}`;
-
             window.open(whatsappUrl, '_blank');
         }
 
@@ -629,8 +672,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // ... (The rest of the Inward/Outward and helper functions remain the same)
-
         function renderOutwardTable() {
             const startIndex = (outwardCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
