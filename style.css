@@ -423,3 +423,35 @@ textarea.input-field { resize: vertical; }
     .search-input { width: 100%; max-width: 100%; }
     .pagination-controls { justify-content: center; }
 }
+
+/* --- START: Add these styles for the Job Range Filter Buttons --- */
+.job-range-filters {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
+}
+
+.job-range-filter-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.job-range-filter-btn:hover {
+    background-color: color-mix(in srgb, var(--border-color) 50%, transparent);
+    color: var(--text-primary);
+}
+
+.job-range-filter-btn.active {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+/* --- END: Add these styles --- */
