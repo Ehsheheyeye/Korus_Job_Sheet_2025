@@ -560,7 +560,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 phoneNumber = '91' + phoneNumber;
             }
 
-            const message = `Hello, ${customerName} 👋\n\nYour Job No: ${jobSheetNo}\nYour ${brandName} ${deviceType} is now ready ✅\n\n💰 Amount: ₹${estimateAmount}\n\n📍 Please collect your device between\n10:30 AM – 07:30 PM\n\nThank you,\nKorus Computers`;
+            // Using Unicode escape sequences for emojis to ensure they render correctly
+            const message = `Hello, ${customerName} \uD83D\uDC4B\n\nYour Job No: ${jobSheetNo}\nYour ${brandName} ${deviceType} is now ready \u2705\n\n\uD83D\uDCB0 Amount: ₹${estimateAmount}\n\n\uD83D\uDCCD Please collect your device between\n10:30 AM – 07:30 PM\n\nThank you,\nKorus Computers`;
 
             const encodedMessage = encodeURIComponent(message);
             const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
