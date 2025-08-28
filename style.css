@@ -46,11 +46,10 @@ body.dark {
     transition: background-color var(--transition-speed) ease;
     flex-shrink: 0;
     
-    /* --- FIX: Make sidebar sticky and full-height --- */
     position: sticky;
     top: 0;
     height: 100vh;
-    box-sizing: border-box; /* Ensures padding is included in height */
+    box-sizing: border-box;
 }
 .main-content {
     flex-grow: 1;
@@ -77,7 +76,7 @@ body.dark {
 .nav-icon { width: 1.5rem; height: 1.5rem; margin-right: 1rem; flex-shrink: 0; }
 
 .sidebar-footer {
-    margin-top: auto; /* This pushes the footer to the bottom */
+    margin-top: auto;
     text-align: center;
     padding-top: 1.5rem;
     border-top: 1px solid #374151;
@@ -222,7 +221,6 @@ textarea.input-field { resize: vertical; }
 }
 .engineer-checkboxes div { display: flex; align-items: center; }
 .engineer-checkboxes input[type="checkbox"] { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
-
 
 /* --- ACTION TAGS STYLES --- */
 .tags-container {
@@ -382,7 +380,7 @@ textarea.input-field { resize: vertical; }
 /* --- RESPONSIVE STYLES --- */
 @media (max-width: 1024px) {
     .sidebar {
-        position: fixed; /* This is already correct for mobile */
+        position: fixed;
         top: 0;
         left: 0;
         height: 100%;
@@ -424,12 +422,42 @@ textarea.input-field { resize: vertical; }
     .pagination-controls { justify-content: center; }
 }
 
-/* --- START: Add these styles for the Job Range Filter Buttons --- */
-.job-range-filters {
-    display: flex;
-    gap: 0.5rem;
+/* --- Filter Dropdown Styles --- */
+.filter-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+#filter-toggle-btn {
+    display: inline-flex;
     align-items: center;
-    flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+}
+
+#filter-toggle-btn.active {
+    background-color: var(--accent-hover);
+    color: white;
+}
+
+.filter-popup {
+    display: none;
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    z-index: 10;
+    padding: 0.75rem;
+    flex-direction: row;
+    gap: 0.5rem;
+    width: max-content;
+}
+
+.filter-popup.visible {
+    display: flex;
 }
 
 .job-range-filter-btn {
@@ -437,16 +465,17 @@ textarea.input-field { resize: vertical; }
     font-size: 0.875rem;
     font-weight: 500;
     border: 1px solid var(--border-color);
-    background-color: transparent;
+    background-color: var(--bg-primary);
     color: var(--text-secondary);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .job-range-filter-btn:hover {
-    background-color: color-mix(in srgb, var(--border-color) 50%, transparent);
-    color: var(--text-primary);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
 }
 
 .job-range-filter-btn.active {
@@ -454,4 +483,3 @@ textarea.input-field { resize: vertical; }
     color: white;
     border-color: var(--accent-color);
 }
-/* --- END: Add these styles --- */
