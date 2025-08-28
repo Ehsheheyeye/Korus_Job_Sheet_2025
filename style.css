@@ -37,13 +37,26 @@ body.dark {
 /* --- LAYOUT --- */
 .app-layout { display: flex; min-height: 100vh; }
 .sidebar {
-    width: 260px; background-color: var(--sidebar-bg); color: #f9fafb;
-    display: flex; flex-direction: column; padding: 1.5rem;
-    transition: background-color var(--transition-speed) ease; flex-shrink: 0;
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    color: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    transition: background-color var(--transition-speed) ease;
+    flex-shrink: 0;
+    
+    /* --- FIX: Make sidebar sticky and full-height --- */
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    box-sizing: border-box; /* Ensures padding is included in height */
 }
 .main-content {
-    flex-grow: 1; padding: 2rem; overflow-y: auto;
-    display: flex; flex-direction: column;
+    flex-grow: 1;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
 }
 .page { display: none; }
 .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
@@ -63,7 +76,12 @@ body.dark {
 .nav-link.active { background-color: var(--accent-color); color: #fff; }
 .nav-icon { width: 1.5rem; height: 1.5rem; margin-right: 1rem; flex-shrink: 0; }
 
-.sidebar-footer { margin-top: auto; text-align: center; padding-top: 1.5rem; border-top: 1px solid #374151; }
+.sidebar-footer {
+    margin-top: auto; /* This pushes the footer to the bottom */
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid #374151;
+}
 .date { font-size: 1.1rem; font-weight: 500; color: #e5e7eb; margin-bottom: 0.5rem; }
 .time { font-size: 2.75rem; font-weight: 700; letter-spacing: -1px; }
 .theme-toggle-btn {
@@ -152,7 +170,7 @@ label {
     font-size: 0.875rem;
     font-weight: 500;
     color: var(--text-secondary);
-    margin-bottom: 0.5rem; /* Adjusted for better visibility */
+    margin-bottom: 0.5rem;
     display: block;
 }
 .input-field, .select-field, .search-input {
@@ -184,7 +202,6 @@ textarea.input-field { resize: vertical; }
 .status-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 
 .form-stack { display: flex; flex-direction: column; gap: 1rem; }
-/* REMOVED problematic style that was hiding labels */
 
 .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
 .checkbox-grid div { display: flex; align-items: center; }
@@ -365,8 +382,12 @@ textarea.input-field { resize: vertical; }
 /* --- RESPONSIVE STYLES --- */
 @media (max-width: 1024px) {
     .sidebar {
-        position: fixed; top: 0; left: 0; height: 100%;
-        z-index: 2000; transform: translateX(-100%);
+        position: fixed; /* This is already correct for mobile */
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 2000;
+        transform: translateX(-100%);
         transition: transform 0.3s ease-in-out;
     }
     body.sidebar-open .sidebar { transform: translateX(0); }
