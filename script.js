@@ -116,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
             inwardOutwardSearchBox: document.getElementById('inward-outward-search-box'),
             downloadInwardOutwardExcelBtn: document.getElementById('download-inward-outward-excel-btn'),
             inwardOutwardPagination: document.getElementById('inward-outward-pagination'),
-            
             actionTagsContainer: document.getElementById('action-tags-container'),
             actionTagsInput: document.getElementById('action-tags-input'),
             serviceLog: document.getElementById('service-log'),
@@ -125,6 +124,9 @@ document.addEventListener('DOMContentLoaded', () => {
             currentStatus: document.getElementById('current-status'),
             finalStatus: document.getElementById('final-status'),
             customerStatus: document.getElementById('customer-status'),
+            filterToggleBtn: document.getElementById('filter-toggle-btn'),
+            filterPopup: document.getElementById('job-range-filters'),
+            filterBtnLabel: document.getElementById('filter-btn-label'),
         };
 
         function init() {
@@ -208,11 +210,21 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
             DOMElements.downloadInwardOutwardExcelBtn.addEventListener('click', downloadInwardOutwardAsExcel);
             
+            DOMElements.filterToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                DOMElements.filterPopup.classList.toggle('visible');
+            });
+    
+            document.addEventListener('click', (e) => {
+                if (!DOMElements.filterPopup.contains(e.target) && !DOMElements.filterToggleBtn.contains(e.target)) {
+                    DOMElements.filterPopup.classList.remove('visible');
+                }
+            });
+
             setupAutocomplete(DOMElements.brandName, brandSuggestions);
             setupAutocomplete(DOMElements.partyName, partySuggestions);
             setupActionTags();
             setupMaterialsTable();
-
             setupDashboardCardClickListeners();
         }
 
@@ -263,11 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
         async function loadInitialData() {
             db.collection("jobSheets").orderBy("jobSheetNo", "desc").onSnapshot(snap => {
                 allJobSheets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-                // This client-side sort ensures correct numerical order (newest first)
                 allJobSheets.sort((a, b) => (b.jobSheetNo || 0) - (a.jobSheetNo || 0));
 
-                renderJobRangeFilters(); // Create the new filter buttons
+                renderJobRangeFilters();
                 updateDashboardStats();
                 handleAllJobsSearch(null);
             });
@@ -313,7 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderJobRangeFilters() {
-            const container = document.getElementById('job-range-filters');
+            const container = DOMElements.filterPopup;
             if (!container) return;
 
             const ranges = [...new Set(allJobSheets
@@ -321,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .filter(r => r > 0)
             )].sort((a, b) => b - a);
 
-            let buttonsHTML = `<button class="job-range-filter-btn active" data-range="all">All</button>`;
+            let buttonsHTML = '<button class="job-range-filter-btn active" data-range="all">All</button>';
             
             ranges.forEach(rangeStart => {
                 const rangeEnd = rangeStart + 99;
@@ -334,8 +344,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.addEventListener('click', () => {
                     container.querySelector('.active')?.classList.remove('active');
                     btn.classList.add('active');
-                    currentJobRangeFilter = btn.dataset.range === 'all' ? 'all' : parseInt(btn.dataset.range);
-                    handleAllJobsSearch(null); 
+                    
+                    const selectedRange = btn.dataset.range;
+                    currentJobRangeFilter = selectedRange === 'all' ? 'all' : parseInt(selectedRange);
+
+                    if (currentJobRangeFilter === 'all') {
+                        DOMElements.filterToggleBtn.classList.remove('active');
+                        DOMElements.filterBtnLabel.textContent = 'Filter';
+                    } else {
+                        DOMElements.filterToggleBtn.classList.add('active');
+                        DOMElements.filterBtnLabel.textContent = btn.textContent;
+                    }
+                    
+                    DOMElements.filterPopup.classList.remove('visible');
+                    handleAllJobsSearch(null);
                 });
             });
         }
@@ -473,10 +495,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (dashboardFilter) {
                 currentJobRangeFilter = 'all';
-                const filterContainer = document.getElementById('job-range-filters');
-                if (filterContainer) {
-                    filterContainer.querySelector('.active')?.classList.remove('active');
-                    filterContainer.querySelector('[data-range="all"]')?.classList.add('active');
+                if (DOMElements.filterPopup) {
+                    DOMElements.filterPopup.querySelector('.active')?.classList.remove('active');
+                    DOMElements.filterPopup.querySelector('[data-range="all"]')?.classList.add('active');
+                    DOMElements.filterToggleBtn.classList.remove('active');
+                    DOMElements.filterBtnLabel.textContent = 'Filter';
                 }
                 
                 if (dashboardFilter.value !== 'all') {
@@ -614,14 +637,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const encodedEstimateAmount = encodeURIComponent(`₹${estimateAmount}`);
 
             const textParts = [
-                `Hello, ${encodedCustomerName} %F0%9F%91%8B`, // 👋
+                `Hello, ${encodedCustomerName} %F0%9F%91%8B`,
                 ``,
                 `Your Job No: ${encodedJobSheetNo}`,
-                `Your ${encodedBrandName} ${encodedDeviceType} is now ready %E2%9C%85`, // ✅
+                `Your ${encodedBrandName} ${encodedDeviceType} is now ready %E2%9C%85`,
                 ``,
-                `%F0%9F%92%B0 Amount: ${encodedEstimateAmount}`, // 💰
+                `%F0%9F%92%B0 Amount: ${encodedEstimateAmount}`,
                 ``,
-                `%F0%9F%93%8D Please collect your device between`, // 📍
+                `%F0%9F%93%8D Please collect your device between`,
                 `10:30 AM – 07:30 PM`,
                 ``,
                 `Thank you,`,
