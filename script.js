@@ -560,11 +560,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 phoneNumber = '91' + phoneNumber;
             }
 
-            // Using Unicode escape sequences for emojis to ensure they render correctly
-            const message = `Hello, ${customerName} \uD83D\uDC4B\n\nYour Job No: ${jobSheetNo}\nYour ${brandName} ${deviceType} is now ready \u2705\n\n\uD83D\uDCB0 Amount: ₹${estimateAmount}\n\n\uD83D\uDCCD Please collect your device between\n10:30 AM – 07:30 PM\n\nThank you,\nKorus Computers`;
+            // Encode only the user-provided parts of the message
+            const encodedCustomerName = encodeURIComponent(customerName);
+            const encodedJobSheetNo = encodeURIComponent(jobSheetNo);
+            const encodedBrandName = encodeURIComponent(brandName);
+            const encodedDeviceType = encodeURIComponent(deviceType);
+            const encodedEstimateAmount = encodeURIComponent(`₹${estimateAmount}`);
 
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            // Manually build the message with pre-encoded emojis and newlines (%0A)
+            const textParts = [
+                `Hello, ${encodedCustomerName} %F0%9F%91%8B`, // 👋
+                ``,
+                `Your Job No: ${encodedJobSheetNo}`,
+                `Your ${encodedBrandName} ${encodedDeviceType} is now ready %E2%9C%85`, // ✅
+                ``,
+                `%F0%9F%92%B0 Amount: ${encodedEstimateAmount}`, // 💰
+                ``,
+                `%F0%9F%93%8D Please collect your device between`, // 📍
+                `10:30 AM – 07:30 PM`,
+                ``,
+                `Thank you,`,
+                `Korus Computers`
+            ];
+
+            const finalMessage = textParts.join('%0A'); // Join each line with an encoded newline
+
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${finalMessage}`;
 
             window.open(whatsappUrl, '_blank');
         }
