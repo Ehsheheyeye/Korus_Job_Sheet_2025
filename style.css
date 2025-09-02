@@ -237,6 +237,18 @@ textarea.input-field { resize: vertical; }
 .engineer-checkboxes div { display: flex; align-items: center; }
 .engineer-checkboxes input[type="checkbox"] { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
 
+.input-with-button {
+    display: flex;
+    gap: 0.5rem;
+}
+.input-with-button .autocomplete {
+    flex-grow: 1;
+}
+.input-with-button button {
+    flex-shrink: 0;
+    padding: 0.75rem;
+    min-width: 44px; /* for '+' icon */
+}
 
 /* --- MATERIALS TABLE STYLES --- */
 .materials-table { width: 100%; border-collapse: collapse; }
@@ -298,7 +310,12 @@ textarea.input-field { resize: vertical; }
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.data-table th { font-weight: 600; color: var(--text-secondary); }
+.data-table thead th {
+    font-weight: 600;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    border-bottom: 2px solid var(--accent-color);
+}
 .data-table tbody tr { transition: background-color 0.2s ease; }
 .data-table tbody tr:hover { background-color: color-mix(in srgb, var(--border-color) 50%, transparent); }
 .table-actions { overflow: visible; }
@@ -479,4 +496,53 @@ textarea.input-field { resize: vertical; }
     background-color: var(--accent-color);
     color: white;
     border-color: var(--accent-color);
+}
+
+/* Smart Filter Styles */
+.th-with-filter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filter-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-left: 0.5rem;
+    color: var(--text-secondary);
+}
+.filter-icon-btn:hover {
+    color: var(--accent-color);
+}
+
+.filter-popup-dynamic {
+    position: absolute;
+    z-index: 1010;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 150px;
+}
+.filter-popup-dynamic button {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+.filter-popup-dynamic button:hover {
+    background-color: var(--accent-color);
+    color: white;
 }
