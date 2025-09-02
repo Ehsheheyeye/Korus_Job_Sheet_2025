@@ -68,6 +68,21 @@ document.addEventListener('DOMContentLoaded', () => {
         let partNameSuggestions = [...initialPartNames];
 
         const problemOptionsConfig = {
+            "Formatting": {
+                subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP"],
+                subOptionType: 'select',
+                subOptionLabel: 'Select OS'
+            },
+            "Software Installation": {
+                subOptions: ["AutoCAD", "CATIA", "SolidWorks", "Photoshop"],
+                subOptionType: 'select',
+                subOptionLabel: 'Select Software'
+            },
+            "Toner Refill": {
+                subOptions: ["12A", "88A", "337A"],
+                subOptionType: 'select',
+                subOptionLabel: 'Select Toner Model'
+            },
             "Dead / No Power": {},
             "No Display": {},
             "Hinge Repair": {},
@@ -81,21 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
             "Paper Jam": {},
             "Moulding / ABH": {},
             "Keyboard / Touchpad": {},
-            "Formatting": {
-                subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP"],
-                subOptionType: 'select',
-                subOptionLabel: 'Select OS'
-            },
-            "Toner Refill": {
-                subOptions: ["12A", "88A", "337A"],
-                subOptionType: 'select',
-                subOptionLabel: 'Select Toner Model'
-            },
-            "Software Installation": {
-                subOptions: ["AutoCAD", "CATIA", "SolidWorks", "Photoshop"],
-                subOptionType: 'select',
-                subOptionLabel: 'Select Software'
-            },
             "Display Replacement": {},
             "Keyboard Replacement": {},
             "Battery Replacement": {},
@@ -121,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             customerMobile: document.getElementById('customer-mobile'), altMobile: document.getElementById('alt-mobile'),
             deviceType: document.getElementById('device-type'), brandName: document.getElementById('brand-name'),
             reportedProblems: document.getElementById('reported-problems'), 
+            serviceNote: document.getElementById('service-note'),
             estimateAmount: document.getElementById('estimate-amount'),
             engineerKundan: document.getElementById('engineer-kundan'), engineerRushi: document.getElementById('engineer-rushi'),
             engineerSachin: document.getElementById('engineer-sachin'),
@@ -141,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
             allJobsTableBody: document.getElementById('all-jobs-table-body'),
             allJobsPagination: document.getElementById('all-jobs-pagination'),
             outwardFormTitle: document.getElementById('outward-form-title'), partyName: document.getElementById('party-name'),
+            addPartyBtn: document.getElementById('add-party-btn'),
             materialDesc: document.getElementById('material-desc'), outwardDate: document.getElementById('outward-date'),
             inwardDate: document.getElementById('inward-date'), saveOutwardBtn: document.getElementById('save-outward-btn'),
             cancelOutwardEditBtn: document.getElementById('cancel-outward-edit-btn'),
@@ -161,6 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
             filterToggleBtn: document.getElementById('filter-toggle-btn'),
             filterPopup: document.getElementById('job-range-filters'),
             filterBtnLabel: document.getElementById('filter-btn-label'),
+            deviceFilterBtn: document.getElementById('device-filter-btn'),
+            statusFilterBtn: document.getElementById('status-filter-btn'),
         };
         
         // --- Helper Functions ---
@@ -178,6 +182,41 @@ document.addEventListener('DOMContentLoaded', () => {
             populateCheckboxes();
             setInitialDate();
             loadInitialData();
+            // runDataMigration(); // Uncomment to run the migration once
+        }
+
+        async function runDataMigration() {
+            console.log("Starting data migration to capitalize customer names...");
+            try {
+                const snapshot = await db.collection("jobSheets").get();
+                const batch = db.batch();
+                let updates = 0;
+        
+                snapshot.forEach(doc => {
+                    const job = doc.data();
+                    const currentName = job.customerName;
+                    const correctedName = toTitleCase(currentName);
+        
+                    if (currentName !== correctedName) {
+                        const docRef = db.collection("jobSheets").doc(doc.id);
+                        batch.update(docRef, { customerName: correctedName });
+                        updates++;
+                        console.log(`Scheduling update for doc ${doc.id}: '${currentName}' -> '${correctedName}'`);
+                    }
+                });
+        
+                if (updates > 0) {
+                    await batch.commit();
+                    console.log(`Successfully updated ${updates} records.`);
+                    alert(`Migration complete! Updated ${updates} customer names to title case.`);
+                } else {
+                    console.log("No records needed updating.");
+                    alert("Migration check complete. All customer names are already in the correct format.");
+                }
+            } catch (error) {
+                console.error("Error during data migration: ", error);
+                alert("An error occurred during the data migration. Check the console for details.");
+            }
         }
 
         function setupNavigation() {
@@ -198,6 +237,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     DOMElements.allJobsHeaderActions.style.display = 'none';
                     DOMElements.inwardOutwardHeaderActions.style.display = 'none';
                     DOMElements.allInOutHeaderActions.style.display = 'none';
+                    
+                    // Reset filters when changing pages
+                    handleAllJobsSearch(null);
+
 
                     if (page === 'job-sheet') {
                         DOMElements.jobSheetHeaderActions.style.display = 'flex';
@@ -264,6 +307,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation();
                 DOMElements.filterPopup.classList.toggle('visible');
             });
+            
+            DOMElements.addPartyBtn.addEventListener('click', async () => {
+                const newParty = prompt("Enter the new party name:");
+                if (newParty && newParty.trim() !== '') {
+                    await addSuggestion(newParty.trim(), 'parties', partySuggestions);
+                    DOMElements.partyName.value = newParty.trim();
+                    alert(`Party "${newParty.trim()}" added successfully!`);
+                }
+            });
     
             document.addEventListener('click', (e) => {
                 if (!DOMElements.filterPopup.contains(e.target) && !DOMElements.filterToggleBtn.contains(e.target)) {
@@ -275,6 +327,67 @@ document.addEventListener('DOMContentLoaded', () => {
             setupAutocomplete(DOMElements.partyName, partySuggestions);
             setupMaterialsTable();
             setupDashboardCardClickListeners();
+            setupSmartFilters();
+        }
+        
+        function setupSmartFilters() {
+            DOMElements.deviceFilterBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const options = ["CPU", "Laptop", "Printer", "Toner", "All-in-One"];
+                showFilterPopup(e.currentTarget, 'deviceType', options);
+            });
+        
+            DOMElements.statusFilterBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const options = [...new Set(allJobSheets.map(j => j.currentStatus).filter(Boolean))];
+                options.sort();
+                showFilterPopup(e.currentTarget, 'currentStatus', options);
+            });
+        }
+        
+        function showFilterPopup(button, filterKey, options) {
+            // Remove any existing popups
+            const existingPopup = document.querySelector('.filter-popup-dynamic');
+            if (existingPopup) {
+                existingPopup.remove();
+            }
+        
+            const popup = document.createElement('div');
+            popup.className = 'filter-popup-dynamic';
+            
+            // Add "All" option
+            const allButton = document.createElement('button');
+            allButton.textContent = 'All';
+            allButton.onclick = () => {
+                handleAllJobsSearch({ type: filterKey, value: null }); // Pass null to reset
+                popup.remove();
+            };
+            popup.appendChild(allButton);
+        
+            options.forEach(option => {
+                const optionButton = document.createElement('button');
+                optionButton.textContent = option;
+                optionButton.onclick = () => {
+                    handleAllJobsSearch({ type: filterKey, value: option });
+                    popup.remove();
+                };
+                popup.appendChild(optionButton);
+            });
+        
+            document.body.appendChild(popup);
+            const rect = button.getBoundingClientRect();
+            popup.style.top = `${rect.bottom + window.scrollY}px`;
+            popup.style.left = `${rect.left + window.scrollX}px`;
+        
+            // Close popup when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', function closePopup(event) {
+                    if (!popup.contains(event.target)) {
+                        popup.remove();
+                        document.removeEventListener('click', closePopup);
+                    }
+                });
+            }, 0);
         }
 
         function setupDashboardCardClickListeners() {
@@ -552,36 +665,42 @@ document.addEventListener('DOMContentLoaded', () => {
             renderPagination(DOMElements.allJobsPagination, filteredJobs.length, allJobsCurrentPage, 'changeAllJobsPage');
         }
 
+        let activeDashboardFilter = null;
+        
         function handleAllJobsSearch(dashboardFilter = null) {
+            if (dashboardFilter) {
+                // If it's a reset, clear the filter
+                if (dashboardFilter.value === null) {
+                    activeDashboardFilter = null;
+                } else {
+                    activeDashboardFilter = dashboardFilter;
+                }
+            }
+        
             const jobNoTerm = DOMElements.jobNoSearchBox.value.trim();
             const mobileTerm = DOMElements.mobileNoSearchBox.value.trim();
             
             let tempFilteredJobs = allJobSheets;
-
-            if (dashboardFilter) {
-                currentJobRangeFilter = 'all';
-                if (DOMElements.filterPopup) {
-                    DOMElements.filterPopup.querySelector('.active')?.classList.remove('active');
-                    DOMElements.filterPopup.querySelector('[data-range="all"]')?.classList.add('active');
-                    DOMElements.filterToggleBtn.classList.remove('active');
-                    DOMElements.filterBtnLabel.textContent = 'Filter';
-                }
-                
-                if (dashboardFilter.value !== 'all') {
-                    if (dashboardFilter.type === 'currentStatus') {
-                        tempFilteredJobs = tempFilteredJobs.filter(job => job.currentStatus === dashboardFilter.value);
-                    } else if (dashboardFilter.type === 'finalStatus') {
-                        tempFilteredJobs = tempFilteredJobs.filter(job => job.finalStatus === dashboardFilter.value);
-                    }
+        
+            // Apply dashboard/smart filter if active
+            if (activeDashboardFilter) {
+                if (activeDashboardFilter.type === 'currentStatus') {
+                    tempFilteredJobs = tempFilteredJobs.filter(job => job.currentStatus === activeDashboardFilter.value);
+                } else if (activeDashboardFilter.type === 'finalStatus') {
+                    tempFilteredJobs = tempFilteredJobs.filter(job => job.finalStatus === activeDashboardFilter.value);
+                } else if (activeDashboardFilter.type === 'deviceType') {
+                    tempFilteredJobs = tempFilteredJobs.filter(job => job.deviceType === activeDashboardFilter.value);
                 }
             }
-
+        
+            // Apply job range filter
             if (currentJobRangeFilter !== 'all') {
                 const lowerBound = currentJobRangeFilter;
                 const upperBound = lowerBound + 99;
                 tempFilteredJobs = tempFilteredJobs.filter(job => job.jobSheetNo >= lowerBound && job.jobSheetNo <= upperBound);
             }
-
+        
+            // Apply search box filters
             if (jobNoTerm) {
                 tempFilteredJobs = tempFilteredJobs.filter(job => String(job.jobSheetNo).includes(jobNoTerm));
             }
@@ -607,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function clearJobSheetForm() {
             currentEditingJobId = null;
-            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.estimateAmount];
+            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.serviceNote, DOMElements.estimateAmount];
             fieldsToClear.forEach(el => el.value = '');
             
             [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
@@ -656,6 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 deviceType: DOMElements.deviceType.value,
                 brandName: DOMElements.brandName.value.trim(),
                 reportedProblems: getReportedProblems(),
+                serviceNote: DOMElements.serviceNote.value.trim(),
                 materials: getMaterials(),
                 currentStatus: DOMElements.currentStatus.value,
                 finalStatus: DOMElements.finalStatus.value,
@@ -743,6 +863,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.altMobile.value = job.altMobile || '';
             DOMElements.deviceType.value = job.deviceType || '';
             DOMElements.brandName.value = job.brandName || '';
+            DOMElements.serviceNote.value = job.serviceNote || '';
             DOMElements.estimateAmount.value = job.estimateAmount || '';
             DOMElements.currentStatus.value = job.currentStatus || '';
             DOMElements.finalStatus.value = job.finalStatus || '';
@@ -794,7 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             DOMElements.allInOutTableBody.innerHTML = pageItems.map(r => `
                 <tr>
-                    <td>${r.jobNo || 'N/A'}</td>
+                    <td>${r.jobNo || '-'}</td>
                     <td title="${r.partyName}">${r.partyName}</td>
                     <td title="${r.material}">${r.material}</td>
                     <td>${formatDate(r.outwardDate)}</td>
@@ -987,6 +1108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
                 "Device Type": job.deviceType, "Brand": job.brandName,
                 "Problems": (job.reportedProblems || []).join(', '),
+                 "Service Note": job.serviceNote,
                 "Materials Used": (job.materials || []).map(m => `${m.qty}x ${m.name} (${m.details || 'N/A'}) - ${m.status}`).join('; '),
                 "Current Status": job.currentStatus,
                 "Final Status": job.finalStatus,
