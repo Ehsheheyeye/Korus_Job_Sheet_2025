@@ -182,41 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
             populateCheckboxes();
             setInitialDate();
             loadInitialData();
-            // runDataMigration(); // Uncomment to run the migration once
-        }
-
-        async function runDataMigration() {
-            console.log("Starting data migration to capitalize customer names...");
-            try {
-                const snapshot = await db.collection("jobSheets").get();
-                const batch = db.batch();
-                let updates = 0;
-        
-                snapshot.forEach(doc => {
-                    const job = doc.data();
-                    const currentName = job.customerName;
-                    const correctedName = toTitleCase(currentName);
-        
-                    if (currentName !== correctedName) {
-                        const docRef = db.collection("jobSheets").doc(doc.id);
-                        batch.update(docRef, { customerName: correctedName });
-                        updates++;
-                        console.log(`Scheduling update for doc ${doc.id}: '${currentName}' -> '${correctedName}'`);
-                    }
-                });
-        
-                if (updates > 0) {
-                    await batch.commit();
-                    console.log(`Successfully updated ${updates} records.`);
-                    alert(`Migration complete! Updated ${updates} customer names to title case.`);
-                } else {
-                    console.log("No records needed updating.");
-                    alert("Migration check complete. All customer names are already in the correct format.");
-                }
-            } catch (error) {
-                console.error("Error during data migration: ", error);
-                alert("An error occurred during the data migration. Check the console for details.");
-            }
         }
 
         function setupNavigation() {
@@ -301,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.allInOutSearchBox.addEventListener('input', () => handleAllInOutSearch(null));
             DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
             DOMElements.downloadAllInOutExcelBtn.addEventListener('click', downloadAllInOutAsExcel);
-             DOMElements.jobNoOutward.addEventListener('input', autofillOutwardFromJob);
+            DOMElements.jobNoOutward.addEventListener('input', autofillOutwardFromJob);
             
             DOMElements.filterToggleBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -311,9 +276,10 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.addPartyBtn.addEventListener('click', async () => {
                 const newParty = prompt("Enter the new party name:");
                 if (newParty && newParty.trim() !== '') {
-                    await addSuggestion(newParty.trim(), 'parties', partySuggestions);
-                    DOMElements.partyName.value = newParty.trim();
-                    alert(`Party "${newParty.trim()}" added successfully!`);
+                    const trimmedParty = toTitleCase(newParty.trim());
+                    await addSuggestion(trimmedParty, 'parties');
+                    DOMElements.partyName.value = trimmedParty;
+                    alert(`Party "${trimmedParty}" added successfully!`);
                 }
             });
     
@@ -346,20 +312,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         function showFilterPopup(button, filterKey, options) {
-            // Remove any existing popups
             const existingPopup = document.querySelector('.filter-popup-dynamic');
-            if (existingPopup) {
-                existingPopup.remove();
-            }
+            if (existingPopup) existingPopup.remove();
         
             const popup = document.createElement('div');
             popup.className = 'filter-popup-dynamic';
             
-            // Add "All" option
             const allButton = document.createElement('button');
             allButton.textContent = 'All';
             allButton.onclick = () => {
-                handleAllJobsSearch({ type: filterKey, value: null }); // Pass null to reset
+                handleAllJobsSearch({ type: filterKey, value: null });
                 popup.remove();
             };
             popup.appendChild(allButton);
@@ -376,10 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
         
             document.body.appendChild(popup);
             const rect = button.getBoundingClientRect();
-            popup.style.top = `${rect.bottom + window.scrollY}px`;
+            popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
             popup.style.left = `${rect.left + window.scrollX}px`;
         
-            // Close popup when clicking outside
             setTimeout(() => {
                 document.addEventListener('click', function closePopup(event) {
                     if (!popup.contains(event.target)) {
@@ -425,11 +386,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function populateCheckboxes() {
             const container = DOMElements.reportedProblems;
-            container.innerHTML = ''; // Clear existing
+            container.innerHTML = '';
         
             for (const problem in problemOptionsConfig) {
                 const config = problemOptionsConfig[problem];
-                const problemId = problem.replace(/\s+/g, '-');
+                const problemId = problem.replace(/[\s/]+/g, '-');
         
                 const itemWrapper = document.createElement('div');
                 itemWrapper.className = 'problem-item';
@@ -454,7 +415,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 itemWrapper.innerHTML = mainCheckboxHTML + subOptionsHTML;
                 container.appendChild(itemWrapper);
         
-                // Add event listener if there are sub-options
                 if (config.subOptions) {
                     const checkbox = itemWrapper.querySelector(`#problem-${problemId}`);
                     const subOptionsDiv = itemWrapper.querySelector(`#sub-options-${problemId}`);
@@ -471,7 +431,19 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.outwardDate.value = today;
         }
 
-        async function loadInitialData() {
+        function listenForSuggestions(collectionName, initialArray, targetArray) {
+            db.collection(collectionName).onSnapshot(snapshot => {
+                const dbSuggestions = snapshot.docs.map(doc => doc.data().name);
+                const combined = [...new Set([...initialArray, ...dbSuggestions])].sort();
+                // Clear and repopulate the target array
+                targetArray.length = 0;
+                Array.prototype.push.apply(targetArray, combined);
+            }, error => {
+                console.error(`Error listening for ${collectionName} suggestions:`, error);
+            });
+        }
+
+        function loadInitialData() {
             db.collection("jobSheets").orderBy("jobSheetNo", "desc").onSnapshot(snap => {
                 allJobSheets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 allJobSheets.sort((a, b) => (b.jobSheetNo || 0) - (a.jobSheetNo || 0));
@@ -492,22 +464,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleAllInOutSearch(null);
             });
 
-            brandSuggestions = await loadSuggestions('brands', initialBrandOptions);
-            partySuggestions = await loadSuggestions('parties', initialPartyOptions);
-            partNameSuggestions = await loadSuggestions('partNames', initialPartNames);
+            listenForSuggestions('brands', initialBrandOptions, brandSuggestions);
+            listenForSuggestions('parties', initialPartyOptions, partySuggestions);
+            listenForSuggestions('partNames', initialPartNames, partNameSuggestions);
         }
         
-        async function loadSuggestions(collectionName, initialArray) {
-            try {
-                const snapshot = await db.collection(collectionName).get();
-                const dbSuggestions = snapshot.docs.map(doc => doc.data().name);
-                return [...new Set([...initialArray, ...dbSuggestions])].sort();
-            } catch (error) {
-                console.error(`Error loading suggestions for ${collectionName}:`, error);
-                return initialArray.sort();
-            }
-        }
-
         function updateDashboardStats() {
             DOMElements.totalJobsStat.textContent = allJobSheets.length;
             DOMElements.pendingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Pending Diagnosis').length;
@@ -593,7 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const name = row.querySelector('.part-name').value.trim();
                 if (name) {
                     materials.push({
-                        name,
+                        name: toTitleCase(name),
                         details: row.querySelector('.part-details').value.trim(),
                         qty: parseInt(row.querySelector('.part-qty').value) || 1,
                         status: row.querySelector('.part-status').value
@@ -655,7 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${formatDate(job.date)}</td>
                     <td title="${job.customerName}">${job.customerName}</td>
                     <td title="${job.customerMobile}">${job.customerMobile}</td>
-                    <td title="${job.deviceType}">${job.deviceType}</td>
+                    <td>${job.deviceType}</td>
                     <td>${job.currentStatus}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
@@ -669,12 +630,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         function handleAllJobsSearch(dashboardFilter = null) {
             if (dashboardFilter) {
-                // If it's a reset, clear the filter
-                if (dashboardFilter.value === null) {
-                    activeDashboardFilter = null;
-                } else {
-                    activeDashboardFilter = dashboardFilter;
-                }
+                if (dashboardFilter.value === null) activeDashboardFilter = null;
+                else activeDashboardFilter = dashboardFilter;
             }
         
             const jobNoTerm = DOMElements.jobNoSearchBox.value.trim();
@@ -682,7 +639,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let tempFilteredJobs = allJobSheets;
         
-            // Apply dashboard/smart filter if active
             if (activeDashboardFilter) {
                 if (activeDashboardFilter.type === 'currentStatus') {
                     tempFilteredJobs = tempFilteredJobs.filter(job => job.currentStatus === activeDashboardFilter.value);
@@ -693,14 +649,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         
-            // Apply job range filter
             if (currentJobRangeFilter !== 'all') {
                 const lowerBound = currentJobRangeFilter;
                 const upperBound = lowerBound + 99;
                 tempFilteredJobs = tempFilteredJobs.filter(job => job.jobSheetNo >= lowerBound && job.jobSheetNo <= upperBound);
             }
         
-            // Apply search box filters
             if (jobNoTerm) {
                 tempFilteredJobs = tempFilteredJobs.filter(job => String(job.jobSheetNo).includes(jobNoTerm));
             }
@@ -733,8 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             document.querySelectorAll('#reported-problems input[type="checkbox"]').forEach(cb => {
                 cb.checked = false;
-                // Also hide sub-options
-                const problemId = cb.value.replace(/\s+/g, '-');
+                const problemId = cb.value.replace(/[\s/]+/g, '-');
                 const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
                 if (subOptionsDiv) {
                     subOptionsDiv.style.display = 'none';
@@ -773,7 +726,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customerMobile: DOMElements.customerMobile.value.trim(),
                 altMobile: DOMElements.altMobile.value.trim(),
                 deviceType: DOMElements.deviceType.value,
-                brandName: DOMElements.brandName.value.trim(),
+                brandName: toTitleCase(DOMElements.brandName.value.trim()),
                 reportedProblems: getReportedProblems(),
                 serviceNote: DOMElements.serviceNote.value.trim(),
                 materials: getMaterials(),
@@ -797,8 +750,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     showSuccessModal("Record Saved!");
                 }
                 
-                await addSuggestion(jobData.brandName, 'brands', brandSuggestions);
-                for (const mat of jobData.materials) { await addSuggestion(mat.name, 'partNames', partNameSuggestions); }
+                await addSuggestion(jobData.brandName, 'brands');
+                for (const mat of jobData.materials) { await addSuggestion(mat.name, 'partNames'); }
                 
                 clearJobSheetForm();
                 document.querySelector('.nav-link[data-page="dashboard"]').click();
@@ -830,18 +783,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const encodedEstimateAmount = encodeURIComponent(`₹${estimateAmount}`);
 
             const textParts = [
-                `Hello, ${encodedCustomerName} %F0%9F%91%8B`,
-                ``,
+                `Hello, ${encodedCustomerName} %F0%9F%91%8B`, ``,
                 `Your Job No: ${encodedJobSheetNo}`,
-                `Your ${encodedBrandName} ${encodedDeviceType} is now ready %E2%9C%85`,
-                ``,
-                `%F0%9F%92%B0 Amount: ${encodedEstimateAmount}`,
-                ``,
+                `Your ${encodedBrandName} ${encodedDeviceType} is now ready %E2%9C%85`, ``,
+                `%F0%9F%92%B0 Amount: ${encodedEstimateAmount}`, ``,
                 `%F0%9F%93%8D Please collect your device between`,
-                `10:30 AM – 07:30 PM`,
-                ``,
-                `Thank you,`,
-                `Korus Computers`
+                `10:30 AM – 07:30 PM`, ``,
+                `Thank you,`, `Korus Computers`
             ];
 
             const finalMessage = textParts.join('%0A');
@@ -869,20 +817,17 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.finalStatus.value = job.finalStatus || '';
             DOMElements.customerStatus.value = job.customerStatus || '';
 
-            // Set reported problems
             (job.reportedProblems || []).forEach(problemStr => {
                 const [mainProblem, subOption] = problemStr.split(': ');
-                const checkbox = document.querySelector(`#reported-problems input[value="${mainProblem}"]`);
+                const problemId = mainProblem.replace(/[\s/]+/g, '-');
+                const checkbox = document.querySelector(`#problem-${problemId}`);
                 if (checkbox) {
                     checkbox.checked = true;
-                    const problemId = mainProblem.replace(/\s+/g, '-');
                     const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
                     if (subOptionsDiv) {
                         subOptionsDiv.style.display = 'block';
                         const select = subOptionsDiv.querySelector('select');
-                        if (select && subOption) {
-                            select.value = subOption;
-                        }
+                        if (select && subOption) select.value = subOption;
                     }
                 }
             });
@@ -903,7 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (password === "KC21") {
                 await db.collection("jobSheets").doc(id).delete();
                 showSuccessModal("Job Sheet Deleted!");
-            } else if (password !== null) { // Only show error if they entered something
+            } else if (password !== null) {
                 alert("Incorrect password. Deletion cancelled.");
             }
         }
@@ -951,7 +896,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderAllInOutTable();
         }
 
-
         function changeAllInOutPage(direction) {
             const totalPages = Math.ceil(filteredOutwards.length / itemsPerPage);
             allInOutCurrentPage += direction;
@@ -973,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async function saveOutwardRecord() {
             const recordData = {
                 jobNo: DOMElements.jobNoOutward.value.trim(),
-                partyName: DOMElements.partyName.value.trim(), 
+                partyName: toTitleCase(DOMElements.partyName.value.trim()), 
                 material: DOMElements.materialDesc.value.trim(),
                 customerName: toTitleCase(DOMElements.outwardCustomerName.value.trim()),
                 outwardDate: DOMElements.outwardDate.value, 
@@ -988,7 +932,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     await db.collection("outwardJobs").add(recordData);
                     showSuccessModal("Outward Record Saved!");
                 }
-                await addSuggestion(recordData.partyName, 'parties', partySuggestions);
+                await addSuggestion(recordData.partyName, 'parties');
                 clearOutwardForm();
                 document.querySelector('.nav-link[data-page="all-in-out"]').click();
             } catch (error) { console.error("Error saving outward record: ", error); }
@@ -1058,13 +1002,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return correctedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
         }
 
-        async function addSuggestion(value, collectionName, suggestionsArray) {
+        async function addSuggestion(value, collectionName) {
             const trimmedValue = value.trim();
-            if (trimmedValue && !suggestionsArray.some(s => s.toLowerCase() === trimmedValue.toLowerCase())) {
+            if (trimmedValue) {
                 try {
-                    await db.collection(collectionName).doc(trimmedValue.toLowerCase()).set({ name: trimmedValue });
-                    suggestionsArray.push(trimmedValue);
-                    suggestionsArray.sort();
+                    const docRef = db.collection(collectionName).doc(trimmedValue.toLowerCase());
+                    const doc = await docRef.get();
+                    if (!doc.exists) {
+                        await docRef.set({ name: trimmedValue });
+                    }
                 } catch (e) { console.error("Error adding suggestion:", e); }
             }
         }
