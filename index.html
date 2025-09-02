@@ -173,6 +173,11 @@
                     </div>
 
                     <div class="card form-section full-width">
+                        <h2>Service Note</h2>
+                        <textarea id="service-note" class="input-field" rows="4" placeholder="e.g., Password = 123, Customer Given Adaptor..."></textarea>
+                    </div>
+
+                    <div class="card form-section full-width">
                         <h2>Parts & Materials Used</h2>
                         <div class="table-wrapper">
                             <table class="materials-table">
@@ -235,8 +240,27 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Job #</th><th>Date</th><th>Customer</th><th>Mobile</th>
-                                    <th>Device</th><th>Status</th><th>Actions</th>
+                                    <th>Job #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Mobile</th>
+                                    <th class="th-with-filter">
+                                        Device
+                                        <button id="device-filter-btn" class="filter-icon-btn" title="Filter by Device">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.74.439L7 12.439V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                                            </svg>
+                                        </button>
+                                    </th>
+                                    <th class="th-with-filter">
+                                        Status
+                                        <button id="status-filter-btn" class="filter-icon-btn" title="Filter by Status">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.74.439L7 12.439V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                                            </svg>
+                                        </button>
+                                    </th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="all-jobs-table-body"></tbody>
@@ -257,10 +281,13 @@
                             </div>
                             <div>
                                <label for="party-name">Party Name</label>
-                                <div class="autocomplete">
-                                    <input id="party-name" type="text" placeholder="Select or type new party" class="input-field" autocomplete="off">
-                                </div>
-                            </div>
+                               <div class="input-with-button">
+                                   <div class="autocomplete">
+                                       <input id="party-name" type="text" placeholder="Select or type new party" class="input-field" autocomplete="off">
+                                   </div>
+                                   <button id="add-party-btn" class="action-btn primary-btn" title="Add New Party">+</button>
+                               </div>
+                           </div>
                         </div>
                         <label for="material-desc">Material Description</label>
                         <textarea id="material-desc" placeholder="e.g., HP Laptop 15s, SN: 12345" class="input-field" rows="4"></textarea>
@@ -324,4 +351,3 @@
 
 </body>
 </html>
-
