@@ -54,26 +54,31 @@ document.addEventListener('DOMContentLoaded', () => {
         let filteredJobs = [];
         let filteredOutwards = [];
         let allJobsCurrentPage = 1;
-        let outwardCurrentPage = 1;
+        let allInOutCurrentPage = 1;
         const itemsPerPage = 10;
         let currentJobRangeFilter = 'all'; 
 
         // --- Pre-populated Data ---
         const initialBrandOptions = ["Dell", "HP", "Lenovo", "ASUS", "Acer", "Intex", "I-Ball", "Artist", "Lapcare", "EVM", "Crucial", "Logitech", "Apple (MacBook)", "MSI", "Samsung", "Avita", "Fujitsu", "LG", "Toshiba", "HCL", "Redmi", "Sony", "OnePlus", "TCL", "Panasonic", "Sansui", "BenQ", "Zebronics", "ViewSonic", "AOC", "Philips", "Gigabyte", "Cooler Master", "Foxin", "Western Digital (WD)", "Seagate", "Kingston", "XPG", "ADATA", "SanDisk", "Intel", "Ant Esports", "Antec", "Deepcool", "Circle", "Frontech", "Enter", "Canon", "Epson", "Brother", "TVS", "Zebra", "Xerox", "Kyocera", "Ricoh", "Pantum", "Delta", "Vertiv", "12A", "88A", "78A", "925A", "337A", "ProDot"];
         const initialPartyOptions = ["Rahul Sir", "Shree Enterprises", "San infotech", "Audio video care", "Rx service centre", "Nate", "DSK", "Crucial service centre", "Rashi Peripheral", "SR enterprises", "Cache technology", "perfect computers", "EVM service centre", "navkar enterprises"];
-        const initialActionTags = ["OS Installation", "Windows 10", "Windows 11", "Software Installation", "Toner Refill (12A)", "Toner Refill (88A)", "Full Servicing", "Data Backup", "Password Crack", "Display Replacement", "Keyboard Replacement", "Battery Replacement", "Hinge Repair", "No Power Diagnosis", "Dead Issue Solved", "Component Repaired"];
         const initialPartNames = ["SSD", "RAM", "Keyboard", "Battery", "Screen", "Toner", "Motherboard", "Adapter", "CPU Fan"];
         
         let brandSuggestions = [...initialBrandOptions];
         let partySuggestions = [...initialPartyOptions];
-        let actionTagsSuggestions = [...initialActionTags];
         let partNameSuggestions = [...initialPartNames];
 
-        const problemOptions = ["Dead / No Power", "No Display", "Dump error", "Beep Sound", "Battery issue", "HDD / SSD issue", "Screen Issue", "Booting issue", "Head block", "Paper Jam", "Moulding / ABH", "Keyboard / Touchpad"];
+        const problemOptions = [
+            "Dead / No Power", "No Display", "Hinge Repair", "Dump Error", "Beep Sound", "Battery Issue", 
+            "HDD / SSD Issue", "Screen Issue", "Booting Issue", "Head Block", "Paper Jam", "Moulding / ABH", 
+            "Keyboard / Touchpad", "Formatting", "Windows 7", "Windows 8", "Windows 10", "Windows 11", 
+            "Toner Refill (12A)", "Toner Refill (88A)", "Toner Refill (337A)", 
+            "Software (AutoCAD)", "Software (CATIA)", "Software (SolidWorks)", "Software (Photoshop)",
+            "Display Replacement", "Keyboard Replacement", "Battery Replacement", "Component Repaired"
+        ];
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
         
-        const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement", "Ready"];
-        const finalStatusOptions = ["Not Delivered", "Delivered"];
+        const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement", "Ready", "Dead"];
+        const finalStatusOptions = ["Not Delivered", "Delivered", "Returned"];
         const customerStatusOptions = ["Not Called", "Called", "Called - No Response", "Called - Will Visit", "Called - Not pickup yet"];
         const materialStatusOptions = ["Installed", "Ordered", "Pending", "Customer Provided", "Not Available"];
 
@@ -91,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             reportedProblems: document.getElementById('reported-problems'), 
             estimateAmount: document.getElementById('estimate-amount'),
             engineerKundan: document.getElementById('engineer-kundan'), engineerRushi: document.getElementById('engineer-rushi'),
+            engineerSachin: document.getElementById('engineer-sachin'),
             saveRecordBtn: document.getElementById('save-record-btn'),
             sendWhatsAppBtn: document.getElementById('send-whatsapp-btn'),
             newJobBtn: document.getElementById('new-job-btn'),
@@ -111,14 +117,14 @@ document.addEventListener('DOMContentLoaded', () => {
             materialDesc: document.getElementById('material-desc'), outwardDate: document.getElementById('outward-date'),
             inwardDate: document.getElementById('inward-date'), saveOutwardBtn: document.getElementById('save-outward-btn'),
             cancelOutwardEditBtn: document.getElementById('cancel-outward-edit-btn'),
-            outwardRecordsTableBody: document.getElementById('outward-records-table-body'),
+            jobNoOutward: document.getElementById('job-no-outward'),
+            newOutwardBtn: document.getElementById('new-outward-btn'),
             inwardOutwardHeaderActions: document.getElementById('inward-outward-header-actions'),
-            inwardOutwardSearchBox: document.getElementById('inward-outward-search-box'),
-            downloadInwardOutwardExcelBtn: document.getElementById('download-inward-outward-excel-btn'),
-            inwardOutwardPagination: document.getElementById('inward-outward-pagination'),
-            actionTagsContainer: document.getElementById('action-tags-container'),
-            actionTagsInput: document.getElementById('action-tags-input'),
-            serviceLog: document.getElementById('service-log'),
+            allInOutHeaderActions: document.getElementById('all-in-out-header-actions'),
+            allInOutSearchBox: document.getElementById('all-in-out-search-box'),
+            downloadAllInOutExcelBtn: document.getElementById('download-all-in-out-excel-btn'),
+            allInOutTableBody: document.getElementById('all-in-out-table-body'),
+            allInOutPagination: document.getElementById('all-in-out-pagination'),
             materialsTableBody: document.getElementById('materials-table-body'),
             addMaterialBtn: document.getElementById('add-material-btn'),
             currentStatus: document.getElementById('current-status'),
@@ -157,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     DOMElements.jobSheetHeaderActions.style.display = 'none';
                     DOMElements.allJobsHeaderActions.style.display = 'none';
                     DOMElements.inwardOutwardHeaderActions.style.display = 'none';
+                    DOMElements.allInOutHeaderActions.style.display = 'none';
 
                     if (page === 'job-sheet') {
                         DOMElements.jobSheetHeaderActions.style.display = 'flex';
@@ -166,7 +173,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         handleAllJobsSearch(null); 
                         DOMElements.allJobsHeaderActions.style.display = 'flex';
                     } else if (page === 'inward-outward') {
+                        clearOutwardForm();
                         DOMElements.inwardOutwardHeaderActions.style.display = 'flex';
+                    } else if (page === 'all-in-out') {
+                        DOMElements.allInOutSearchBox.value = '';
+                        handleAllInOutSearch(null);
+                        DOMElements.allInOutHeaderActions.style.display = 'flex';
                     }
 
                     document.body.classList.remove('sidebar-open');
@@ -203,12 +215,16 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.newJobBtn.addEventListener('click', clearJobSheetForm);
             DOMElements.saveOutwardBtn.addEventListener('click', saveOutwardRecord);
             DOMElements.cancelOutwardEditBtn.addEventListener('click', clearOutwardForm);
+            DOMElements.newOutwardBtn.addEventListener('click', () => {
+                 document.querySelector('.nav-link[data-page="inward-outward"]').click();
+            });
             DOMElements.logoutBtn.addEventListener('click', () => auth.signOut());
             DOMElements.jobNoSearchBox.addEventListener('input', () => handleAllJobsSearch(null));
             DOMElements.mobileNoSearchBox.addEventListener('input', () => handleAllJobsSearch(null));
-            DOMElements.inwardOutwardSearchBox.addEventListener('input', () => handleOutwardSearch(null));
+            DOMElements.allInOutSearchBox.addEventListener('input', () => handleAllInOutSearch(null));
             DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
-            DOMElements.downloadInwardOutwardExcelBtn.addEventListener('click', downloadInwardOutwardAsExcel);
+            DOMElements.downloadAllInOutExcelBtn.addEventListener('click', downloadAllInOutAsExcel);
+             DOMElements.jobNoOutward.addEventListener('input', autofillOutwardFromJob);
             
             DOMElements.filterToggleBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -223,7 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             setupAutocomplete(DOMElements.brandName, brandSuggestions);
             setupAutocomplete(DOMElements.partyName, partySuggestions);
-            setupActionTags();
             setupMaterialsTable();
             setupDashboardCardClickListeners();
         }
@@ -235,10 +250,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     const filterValue = card.dataset.filterValue;
 
                     if (filterType === 'inward-outward') {
+                        document.querySelector('.nav-link[data-page="all-in-out"]').click();
                         const outwardFilter = { value: filterValue };
-                        document.querySelector('.nav-link[data-page="inward-outward"]').click();
-                        DOMElements.inwardOutwardSearchBox.value = '';
-                        handleOutwardSearch(outwardFilter);
+                        handleAllInOutSearch(outwardFilter);
                     } else {
                         const jobFilter = { type: filterType, value: filterValue };
                         document.querySelector('.nav-link[data-page="all-jobs"]').click();
@@ -290,12 +304,11 @@ document.addEventListener('DOMContentLoaded', () => {
             db.collection("outwardJobs").orderBy("outwardDate", "desc").onSnapshot(snap => {
                 allOutwardRecords = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 updateDashboardStats();
-                handleOutwardSearch();
+                handleAllInOutSearch(null);
             });
 
             brandSuggestions = await loadSuggestions('brands', initialBrandOptions);
             partySuggestions = await loadSuggestions('parties', initialPartyOptions);
-            actionTagsSuggestions = await loadSuggestions('actionTags', initialActionTags);
             partNameSuggestions = await loadSuggestions('partNames', initialPartNames);
         }
         
@@ -360,43 +373,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     handleAllJobsSearch(null);
                 });
             });
-        }
-
-        function setupActionTags() {
-            setupAutocomplete(DOMElements.actionTagsInput, actionTagsSuggestions);
-            DOMElements.actionTagsInput.addEventListener('keydown', e => {
-                if (e.key === 'Enter' || e.key === ',') {
-                    e.preventDefault();
-                    const tagValue = DOMElements.actionTagsInput.value.trim();
-                    if (tagValue) {
-                        addTag(tagValue);
-                        DOMElements.actionTagsInput.value = '';
-                    }
-                }
-            });
-        }
-        
-        function addTag(text) {
-            const tagEl = document.createElement('span');
-            tagEl.className = 'tag';
-            tagEl.textContent = text;
-
-            const removeBtn = document.createElement('button');
-            removeBtn.className = 'remove-tag-btn';
-            removeBtn.innerHTML = '&times;';
-            removeBtn.onclick = () => tagEl.remove();
-            
-            tagEl.appendChild(removeBtn);
-            DOMElements.actionTagsContainer.insertBefore(tagEl, DOMElements.actionTagsInput);
-        }
-
-        function getTags() {
-            return Array.from(DOMElements.actionTagsContainer.querySelectorAll('.tag')).map(tagEl => tagEl.textContent.slice(0, -1));
-        }
-
-        function renderTags(tags = []) {
-            DOMElements.actionTagsContainer.querySelectorAll('.tag').forEach(t => t.remove());
-            tags.forEach(addTag);
         }
 
         function setupMaterialsTable() {
@@ -542,15 +518,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function clearJobSheetForm() {
             currentEditingJobId = null;
-            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.serviceLog, DOMElements.estimateAmount];
+            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.estimateAmount];
             fieldsToClear.forEach(el => el.value = '');
             
             [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
             
             document.querySelectorAll('#reported-problems input').forEach(cb => cb.checked = false);
-            DOMElements.engineerKundan.checked = false; DOMElements.engineerRushi.checked = false;
+            DOMElements.engineerKundan.checked = false; 
+            DOMElements.engineerSachin.checked = false;
+            DOMElements.engineerRushi.checked = false;
             
-            renderTags([]);
             renderMaterialsTable([]);
 
             setInitialDate();
@@ -568,6 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const engineers = [];
             if (DOMElements.engineerKundan.checked) engineers.push("Kundan Sir");
+            if (DOMElements.engineerSachin.checked) engineers.push("Sachin Sir");
             if (DOMElements.engineerRushi.checked) engineers.push("Rushi");
 
             const jobData = {
@@ -580,8 +558,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 deviceType: DOMElements.deviceType.value,
                 brandName: DOMElements.brandName.value.trim(),
                 reportedProblems: Array.from(document.querySelectorAll('#reported-problems input:checked')).map(cb => cb.value),
-                actionTags: getTags(),
-                serviceLog: DOMElements.serviceLog.value.trim(),
                 materials: getMaterials(),
                 currentStatus: DOMElements.currentStatus.value,
                 finalStatus: DOMElements.finalStatus.value,
@@ -604,7 +580,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 
                 await addSuggestion(jobData.brandName, 'brands', brandSuggestions);
-                for (const tag of jobData.actionTags) { await addSuggestion(tag, 'actionTags', actionTagsSuggestions); }
                 for (const mat of jobData.materials) { await addSuggestion(mat.name, 'partNames', partNameSuggestions); }
                 
                 clearJobSheetForm();
@@ -671,16 +646,15 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.deviceType.value = job.deviceType || '';
             DOMElements.brandName.value = job.brandName || '';
             DOMElements.estimateAmount.value = job.estimateAmount || '';
-            DOMElements.serviceLog.value = job.serviceLog || '';
             DOMElements.currentStatus.value = job.currentStatus || '';
             DOMElements.finalStatus.value = job.finalStatus || '';
             DOMElements.customerStatus.value = job.customerStatus || '';
 
             document.querySelectorAll('#reported-problems input').forEach(cb => { cb.checked = job.reportedProblems?.includes(cb.value); });
             DOMElements.engineerKundan.checked = job.engineers?.includes("Kundan Sir") || false;
+            DOMElements.engineerSachin.checked = job.engineers?.includes("Sachin Sir") || false;
             DOMElements.engineerRushi.checked = job.engineers?.includes("Rushi") || false;
             
-            renderTags(job.actionTags);
             renderMaterialsTable(job.materials);
             
             DOMElements.saveRecordBtn.textContent = 'Update Record';
@@ -695,12 +669,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        function renderOutwardTable() {
-            const startIndex = (outwardCurrentPage - 1) * itemsPerPage;
+        function renderAllInOutTable() {
+            const startIndex = (allInOutCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const pageItems = filteredOutwards.slice(startIndex, endIndex);
 
-            DOMElements.outwardRecordsTableBody.innerHTML = pageItems.map(r => `
+            DOMElements.allInOutTableBody.innerHTML = pageItems.map(r => `
                 <tr>
                     <td title="${r.partyName}">${r.partyName}</td>
                     <td title="${r.material}">${r.material}</td>
@@ -711,22 +685,21 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="delete-btn" title="Delete" onclick="window.app.deleteOutward('${r.id}')">🗑️</button>
                     </td>
                 </tr>`).join('');
-            renderPagination(DOMElements.inwardOutwardPagination, filteredOutwards.length, outwardCurrentPage, 'changeOutwardPage');
+            renderPagination(DOMElements.allInOutPagination, filteredOutwards.length, allInOutCurrentPage, 'changeAllInOutPage');
         }
 
-        function handleOutwardSearch(dashboardFilter = null) {
-            const term = DOMElements.inwardOutwardSearchBox.value.toLowerCase();
+        function handleAllInOutSearch(dashboardFilter = null) {
+            const term = DOMElements.allInOutSearchBox.value.toLowerCase();
             let tempFilteredOutwards = allOutwardRecords;
 
             if (dashboardFilter) {
+                 DOMElements.allInOutSearchBox.value = '';
                 if (dashboardFilter.value === 'pending-inward') {
                     tempFilteredOutwards = tempFilteredOutwards.filter(r => !r.inwardDate);
                 } else if (dashboardFilter.value === 'rahul-sir-pending') {
                     tempFilteredOutwards = tempFilteredOutwards.filter(r => r.partyName === 'Rahul Sir' && !r.inwardDate);
                 }
-            }
-
-            if (term) {
+            } else if (term) {
                 tempFilteredOutwards = tempFilteredOutwards.filter(r =>
                     (r.partyName && r.partyName.toLowerCase().includes(term)) ||
                     (r.material && r.material.toLowerCase().includes(term))
@@ -734,16 +707,17 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             filteredOutwards = tempFilteredOutwards;
-            outwardCurrentPage = 1;
-            renderOutwardTable();
+            allInOutCurrentPage = 1;
+            renderAllInOutTable();
         }
 
-        function changeOutwardPage(direction) {
+
+        function changeAllInOutPage(direction) {
             const totalPages = Math.ceil(filteredOutwards.length / itemsPerPage);
-            outwardCurrentPage += direction;
-            if (outwardCurrentPage < 1) outwardCurrentPage = 1;
-            if (outwardCurrentPage > totalPages) outwardCurrentPage = totalPages;
-            renderOutwardTable();
+            allInOutCurrentPage += direction;
+            if (allInOutCurrentPage < 1) allInOutCurrentPage = 1;
+            if (allInOutCurrentPage > totalPages) allInOutCurrentPage = totalPages;
+            renderAllInOutTable();
         }
 
         function clearOutwardForm() {
@@ -752,14 +726,17 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.saveOutwardBtn.textContent = 'Save Record';
             DOMElements.saveOutwardBtn.classList.remove('update-btn');
             DOMElements.cancelOutwardEditBtn.style.display = 'none';
-            [DOMElements.partyName, DOMElements.materialDesc, DOMElements.inwardDate].forEach(el => el.value = '');
+            [DOMElements.partyName, DOMElements.materialDesc, DOMElements.inwardDate, DOMElements.jobNoOutward].forEach(el => el.value = '');
             setInitialDate();
         }
 
         async function saveOutwardRecord() {
             const recordData = {
-                partyName: DOMElements.partyName.value.trim(), material: DOMElements.materialDesc.value.trim(),
-                outwardDate: DOMElements.outwardDate.value, inwardDate: DOMElements.inwardDate.value || null,
+                jobNo: DOMElements.jobNoOutward.value.trim(),
+                partyName: DOMElements.partyName.value.trim(), 
+                material: DOMElements.materialDesc.value.trim(),
+                outwardDate: DOMElements.outwardDate.value, 
+                inwardDate: DOMElements.inwardDate.value || null,
             };
             if (!recordData.partyName || !recordData.material) { alert("Party Name and Material are required."); return; }
             try {
@@ -772,15 +749,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 await addSuggestion(recordData.partyName, 'parties', partySuggestions);
                 clearOutwardForm();
+                document.querySelector('.nav-link[data-page="all-in-out"]').click();
             } catch (error) { console.error("Error saving outward record: ", error); }
         }
 
         function editOutward(id) {
             const record = allOutwardRecords.find(r => r.id === id);
             if (!record) return;
+            document.querySelector('.nav-link[data-page="inward-outward"]').click();
             currentEditingOutwardId = id;
             DOMElements.outwardFormTitle.textContent = 'Edit Outward Entry';
-            DOMElements.partyName.value = record.partyName; DOMElements.materialDesc.value = record.material;
+            DOMElements.jobNoOutward.value = record.jobNo || '';
+            DOMElements.partyName.value = record.partyName; 
+            DOMElements.materialDesc.value = record.material;
             DOMElements.outwardDate.value = record.outwardDate; DOMElements.inwardDate.value = record.inwardDate || '';
             DOMElements.saveOutwardBtn.textContent = 'Update Record';
             DOMElements.saveOutwardBtn.classList.add('update-btn');
@@ -791,6 +772,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirm("Delete this outward record?")) {
                 await db.collection("outwardJobs").doc(id).delete();
                 showSuccessModal("Outward Record Deleted!");
+            }
+        }
+        
+         function autofillOutwardFromJob() {
+            const jobNo = DOMElements.jobNoOutward.value;
+            if (jobNo) {
+                const job = allJobSheets.find(j => j.jobSheetNo == jobNo);
+                if (job) {
+                    DOMElements.materialDesc.value = `${job.brandName} ${job.deviceType}`;
+                }
             }
         }
 
@@ -853,10 +844,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (e.target.dataset.value) { 
                     input.value = e.target.dataset.value; 
                     container.innerHTML = ''; 
-                    if(input.id === 'action-tags-input') {
-                        addTag(input.value);
-                        input.value = '';
-                    }
                 } 
             });
             document.addEventListener('click', e => { if (e.target !== input) container.innerHTML = ''; });
@@ -875,8 +862,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
                 "Device Type": job.deviceType, "Brand": job.brandName,
                 "Problems": (job.reportedProblems || []).join(', '),
-                "Action Tags": (job.actionTags || []).join(', '),
-                "Service Log": job.serviceLog,
                 "Materials Used": (job.materials || []).map(m => `${m.qty}x ${m.name} (${m.details || 'N/A'}) - ${m.status}`).join('; '),
                 "Current Status": job.currentStatus,
                 "Final Status": job.finalStatus,
@@ -891,19 +876,20 @@ document.addEventListener('DOMContentLoaded', () => {
             showSuccessModal("Downloading Excel file...");
         }
 
-        function downloadInwardOutwardAsExcel() {
+        function downloadAllInOutAsExcel() {
             const dataToExport = allOutwardRecords.map(r => ({
+                 "Job No": r.jobNo,
                 "Party Name": r.partyName, "Material": r.material, "Outward Date": formatDate(r.outwardDate),
                 "Inward Date": r.inwardDate ? formatDate(r.inwardDate) : 'Pending',
             }));
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "InwardOutward");
-            XLSX.writeFile(workbook, "Korus_Inward_Outward_Export.xlsx");
+            XLSX.utils.book_append_sheet(workbook, worksheet, "AllInwardOutward");
+            XLSX.writeFile(workbook, "Korus_All_Inward_Outward_Export.xlsx");
             showSuccessModal("Downloading Excel file...");
         }
 
-        window.app = { editJob, deleteJob, editOutward, deleteOutward, changeAllJobsPage, changeOutwardPage };
+        window.app = { editJob, deleteJob, editOutward, deleteOutward, changeAllJobsPage, changeAllInOutPage };
         init();
     }
 });
