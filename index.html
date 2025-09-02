@@ -36,6 +36,10 @@
                      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
                     <span>Inward/Outward</span>
                 </a>
+                <a href="#" class="nav-link" data-page="all-in-out">
+                    <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                    <span>All In & Out</span>
+                </a>
             </nav>
             <div class="sidebar-footer">
                 <div id="clock-date" class="date"></div>
@@ -80,8 +84,11 @@
                     <button id="download-excel-btn" class="action-btn primary-btn">Excel</button>
                 </div>
                 <div id="inward-outward-header-actions" class="header-actions" style="display: none;">
-                    <input id="inward-outward-search-box" type="text" placeholder="Search Outward Records..." class="search-input">
-                    <button id="download-inward-outward-excel-btn" class="action-btn primary-btn">Excel</button>
+                     <button id="new-outward-btn" class="action-btn primary-btn">+ New Outward</button>
+                </div>
+                 <div id="all-in-out-header-actions" class="header-actions" style="display: none;">
+                    <input id="all-in-out-search-box" type="text" placeholder="Search by Party Name..." class="search-input">
+                    <button id="download-all-in-out-excel-btn" class="action-btn primary-btn">Excel</button>
                 </div>
 
                 <div class="header-spacer"></div>
@@ -166,24 +173,6 @@
                     </div>
 
                     <div class="card form-section full-width">
-                        <h2>Engineer's Log & Actions</h2>
-                        <div class="form-stack">
-                            <div>
-                                <label for="action-tags-input">Action Tags (press Enter or comma to add)</label>
-                                <div class="autocomplete">
-                                    <div id="action-tags-container" class="tags-container">
-                                        <input id="action-tags-input" type="text" placeholder="e.g., OS Installation, Toner Refill..." autocomplete="off">
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <label for="service-log">Service Log / Notes</label>
-                                <textarea id="service-log" placeholder="e.g., Cleaned dust from fan. Customer confirmed no data backup needed." class="input-field" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card form-section full-width">
                         <h2>Parts & Materials Used</h2>
                         <div class="table-wrapper">
                             <table class="materials-table">
@@ -222,6 +211,10 @@
                                 <input type="checkbox" id="engineer-kundan" value="Kundan Sir">
                                 <label for="engineer-kundan">Kundan Sir</label>
                             </div>
+                             <div>
+                                <input type="checkbox" id="engineer-sachin" value="Sachin Sir">
+                                <label for="engineer-sachin">Sachin Sir</label>
+                            </div>
                             <div>
                                 <input type="checkbox" id="engineer-rushi" value="Rushi">
                                 <label for="engineer-rushi">Rushi</label>
@@ -254,39 +247,56 @@
             </div>
 
             <div id="inward-outward-page" class="page">
-                <div class="inward-outward-layout">
-                    <div class="card form-section">
-                         <h2 id="outward-form-title">New Outward Entry</h2>
-                         <div class="form-stack">
-                            <label for="party-name">Party Name</label>
-                            <div class="autocomplete">
-                                <input id="party-name" type="text" placeholder="Select or type new party" class="input-field" autocomplete="off">
+                <div class="card form-section">
+                     <h2 id="outward-form-title">New Outward Entry</h2>
+                     <div class="form-stack">
+                        <div class="grid-2-col">
+                             <div>
+                                <label for="job-no-outward">Job No. (Optional)</label>
+                                <input id="job-no-outward" type="number" placeholder="e.g., 1234" class="input-field">
                             </div>
-                            <label for="material-desc">Material Description</label>
-                            <textarea id="material-desc" placeholder="e.g., HP Laptop 15s, SN: 12345" class="input-field" rows="4"></textarea>
-                            <label>Outward Date</label>
-                            <input id="outward-date" type="date" class="input-field">
-                            <label>Inward Date (when returned)</label>
-                            <input id="inward-date" type="date" class="input-field">
+                            <div>
+                               <label for="party-name">Party Name</label>
+                                <div class="autocomplete">
+                                    <input id="party-name" type="text" placeholder="Select or type new party" class="input-field" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <label for="material-desc">Material Description</label>
+                        <textarea id="material-desc" placeholder="e.g., HP Laptop 15s, SN: 12345" class="input-field" rows="4"></textarea>
+                        <div class="grid-2-col">
+                            <div>
+                                <label>Outward Date</label>
+                                <input id="outward-date" type="date" class="input-field">
+                            </div>
+                            <div>
+                                <label>Inward Date (when returned)</label>
+                                <input id="inward-date" type="date" class="input-field">
+                            </div>
+                        </div>
+                        <div class="action-footer" style="justify-content: flex-start; gap: 1rem;">
                             <button id="save-outward-btn" class="action-btn primary-btn">Save Record</button>
                             <button id="cancel-outward-edit-btn" class="action-btn secondary-btn" style="display: none;">Cancel Edit</button>
-                         </div>
-                    </div>
-                    <div class="card table-container">
-                        <h2>All Outward Records</h2>
-                        <div class="table-wrapper">
-                            <table class="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Party Name</th><th>Material</th>
-                                        <th>Outward Date</th><th>Inward Date</th><th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="outward-records-table-body"></tbody>
-                            </table>
                         </div>
-                        <div id="inward-outward-pagination" class="pagination-controls"></div>
+                     </div>
+                </div>
+            </div>
+
+            <div id="all-in-out-page" class="page">
+                <div class="card table-container">
+                     <h2>All Inward & Outward Records</h2>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Party Name</th><th>Material</th>
+                                    <th>Outward Date</th><th>Inward Date</th><th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-in-out-table-body"></tbody>
+                        </table>
                     </div>
+                    <div id="all-in-out-pagination" class="pagination-controls"></div>
                 </div>
             </div>
 
