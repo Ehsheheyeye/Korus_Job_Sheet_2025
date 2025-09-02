@@ -264,6 +264,10 @@
                         </div>
                         <label for="material-desc">Material Description</label>
                         <textarea id="material-desc" placeholder="e.g., HP Laptop 15s, SN: 12345" class="input-field" rows="4"></textarea>
+                        
+                        <label for="outward-customer-name">Customer / Company Name (Optional)</label>
+                        <input id="outward-customer-name" type="text" placeholder="e.g., Raju Chaudhari" class="input-field">
+
                         <div class="grid-2-col">
                             <div>
                                 <label>Outward Date</label>
@@ -289,8 +293,12 @@
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Party Name</th><th>Material</th>
-                                    <th>Outward Date</th><th>Inward Date</th><th>Actions</th>
+                                    <th>Job No.</th>
+                                    <th>Party Name</th>
+                                    <th>Material</th>
+                                    <th>Outward Date</th>
+                                    <th>Inward Date</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="all-in-out-table-body"></tbody>
