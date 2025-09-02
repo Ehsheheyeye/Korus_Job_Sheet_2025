@@ -67,14 +67,41 @@ document.addEventListener('DOMContentLoaded', () => {
         let partySuggestions = [...initialPartyOptions];
         let partNameSuggestions = [...initialPartNames];
 
-        const problemOptions = [
-            "Dead / No Power", "No Display", "Hinge Repair", "Dump Error", "Beep Sound", "Battery Issue", 
-            "HDD / SSD Issue", "Screen Issue", "Booting Issue", "Head Block", "Paper Jam", "Moulding / ABH", 
-            "Keyboard / Touchpad", "Formatting", "Windows 7", "Windows 8", "Windows 10", "Windows 11", 
-            "Toner Refill (12A)", "Toner Refill (88A)", "Toner Refill (337A)", 
-            "Software (AutoCAD)", "Software (CATIA)", "Software (SolidWorks)", "Software (Photoshop)",
-            "Display Replacement", "Keyboard Replacement", "Battery Replacement", "Component Repaired"
-        ];
+        const problemOptionsConfig = {
+            "Dead / No Power": {},
+            "No Display": {},
+            "Hinge Repair": {},
+            "Dump Error": {},
+            "Beep Sound": {},
+            "Battery Issue": {},
+            "HDD / SSD Issue": {},
+            "Screen Issue": {},
+            "Booting Issue": {},
+            "Head Block": {},
+            "Paper Jam": {},
+            "Moulding / ABH": {},
+            "Keyboard / Touchpad": {},
+            "Formatting": {
+                subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP"],
+                subOptionType: 'select',
+                subOptionLabel: 'Select OS'
+            },
+            "Toner Refill": {
+                subOptions: ["12A", "88A", "337A"],
+                subOptionType: 'select',
+                subOptionLabel: 'Select Toner Model'
+            },
+            "Software Installation": {
+                subOptions: ["AutoCAD", "CATIA", "SolidWorks", "Photoshop"],
+                subOptionType: 'select',
+                subOptionLabel: 'Select Software'
+            },
+            "Display Replacement": {},
+            "Keyboard Replacement": {},
+            "Battery Replacement": {},
+            "Component Repaired": {}
+        };
+
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
         
         const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement", "Ready", "Dead"];
@@ -118,6 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inwardDate: document.getElementById('inward-date'), saveOutwardBtn: document.getElementById('save-outward-btn'),
             cancelOutwardEditBtn: document.getElementById('cancel-outward-edit-btn'),
             jobNoOutward: document.getElementById('job-no-outward'),
+            outwardCustomerName: document.getElementById('outward-customer-name'),
             newOutwardBtn: document.getElementById('new-outward-btn'),
             inwardOutwardHeaderActions: document.getElementById('inward-outward-header-actions'),
             allInOutHeaderActions: document.getElementById('all-in-out-header-actions'),
@@ -134,6 +162,12 @@ document.addEventListener('DOMContentLoaded', () => {
             filterPopup: document.getElementById('job-range-filters'),
             filterBtnLabel: document.getElementById('filter-btn-label'),
         };
+        
+        // --- Helper Functions ---
+        function toTitleCase(str) {
+            if (!str) return '';
+            return str.toLowerCase().replace(/\b(\w)/g, s => s.toUpperCase());
+        }
 
         function init() {
             setupNavigation();
@@ -277,7 +311,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function populateCheckboxes() {
-            DOMElements.reportedProblems.innerHTML = problemOptions.map(p => `<div><input type="checkbox" id="problem-${p.replace(/\s+/g, '-')}" value="${p}"><label for="problem-${p.replace(/\s+/g, '-')}">${p}</label></div>`).join('');
+            const container = DOMElements.reportedProblems;
+            container.innerHTML = ''; // Clear existing
+        
+            for (const problem in problemOptionsConfig) {
+                const config = problemOptionsConfig[problem];
+                const problemId = problem.replace(/\s+/g, '-');
+        
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'problem-item';
+        
+                let mainCheckboxHTML = `
+                    <div class="problem-main">
+                        <input type="checkbox" id="problem-${problemId}" value="${problem}">
+                        <label for="problem-${problemId}">${problem}</label>
+                    </div>`;
+        
+                let subOptionsHTML = '';
+                if (config.subOptions) {
+                    const subOptionsId = `sub-options-${problemId}`;
+                    const selectOptions = config.subOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    subOptionsHTML = `
+                        <div class="problem-sub-options" id="${subOptionsId}">
+                            <label for="select-${problemId}">${config.subOptionLabel}</label>
+                            <select id="select-${problemId}" class="select-field">${selectOptions}</select>
+                        </div>`;
+                }
+        
+                itemWrapper.innerHTML = mainCheckboxHTML + subOptionsHTML;
+                container.appendChild(itemWrapper);
+        
+                // Add event listener if there are sub-options
+                if (config.subOptions) {
+                    const checkbox = itemWrapper.querySelector(`#problem-${problemId}`);
+                    const subOptionsDiv = itemWrapper.querySelector(`#sub-options-${problemId}`);
+                    checkbox.addEventListener('change', () => {
+                        subOptionsDiv.style.display = checkbox.checked ? 'block' : 'none';
+                    });
+                }
+            }
         }
 
         function setInitialDate() {
@@ -417,6 +489,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             return materials;
         }
+        
+        function getReportedProblems() {
+            const problems = [];
+            document.querySelectorAll('#reported-problems .problem-item').forEach(item => {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    const problemName = checkbox.value;
+                    const subOptionsSelect = item.querySelector('select');
+                    if (subOptionsSelect) {
+                        problems.push(`${problemName}: ${subOptionsSelect.value}`);
+                    } else {
+                        problems.push(problemName);
+                    }
+                }
+            });
+            return problems;
+        }
 
         function renderMaterialsTable(materials = []) {
             DOMElements.materialsTableBody.innerHTML = '';
@@ -523,7 +612,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
             
-            document.querySelectorAll('#reported-problems input').forEach(cb => cb.checked = false);
+            document.querySelectorAll('#reported-problems input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+                // Also hide sub-options
+                const problemId = cb.value.replace(/\s+/g, '-');
+                const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
+                if (subOptionsDiv) {
+                    subOptionsDiv.style.display = 'none';
+                }
+            });
+
             DOMElements.engineerKundan.checked = false; 
             DOMElements.engineerSachin.checked = false;
             DOMElements.engineerRushi.checked = false;
@@ -552,12 +650,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 jobSheetNo: jobSheetNo,
                 oldJobSheetNo: DOMElements.oldJobSheetNo.value.trim(),
                 date: DOMElements.date.value,
-                customerName: DOMElements.customerName.value.trim(),
+                customerName: toTitleCase(DOMElements.customerName.value.trim()),
                 customerMobile: DOMElements.customerMobile.value.trim(),
                 altMobile: DOMElements.altMobile.value.trim(),
                 deviceType: DOMElements.deviceType.value,
                 brandName: DOMElements.brandName.value.trim(),
-                reportedProblems: Array.from(document.querySelectorAll('#reported-problems input:checked')).map(cb => cb.value),
+                reportedProblems: getReportedProblems(),
                 materials: getMaterials(),
                 currentStatus: DOMElements.currentStatus.value,
                 finalStatus: DOMElements.finalStatus.value,
@@ -650,7 +748,24 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.finalStatus.value = job.finalStatus || '';
             DOMElements.customerStatus.value = job.customerStatus || '';
 
-            document.querySelectorAll('#reported-problems input').forEach(cb => { cb.checked = job.reportedProblems?.includes(cb.value); });
+            // Set reported problems
+            (job.reportedProblems || []).forEach(problemStr => {
+                const [mainProblem, subOption] = problemStr.split(': ');
+                const checkbox = document.querySelector(`#reported-problems input[value="${mainProblem}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    const problemId = mainProblem.replace(/\s+/g, '-');
+                    const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
+                    if (subOptionsDiv) {
+                        subOptionsDiv.style.display = 'block';
+                        const select = subOptionsDiv.querySelector('select');
+                        if (select && subOption) {
+                            select.value = subOption;
+                        }
+                    }
+                }
+            });
+
             DOMElements.engineerKundan.checked = job.engineers?.includes("Kundan Sir") || false;
             DOMElements.engineerSachin.checked = job.engineers?.includes("Sachin Sir") || false;
             DOMElements.engineerRushi.checked = job.engineers?.includes("Rushi") || false;
@@ -663,9 +778,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function deleteJob(id) {
-            if (confirm("Delete this job sheet?")) {
+            const password = prompt("To delete this job, please enter the password:");
+            if (password === "KC21") {
                 await db.collection("jobSheets").doc(id).delete();
                 showSuccessModal("Job Sheet Deleted!");
+            } else if (password !== null) { // Only show error if they entered something
+                alert("Incorrect password. Deletion cancelled.");
             }
         }
         
@@ -676,10 +794,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             DOMElements.allInOutTableBody.innerHTML = pageItems.map(r => `
                 <tr>
+                    <td>${r.jobNo || 'N/A'}</td>
                     <td title="${r.partyName}">${r.partyName}</td>
                     <td title="${r.material}">${r.material}</td>
                     <td>${formatDate(r.outwardDate)}</td>
-                    <td>${r.inwardDate ? formatDate(r.inwardDate) : 'Pending'}</td>
+                    <td>${r.inwardDate ? formatDate(r.inwardDate) : `<button class="action-btn primary-btn pending-btn" onclick="window.app.editOutward('${r.id}')">Pending</button>`}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editOutward('${r.id}')">✏️</button>
                         <button class="delete-btn" title="Delete" onclick="window.app.deleteOutward('${r.id}')">🗑️</button>
@@ -726,7 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.saveOutwardBtn.textContent = 'Save Record';
             DOMElements.saveOutwardBtn.classList.remove('update-btn');
             DOMElements.cancelOutwardEditBtn.style.display = 'none';
-            [DOMElements.partyName, DOMElements.materialDesc, DOMElements.inwardDate, DOMElements.jobNoOutward].forEach(el => el.value = '');
+            [DOMElements.partyName, DOMElements.materialDesc, DOMElements.inwardDate, DOMElements.jobNoOutward, DOMElements.outwardCustomerName].forEach(el => el.value = '');
             setInitialDate();
         }
 
@@ -735,6 +854,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 jobNo: DOMElements.jobNoOutward.value.trim(),
                 partyName: DOMElements.partyName.value.trim(), 
                 material: DOMElements.materialDesc.value.trim(),
+                customerName: toTitleCase(DOMElements.outwardCustomerName.value.trim()),
                 outwardDate: DOMElements.outwardDate.value, 
                 inwardDate: DOMElements.inwardDate.value || null,
             };
@@ -762,6 +882,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.jobNoOutward.value = record.jobNo || '';
             DOMElements.partyName.value = record.partyName; 
             DOMElements.materialDesc.value = record.material;
+            DOMElements.outwardCustomerName.value = record.customerName || '';
             DOMElements.outwardDate.value = record.outwardDate; DOMElements.inwardDate.value = record.inwardDate || '';
             DOMElements.saveOutwardBtn.textContent = 'Update Record';
             DOMElements.saveOutwardBtn.classList.add('update-btn');
@@ -769,9 +890,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function deleteOutward(id) {
-            if (confirm("Delete this outward record?")) {
+            const password = prompt("To delete this record, please enter the password:");
+            if (password === "KC21") {
                 await db.collection("outwardJobs").doc(id).delete();
                 showSuccessModal("Outward Record Deleted!");
+            } else if (password !== null) {
+                alert("Incorrect password. Deletion cancelled.");
             }
         }
         
@@ -781,6 +905,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const job = allJobSheets.find(j => j.jobSheetNo == jobNo);
                 if (job) {
                     DOMElements.materialDesc.value = `${job.brandName} ${job.deviceType}`;
+                    DOMElements.outwardCustomerName.value = job.customerName;
                 }
             }
         }
@@ -879,7 +1004,9 @@ document.addEventListener('DOMContentLoaded', () => {
         function downloadAllInOutAsExcel() {
             const dataToExport = allOutwardRecords.map(r => ({
                  "Job No": r.jobNo,
-                "Party Name": r.partyName, "Material": r.material, "Outward Date": formatDate(r.outwardDate),
+                "Party Name": r.partyName, 
+                "Customer Name": r.customerName,
+                "Material": r.material, "Outward Date": formatDate(r.outwardDate),
                 "Inward Date": r.inwardDate ? formatDate(r.inwardDate) : 'Pending',
             }));
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
