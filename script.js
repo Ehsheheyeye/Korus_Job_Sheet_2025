@@ -56,13 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
         let allJobsCurrentPage = 1;
         let allInOutCurrentPage = 1;
         const itemsPerPage = 10;
-        let currentJobRangeFilter = 'all';
+        let currentJobRangeFilter = 'all'; 
 
         // --- Pre-populated Data ---
         const initialBrandOptions = ["Dell", "HP", "Lenovo", "ASUS", "Acer", "Intex", "I-Ball", "Artist", "Lapcare", "EVM", "Crucial", "Logitech", "Apple (MacBook)", "MSI", "Samsung", "Avita", "Fujitsu", "LG", "Toshiba", "HCL", "Redmi", "Sony", "OnePlus", "TCL", "Panasonic", "Sansui", "BenQ", "Zebronics", "ViewSonic", "AOC", "Philips", "Gigabyte", "Cooler Master", "Foxin", "Western Digital (WD)", "Seagate", "Kingston", "XPG", "ADATA", "SanDisk", "Intel", "Ant Esports", "Antec", "Deepcool", "Circle", "Frontech", "Enter", "Canon", "Epson", "Brother", "TVS", "Zebra", "Xerox", "Kyocera", "Ricoh", "Pantum", "Delta", "Vertiv", "12A", "88A", "78A", "925A", "337A", "ProDot"];
         const initialPartyOptions = ["Rahul Sir", "Shree Enterprises", "San infotech", "Audio video care", "Rx service centre", "Nate", "DSK", "Crucial service centre", "Rashi Peripheral", "SR enterprises", "Cache technology", "perfect computers", "EVM service centre", "navkar enterprises"];
         const initialPartNames = ["SSD", "RAM", "Keyboard", "Battery", "Screen", "Toner", "Motherboard", "Adapter", "CPU Fan"];
-
+        
         let brandSuggestions = [...initialBrandOptions];
         let partySuggestions = [...initialPartyOptions];
         let partNameSuggestions = [...initialPartNames];
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
             jobSheetNo: document.getElementById('job-sheet-no'), oldJobSheetNo: document.getElementById('old-job-sheet-no'),
             date: document.getElementById('date'), customerName: document.getElementById('customer-name'),
             customerMobile: document.getElementById('customer-mobile'), altMobile: document.getElementById('alt-mobile'),
-            devicesList: document.getElementById('devices-list'), addDeviceBtn: document.getElementById('add-device-btn'),
+            deviceType: document.getElementById('device-type'), brandName: document.getElementById('brand-name'),
             reportedProblems: document.getElementById('reported-problems'), 
             serviceNote: document.getElementById('service-note'),
             estimateAmount: document.getElementById('estimate-amount'),
@@ -201,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
             populateCheckboxes();
             setInitialDate();
             loadInitialData();
-            addDeviceItem(); // Start with one device item
         }
 
         function setupNavigation() {
@@ -287,8 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
             DOMElements.downloadAllInOutExcelBtn.addEventListener('click', downloadAllInOutAsExcel);
             DOMElements.jobNoOutward.addEventListener('input', autofillOutwardFromJob);
-            DOMElements.addDeviceBtn.addEventListener('click', () => addDeviceItem());
-
+            
             DOMElements.filterToggleBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 DOMElements.filterPopup.classList.toggle('visible');
@@ -310,6 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            setupAutocomplete(DOMElements.brandName, brandSuggestions);
+            setupAutocomplete(DOMElements.partyName, partySuggestions);
             setupMaterialsTable();
             setupDashboardCardClickListeners();
             setupSmartFilters();
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function populateSelects() {
-            // No longer need to populate a single deviceType select
+            populateOptions(DOMElements.deviceType, deviceTypeOptions, "Select Device Type");
             populateOptions(DOMElements.currentStatus, currentStatusOptions, "Select Current Status");
             populateOptions(DOMElements.finalStatus, finalStatusOptions, "Select Final Status");
             populateOptions(DOMElements.customerStatus, customerStatusOptions, "Select Customer Status");
@@ -548,57 +548,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        
-        function addDeviceItem(device = {}) {
-            const deviceId = `device-${Date.now()}-${Math.random()}`;
-            const deviceItem = document.createElement('div');
-            deviceItem.className = 'device-item';
-            deviceItem.setAttribute('data-id', deviceId);
-
-            const deviceTypeOptionsHTML = deviceTypeOptions.map(opt => 
-                `<option value="${opt}" ${device.deviceType === opt ? 'selected' : ''}>${opt}</option>`
-            ).join('');
-
-            deviceItem.innerHTML = `
-                <div class="device-item-header">
-                    <h3>Device</h3>
-                    <button class="remove-device-btn">&times;</button>
-                </div>
-                <div class="device-item-body">
-                    <div class="form-stack">
-                        <label>Device Type</label>
-                        <select class="select-field device-type">${deviceTypeOptionsHTML}</select>
-                        <label>Company / Brand Name</label>
-                        <div class="autocomplete">
-                            <input type="text" placeholder="e.g., Dell, HP, Lenovo" class="input-field brand-name" autocomplete="off" value="${device.brandName || ''}">
-                        </div>
-                    </div>
-                </div>
-            `;
-            DOMElements.devicesList.appendChild(deviceItem);
-
-            const brandNameInput = deviceItem.querySelector('.brand-name');
-            setupAutocomplete(brandNameInput, brandSuggestions);
-
-            deviceItem.querySelector('.remove-device-btn').addEventListener('click', () => {
-                deviceItem.remove();
-            });
-        }
-
-        function getDevices() {
-            const devices = [];
-            document.querySelectorAll('#devices-list .device-item').forEach(item => {
-                const deviceType = item.querySelector('.device-type').value;
-                const brandName = item.querySelector('.brand-name').value.trim();
-                if (deviceType && brandName) {
-                    devices.push({
-                        deviceType: deviceType,
-                        brandName: toTitleCase(brandName)
-                    });
-                }
-            });
-            return devices;
-        }
 
         function addMaterialRow(material = {}) {
             const row = document.createElement('tr');
@@ -664,7 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tr>
                     <td>${job.jobSheetNo}</td>
                     <td title="${job.customerName}">${job.customerName}</td>
-                    <td title="${(job.devices || []).map(d => d.deviceType).join(', ')}">${(job.devices || []).map(d => d.deviceType).join(', ')}</td>
+                    <td title="${job.deviceType}">${job.deviceType}</td>
                     <td>${job.currentStatus || 'N/A'}</td>
                     <td>${formatTimestamp(job.updatedAt)}</td>
                     <td class="table-actions">
@@ -686,7 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${formatDate(job.date)}</td>
                     <td title="${job.customerName}">${job.customerName}</td>
                     <td title="${job.customerMobile}">${job.customerMobile}</td>
-                    <td>${(job.devices || []).map(d => d.deviceType).join(', ')}</td>
+                    <td>${job.deviceType}</td>
                     <td>${job.currentStatus}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
@@ -715,7 +664,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (activeDashboardFilter.type === 'finalStatus') {
                     tempFilteredJobs = tempFilteredJobs.filter(job => job.finalStatus === activeDashboardFilter.value);
                 } else if (activeDashboardFilter.type === 'deviceType') {
-                    tempFilteredJobs = tempFilteredJobs.filter(job => (job.devices || []).some(d => d.deviceType === activeDashboardFilter.value));
+                    tempFilteredJobs = tempFilteredJobs.filter(job => job.deviceType === activeDashboardFilter.value);
                 }
             }
         
@@ -750,13 +699,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function clearJobSheetForm() {
             currentEditingJobId = null;
-            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.serviceNote, DOMElements.estimateAmount];
+            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.serviceNote, DOMElements.estimateAmount];
             fieldsToClear.forEach(el => el.value = '');
             
-            DOMElements.devicesList.innerHTML = '';
-            addDeviceItem(); // Add one empty device item
-
-            [DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
+            [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
             
             document.querySelectorAll('#reported-problems input[type="checkbox"]').forEach(cb => {
                 cb.checked = false;
@@ -791,12 +737,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (DOMElements.engineerSachin.checked) engineers.push("Sachin Sir");
             if (DOMElements.engineerRushi.checked) engineers.push("Rushi");
 
-            const devices = getDevices();
-            if (devices.length === 0) {
-                alert("Please add at least one device.");
-                return;
-            }
-
             const jobData = {
                 jobSheetNo: jobSheetNo,
                 oldJobSheetNo: DOMElements.oldJobSheetNo.value.trim(),
@@ -804,7 +744,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 customerName: toTitleCase(DOMElements.customerName.value.trim()),
                 customerMobile: DOMElements.customerMobile.value.trim(),
                 altMobile: DOMElements.altMobile.value.trim(),
-                devices: devices,
+                deviceType: DOMElements.deviceType.value,
+                brandName: toTitleCase(DOMElements.brandName.value.trim()),
                 reportedProblems: getReportedProblems(),
                 serviceNote: DOMElements.serviceNote.value.trim(),
                 materials: getMaterials(),
@@ -828,9 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     showSuccessModal("Record Saved!");
                 }
                 
-                for (const device of jobData.devices) {
-                    await addSuggestion(device.brandName, 'brands');
-                }
+                await addSuggestion(jobData.brandName, 'brands');
                 for (const mat of jobData.materials) { await addSuggestion(mat.name, 'partNames'); }
                 
                 clearJobSheetForm();
@@ -841,11 +780,12 @@ document.addEventListener('DOMContentLoaded', () => {
         function sendWhatsAppMessage() {
             const customerName = DOMElements.customerName.value.trim();
             const jobSheetNo = DOMElements.jobSheetNo.value.trim();
-            const devices = getDevices();
+            const brandName = DOMElements.brandName.value.trim();
+            const deviceType = DOMElements.deviceType.value;
             const estimateAmount = DOMElements.estimateAmount.value.trim();
             const customerMobile = DOMElements.customerMobile.value.trim();
 
-            if (!customerMobile || !customerName || !jobSheetNo || devices.length === 0 || !estimateAmount) {
+            if (!customerMobile || !customerName || !jobSheetNo || !brandName || !deviceType || !estimateAmount) {
                 alert('Please fill all the required fields to send a WhatsApp message.');
                 return;
             }
@@ -854,18 +794,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (phoneNumber.length === 10 && !phoneNumber.startsWith('91')) {
                 phoneNumber = '91' + phoneNumber;
             }
-            
-            const deviceText = devices.map(d => `${d.brandName} ${d.deviceType}`).join(', ');
 
             const encodedCustomerName = encodeURIComponent(customerName);
             const encodedJobSheetNo = encodeURIComponent(jobSheetNo);
-            const encodedDeviceText = encodeURIComponent(deviceText);
+            const encodedBrandName = encodeURIComponent(brandName);
+            const encodedDeviceType = encodeURIComponent(deviceType);
             const encodedEstimateAmount = encodeURIComponent(`₹${estimateAmount}`);
 
             const textParts = [
                 `Hello, ${encodedCustomerName} %F0%9F%91%8B`, ``,
                 `Your Job No: ${encodedJobSheetNo}`,
-                `Your ${encodedDeviceText} is now ready %E2%9C%85`, ``,
+                `Your ${encodedBrandName} ${encodedDeviceType} is now ready %E2%9C%85`, ``,
                 `%F0%9F%92%B0 Amount: ${encodedEstimateAmount}`, ``,
                 `%F0%9F%93%8D Please collect your device between`,
                 `10:30 AM – 07:30 PM`, ``,
@@ -889,15 +828,8 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.customerName.value = job.customerName || '';
             DOMElements.customerMobile.value = job.customerMobile || '';
             DOMElements.altMobile.value = job.altMobile || '';
-            
-            DOMElements.devicesList.innerHTML = '';
-            if (job.devices && job.devices.length > 0) {
-                job.devices.forEach(addDeviceItem);
-            } else {
-                // For backward compatibility with old data
-                addDeviceItem({ deviceType: job.deviceType, brandName: job.brandName });
-            }
-
+            DOMElements.deviceType.value = job.deviceType || '';
+            DOMElements.brandName.value = job.brandName || '';
             DOMElements.serviceNote.value = job.serviceNote || '';
             DOMElements.estimateAmount.value = job.estimateAmount || '';
             DOMElements.currentStatus.value = job.currentStatus || '';
@@ -1056,8 +988,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (jobNo) {
                 const job = allJobSheets.find(j => j.jobSheetNo == jobNo);
                 if (job) {
-                    const deviceText = (job.devices || []).map(d => `${d.brandName} ${d.deviceType}`).join(', ');
-                    DOMElements.materialDesc.value = deviceText;
+                    DOMElements.materialDesc.value = `${job.brandName} ${job.deviceType}`;
                     DOMElements.outwardCustomerName.value = job.customerName;
                 }
             }
@@ -1137,22 +1068,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function downloadJobsAsExcel() {
-            const dataToExport = allJobSheets.map(job => {
-                const devices = (job.devices || []).map(d => `${d.brandName} ${d.deviceType}`).join('; ');
-                return {
-                    "Job No": job.jobSheetNo, "Old Job No": job.oldJobSheetNo, "Date": formatDate(job.date),
-                    "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
-                    "Devices": devices,
-                    "Problems": (job.reportedProblems || []).join(', '),
-                     "Service Note": job.serviceNote,
-                    "Materials Used": (job.materials || []).map(m => `${m.qty}x ${m.name} (${m.details || 'N/A'}) - ${m.status}`).join('; '),
-                    "Current Status": job.currentStatus,
-                    "Final Status": job.finalStatus,
-                    "Customer Status": job.customerStatus,
-                    "Engineer(s)": (job.engineers || []).join(', '),
-                    "Estimate Amount": job.estimateAmount,
-                };
-            });
+            const dataToExport = allJobSheets.map(job => ({
+                "Job No": job.jobSheetNo, "Old Job No": job.oldJobSheetNo, "Date": formatDate(job.date),
+                "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
+                "Device Type": job.deviceType, "Brand": job.brandName,
+                "Problems": (job.reportedProblems || []).join(', '),
+                 "Service Note": job.serviceNote,
+                "Materials Used": (job.materials || []).map(m => `${m.qty}x ${m.name} (${m.details || 'N/A'}) - ${m.status}`).join('; '),
+                "Current Status": job.currentStatus,
+                "Final Status": job.finalStatus,
+                "Customer Status": job.customerStatus,
+                "Engineer(s)": (job.engineers || []).join(', '),
+                "Estimate Amount": job.estimateAmount,
+            }));
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "JobSheets");
@@ -1179,3 +1107,4 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
+
