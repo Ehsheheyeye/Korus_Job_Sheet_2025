@@ -550,3 +550,46 @@ textarea.input-field { resize: vertical; }
     background-color: var(--accent-color);
     color: white;
 }
+/* --- Add these new styles to the end of your style.css file --- */
+
+.devices-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.device-item {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: var(--bg-primary);
+}
+
+.device-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.device-item-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.remove-device-btn {
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    cursor: pointer;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.device-item-body .form-stack {
+    gap: 0.75rem;
+}
+
