@@ -156,10 +156,15 @@
                         </div>
                     </div>
                     <div class="card form-section">
-                        <h2>Devices</h2>
-                        <div id="devices-list" class="devices-list-container">
+                        <h2>Device Details</h2>
+                        <div class="form-stack">
+                            <label for="device-type">Device Type</label>
+                            <select id="device-type" class="select-field"></select>
+                            <label for="brand-name">Company / Brand Name</label>
+                            <div class="autocomplete">
+                                <input id="brand-name" type="text" placeholder="e.g., Dell, HP, Lenovo" class="input-field" autocomplete="off">
                             </div>
-                        <button id="add-device-btn" class="action-btn secondary-btn" style="margin-top: 1rem;">+ Add Device</button>
+                        </div>
                     </div>
 
                     <div class="card form-section full-width">
