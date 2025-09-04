@@ -1005,7 +1005,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderPagination(container, totalItems, currentPage, handlerName) {
-            if (totalItems <= itemsPerPage) { container.innerHTML = ''; return; }
+            // UPDATED LINE: This will now show pagination even if there's only one page.
+            if (totalItems === 0) { container.innerHTML = ''; return; }
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const startItem = (currentPage - 1) * itemsPerPage + 1;
             const endItem = Math.min(currentPage * itemsPerPage, totalItems);
@@ -1117,6 +1118,3 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
-
-
-
