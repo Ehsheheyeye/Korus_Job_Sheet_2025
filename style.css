@@ -206,27 +206,15 @@ textarea.input-field { resize: vertical; }
 
 .form-stack { display: flex; flex-direction: column; gap: 1rem; }
 
-.checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+.checkbox-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
 .checkbox-grid .problem-item { display: flex; flex-direction: column; }
 .checkbox-grid .problem-main { display: flex; align-items: center; }
-.checkbox-grid .problem-main input[type="checkbox"] { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
+.checkbox-grid input[type="checkbox"] { margin-right: 0.5rem; width: 1rem; height: 1rem; accent-color: var(--accent-color); }
 
 .problem-sub-options {
     display: none;
     padding-left: 1.5rem;
     margin-top: 0.75rem;
-}
-.sub-checkbox-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.75rem;
-}
-.sub-checkbox-item {
-    display: flex;
-    align-items: center;
-}
-.sub-checkbox-item input[type="checkbox"] {
-    margin-right: 0.5rem;
 }
 
 .estimate-input {
@@ -364,13 +352,11 @@ textarea.input-field { resize: vertical; }
 }
 .pagination-info { font-size: 0.875rem; font-weight: 500; }
 
-/* --- AUTOCOMPLETE (FIXED) --- */
+/* --- AUTOCOMPLETE --- */
 .autocomplete { position: relative; width: 100%; }
 .autocomplete-items {
     position: absolute; border: 1px solid var(--border-color);
-    border-top: none; 
-    z-index: 1000; /* Increased z-index to ensure it's on top */
-    top: 100%; left: 0; right: 0;
+    border-top: none; z-index: 100; top: 100%; left: 0; right: 0;
     background-color: var(--bg-secondary); border-radius: 0 0 8px 8px;
     max-height: 200px; overflow-y: auto; box-shadow: var(--shadow);
 }
@@ -381,7 +367,7 @@ textarea.input-field { resize: vertical; }
 .modal-overlay {
     position: fixed; inset: 0; background-color: rgba(17, 24, 39, 0.6);
     backdrop-filter: blur(4px); display: flex; align-items: center;
-    justify-content: center; z-index: 1050; opacity: 0; visibility: hidden;
+    justify-content: center; z-index: 1000; opacity: 0; visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 .modal-overlay.visible { opacity: 1; visibility: visible; }
@@ -513,4 +499,54 @@ textarea.input-field { resize: vertical; }
     background-color: var(--accent-color);
     color: white;
     border-color: var(--accent-color);
+}
+
+/* Smart Filter Styles */
+.th-with-filter > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.filter-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-left: 0.5rem;
+    color: var(--text-secondary);
+}
+.filter-icon-btn:hover {
+    color: var(--accent-color);
+}
+
+.filter-popup-dynamic {
+    position: absolute;
+    z-index: 1010;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 150px;
+}
+.filter-popup-dynamic button {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+.filter-popup-dynamic button:hover {
+    background-color: var(--accent-color);
+    color: white;
 }
