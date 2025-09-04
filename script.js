@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let allJobsCurrentPage = 1;
         let allInOutCurrentPage = 1;
         const itemsPerPage = 10;
-        let currentJobRangeFilter = 'all'; 
+        let currentJobRangeFilter = 'all';
 
         // --- Pre-populated Data ---
         const initialBrandOptions = ["Dell", "HP", "Lenovo", "ASUS", "Acer", "Intex", "I-Ball", "Artist", "Lapcare", "EVM", "Crucial", "Logitech", "Apple (MacBook)", "MSI", "Samsung", "Avita", "Fujitsu", "LG", "Toshiba", "HCL", "Redmi", "Sony", "OnePlus", "TCL", "Panasonic", "Sansui", "BenQ", "Zebronics", "ViewSonic", "AOC", "Philips", "Gigabyte", "Cooler Master", "Foxin", "Western Digital (WD)", "Seagate", "Kingston", "XPG", "ADATA", "SanDisk", "Intel", "Ant Esports", "Antec", "Deepcool", "Circle", "Frontech", "Enter", "Canon", "Epson", "Brother", "TVS", "Zebra", "Xerox", "Kyocera", "Ricoh", "Pantum", "Delta", "Vertiv", "12A", "88A", "78A", "925A", "337A", "ProDot"];
@@ -68,68 +68,48 @@ document.addEventListener('DOMContentLoaded', () => {
         let partNameSuggestions = [...initialPartNames];
 
         const problemOptionsConfig = {
-    "Formatting": {
-        subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP", "Ubantu", "Mac OS", "Other"],
-        subOptionType: "select",
-        subOptionLabel: "Select OS"
-    },
-
-    "Software Installation": {
-        subOptions: ["AutoCAD", "CATIA", "SolidWorks", "PowerMill", "CoralDraw", "SolidEdge", "Premiere Pro", "After Effect", "MasterCam", "SketchUp", "Photoshop", "MS Office", "Tally Prime", "Tally ERP9", "Siemens NX", "PTC Creo", "Revit", "Illustrator", "3ds Max", "Maya", "ISM", "Other"],
-        subOptionType: "select",
-        subOptionLabel: "Select Software"
-    },
-
-    "Toner Refill": {
-        subOptions: ["12A", "88A", "337A", "285A", "78A", "925A", "TN-1020", "Samsung", "Ricoh", "Pantum", "Xerox", "Other"],
-        subOptionType: "select",
-        subOptionLabel: "Select Toner Model"
-    },
-
-    "Antivirus": {
-        subOptions: ["Quick Heal", "NPAV", "Bitdefender", "Other"],
-        subOptionType: "select",
-        subOptionLabel: "Select Antivirus"
-    },
-
-    "Printer Problem": {
-        subOptions: ["Paper Jam", "Head Cleaning", "Servicing", "Head Block", "Low Ink/Toner", "Slow Printing", "Faded Printouts", "Strange Noises", "Blank Pages Printing", "Paper Misfeed", "Scanner Not Working", "Other"],
-        subOptionType: "select",
-        subOptionLabel: "Select Printer Issue"
-    },
-
-    "Replacement": {
-        subOptions: ["Battery", "Keyboard", "Mouse", "SSD", "HDD", "Laptop Screen", "Desktop Screen", "SMPS", "Router", "RAM", "Other"],
-        subOptionType: "select",
-        subOptionLabel: "Select Replacement"
-    },
-
-    "Hardware Issue": {
-        subOptions: [
-            "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue", "Speaker Issue", "SMPS Issue", "CPU Fan Issue", "WiFi Not Working", "LAN Port Issue", "HDMI / VGA Port Issue", "BIOS Current", "CMOS Issue", "Auto Shutdown", "Auto Restart", "Bluetooth Issue", "Power Button Issue", "Other"
-        ],
-        subOptionType: "select",
-        subOptionLabel: "Select Hardware Issue"
-    },
-
-    "Dead / No Power": {},
-    "No Display": {},
-    "Moulding / ABH": {},
-    "HDD / SSD Issue": {},
-    "Data Backup": {},
-    "Password Crack / Reset": {},
-    "OS Recovery": {},
-    "Hang / Stuck Issue": {},
-    "Overheating": {},
-    "RAM Issue": {},
-    "Keyboard / Touchpad": {},
-    "Battery Issue": {},
-    "Screen Issue": {},
-    "Booting Issue": {},
-    "Dump Error": {},
-    "Beep Sound": {},
-    "Other": {}
-};
+            "Formatting": {
+                subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP", "Ubantu", "Mac OS", "Other"],
+                subOptionType: "select",
+                subOptionLabel: "Select OS"
+            },
+            "Software Installation": {
+                subOptions: ["AutoCAD", "CATIA", "SolidWorks", "PowerMill", "CoralDraw", "SolidEdge", "Premiere Pro", "After Effect", "MasterCam", "SketchUp", "Photoshop", "MS Office", "Tally Prime", "Tally ERP9", "Siemens NX", "PTC Creo", "Revit", "Illustrator", "3ds Max", "Maya", "ISM", "Other"],
+                subOptionType: "checkbox", // Changed to checkbox
+                subOptionLabel: "Select Software"
+            },
+            "Toner Refill": {
+                subOptions: ["12A", "88A", "337A", "285A", "78A", "925A", "TN-1020", "Samsung", "Ricoh", "Pantum", "Xerox", "Other"],
+                subOptionType: "select",
+                subOptionLabel: "Select Toner Model"
+            },
+            "Antivirus": {
+                subOptions: ["Quick Heal", "NPAV", "Bitdefender", "Other"],
+                subOptionType: "select",
+                subOptionLabel: "Select Antivirus"
+            },
+            "Printer Problem": {
+                subOptions: ["Paper Jam", "Head Cleaning", "Servicing", "Head Block", "Low Ink/Toner", "Slow Printing", "Faded Printouts", "Strange Noises", "Blank Pages Printing", "Paper Misfeed", "Scanner Not Working", "Other"],
+                subOptionType: "select",
+                subOptionLabel: "Select Printer Issue"
+            },
+            "Replacement": {
+                subOptions: ["Battery", "Keyboard", "Mouse", "SSD", "HDD", "Laptop Screen", "Desktop Screen", "SMPS", "Router", "RAM", "Other"],
+                subOptionType: "select",
+                subOptionLabel: "Select Replacement"
+            },
+            "Hardware Issue": {
+                subOptions: [
+                    "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue", "Speaker Issue", "SMPS Issue", "CPU Fan Issue", "WiFi Not Working", "LAN Port Issue", "HDMI / VGA Port Issue", "BIOS Current", "CMOS Issue", "Auto Shutdown", "Auto Restart", "Bluetooth Issue", "Power Button Issue", "Other"
+                ],
+                subOptionType: "select",
+                subOptionLabel: "Select Hardware Issue"
+            },
+            "Dead / No Power": {}, "No Display": {}, "Moulding / ABH": {}, "HDD / SSD Issue": {}, "Data Backup": {},
+            "Password Crack / Reset": {}, "OS Recovery": {}, "Hang / Stuck Issue": {}, "Overheating": {}, "RAM Issue": {},
+            "Keyboard / Touchpad": {}, "Battery Issue": {}, "Screen Issue": {}, "Booting Issue": {}, "Dump Error": {},
+            "Beep Sound": {}, "Other": {}
+        };
 
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
         
@@ -148,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             jobSheetNo: document.getElementById('job-sheet-no'), oldJobSheetNo: document.getElementById('old-job-sheet-no'),
             date: document.getElementById('date'), customerName: document.getElementById('customer-name'),
             customerMobile: document.getElementById('customer-mobile'), altMobile: document.getElementById('alt-mobile'),
-            deviceType: document.getElementById('device-type'), brandName: document.getElementById('brand-name'),
+            devicesTableBody: document.getElementById('devices-table-body'), addDeviceBtn: document.getElementById('add-device-btn'),
             reportedProblems: document.getElementById('reported-problems'), 
             serviceNote: document.getElementById('service-note'),
             estimateAmount: document.getElementById('estimate-amount'),
@@ -211,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
             populateCheckboxes();
             setInitialDate();
             loadInitialData();
+            addDeviceRow(); // Add one device row by default
         }
 
         function setupNavigation() {
@@ -232,13 +213,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     DOMElements.inwardOutwardHeaderActions.style.display = 'none';
                     DOMElements.allInOutHeaderActions.style.display = 'none';
                     
-                    // Reset filters when changing pages
                     handleAllJobsSearch(null);
 
-
-                    if (page === 'job-sheet') {
-                        DOMElements.jobSheetHeaderActions.style.display = 'flex';
-                    } else if (page === 'all-jobs') {
+                    if (page === 'job-sheet') DOMElements.jobSheetHeaderActions.style.display = 'flex';
+                    else if (page === 'all-jobs') {
                         DOMElements.jobNoSearchBox.value = '';
                         DOMElements.mobileNoSearchBox.value = '';
                         handleAllJobsSearch(null); 
@@ -251,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         handleAllInOutSearch(null);
                         DOMElements.allInOutHeaderActions.style.display = 'flex';
                     }
-
                     document.body.classList.remove('sidebar-open');
                 });
             });
@@ -318,9 +295,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            setupAutocomplete(DOMElements.brandName, brandSuggestions);
             setupAutocomplete(DOMElements.partyName, partySuggestions);
             setupMaterialsTable();
+            setupDevicesTable();
             setupDashboardCardClickListeners();
             setupSmartFilters();
         }
@@ -334,8 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
             DOMElements.statusFilterBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const options = [...new Set(allJobSheets.map(j => j.currentStatus).filter(Boolean))];
-                options.sort();
+                const options = [...new Set(allJobSheets.map(j => j.currentStatus).filter(Boolean))].sort();
                 showFilterPopup(e.currentTarget, 'currentStatus', options);
             });
         }
@@ -349,19 +325,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const allButton = document.createElement('button');
             allButton.textContent = 'All';
-            allButton.onclick = () => {
-                handleAllJobsSearch({ type: filterKey, value: null });
-                popup.remove();
-            };
+            allButton.onclick = () => { handleAllJobsSearch({ type: filterKey, value: null }); popup.remove(); };
             popup.appendChild(allButton);
         
             options.forEach(option => {
                 const optionButton = document.createElement('button');
                 optionButton.textContent = option;
-                optionButton.onclick = () => {
-                    handleAllJobsSearch({ type: filterKey, value: option });
-                    popup.remove();
-                };
+                optionButton.onclick = () => { handleAllJobsSearch({ type: filterKey, value: option }); popup.remove(); };
                 popup.appendChild(optionButton);
             });
         
@@ -372,10 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
             setTimeout(() => {
                 document.addEventListener('click', function closePopup(event) {
-                    if (!popup.contains(event.target)) {
-                        popup.remove();
-                        document.removeEventListener('click', closePopup);
-                    }
+                    if (!popup.contains(event.target)) { popup.remove(); document.removeEventListener('click', closePopup); }
                 });
             }, 0);
         }
@@ -402,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function populateSelects() {
-            populateOptions(DOMElements.deviceType, deviceTypeOptions, "Select Device Type");
             populateOptions(DOMElements.currentStatus, currentStatusOptions, "Select Current Status");
             populateOptions(DOMElements.finalStatus, finalStatusOptions, "Select Final Status");
             populateOptions(DOMElements.customerStatus, customerStatusOptions, "Select Customer Status");
@@ -416,40 +382,29 @@ document.addEventListener('DOMContentLoaded', () => {
         function populateCheckboxes() {
             const container = DOMElements.reportedProblems;
             container.innerHTML = '';
-        
             for (const problem in problemOptionsConfig) {
                 const config = problemOptionsConfig[problem];
                 const problemId = problem.replace(/[\s/]+/g, '-');
-        
                 const itemWrapper = document.createElement('div');
                 itemWrapper.className = 'problem-item';
-        
-                let mainCheckboxHTML = `
-                    <div class="problem-main">
-                        <input type="checkbox" id="problem-${problemId}" value="${problem}">
-                        <label for="problem-${problemId}">${problem}</label>
-                    </div>`;
-        
+                let mainCheckboxHTML = `<div class="problem-main"><input type="checkbox" id="problem-${problemId}" value="${problem}"><label for="problem-${problemId}">${problem}</label></div>`;
                 let subOptionsHTML = '';
                 if (config.subOptions) {
                     const subOptionsId = `sub-options-${problemId}`;
-                    const selectOptions = config.subOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-                    subOptionsHTML = `
-                        <div class="problem-sub-options" id="${subOptionsId}">
-                            <label for="select-${problemId}">${config.subOptionLabel}</label>
-                            <select id="select-${problemId}" class="select-field">${selectOptions}</select>
-                        </div>`;
+                    if (config.subOptionType === 'checkbox') {
+                        const checkboxOptions = config.subOptions.map(opt => `<div class="sub-checkbox-item"><input type="checkbox" id="sub-opt-${problemId}-${opt.replace(/\s/g, '')}" value="${opt}"><label for="sub-opt-${problemId}-${opt.replace(/\s/g, '')}">${opt}</label></div>`).join('');
+                        subOptionsHTML = `<div class="problem-sub-options" id="${subOptionsId}"><label>${config.subOptionLabel}</label><div class="sub-checkbox-grid">${checkboxOptions}</div></div>`;
+                    } else { // select
+                        const selectOptions = config.subOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                        subOptionsHTML = `<div class="problem-sub-options" id="${subOptionsId}"><label for="select-${problemId}">${config.subOptionLabel}</label><select id="select-${problemId}" class="select-field">${selectOptions}</select></div>`;
+                    }
                 }
-        
                 itemWrapper.innerHTML = mainCheckboxHTML + subOptionsHTML;
                 container.appendChild(itemWrapper);
-        
                 if (config.subOptions) {
                     const checkbox = itemWrapper.querySelector(`#problem-${problemId}`);
                     const subOptionsDiv = itemWrapper.querySelector(`#sub-options-${problemId}`);
-                    checkbox.addEventListener('change', () => {
-                        subOptionsDiv.style.display = checkbox.checked ? 'block' : 'none';
-                    });
+                    checkbox.addEventListener('change', () => { subOptionsDiv.style.display = checkbox.checked ? 'block' : 'none'; });
                 }
             }
         }
@@ -464,35 +419,28 @@ document.addEventListener('DOMContentLoaded', () => {
             db.collection(collectionName).onSnapshot(snapshot => {
                 const dbSuggestions = snapshot.docs.map(doc => doc.data().name);
                 const combined = [...new Set([...initialArray, ...dbSuggestions])].sort();
-                // Clear and repopulate the target array
                 targetArray.length = 0;
                 Array.prototype.push.apply(targetArray, combined);
-            }, error => {
-                console.error(`Error listening for ${collectionName} suggestions:`, error);
-            });
+            }, error => console.error(`Error listening for ${collectionName} suggestions:`, error));
         }
 
         function loadInitialData() {
             db.collection("jobSheets").orderBy("jobSheetNo", "desc").onSnapshot(snap => {
                 allJobSheets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 allJobSheets.sort((a, b) => (b.jobSheetNo || 0) - (a.jobSheetNo || 0));
-
                 renderJobRangeFilters();
                 updateDashboardStats();
                 handleAllJobsSearch(null);
             });
-
             db.collection("jobSheets").orderBy("updatedAt", "desc").limit(5).onSnapshot(snap => {
                 const recentJobs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderRecentJobsTable(recentJobs);
             });
-
             db.collection("outwardJobs").orderBy("outwardDate", "desc").onSnapshot(snap => {
                 allOutwardRecords = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 updateDashboardStats();
                 handleAllInOutSearch(null);
             });
-
             listenForSuggestions('brands', initialBrandOptions, brandSuggestions);
             listenForSuggestions('parties', initialPartyOptions, partySuggestions);
             listenForSuggestions('partNames', initialPartNames, partNameSuggestions);
@@ -504,7 +452,6 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.workingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Working').length;
             DOMElements.deliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Delivered').length;
             DOMElements.notDeliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Not Delivered').length;
-
             const pendingInwards = allOutwardRecords.filter(r => !r.inwardDate);
             DOMElements.pendingInwardStat.textContent = pendingInwards.length;
             DOMElements.rahulSirPendingStat.textContent = pendingInwards.filter(r => r.partyName === 'Rahul Sir').length;
@@ -513,58 +460,81 @@ document.addEventListener('DOMContentLoaded', () => {
         function renderJobRangeFilters() {
             const container = DOMElements.filterPopup;
             if (!container) return;
-
-            const ranges = [...new Set(allJobSheets
-                .map(j => Math.floor(j.jobSheetNo / 100) * 100)
-                .filter(r => r > 0)
-            )].sort((a, b) => b - a);
-
+            const ranges = [...new Set(allJobSheets.map(j => Math.floor(j.jobSheetNo / 100) * 100).filter(r => r > 0))].sort((a, b) => b - a);
             let buttonsHTML = '<button class="job-range-filter-btn active" data-range="all">All</button>';
-            
             ranges.forEach(rangeStart => {
                 const rangeEnd = rangeStart + 99;
                 buttonsHTML += `<button class="job-range-filter-btn" data-range="${rangeStart}">${rangeStart}-${rangeEnd}</button>`;
             });
-
             container.innerHTML = buttonsHTML;
-
             container.querySelectorAll('.job-range-filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     container.querySelector('.active')?.classList.remove('active');
                     btn.classList.add('active');
-                    
-                    const selectedRange = btn.dataset.range;
-                    currentJobRangeFilter = selectedRange === 'all' ? 'all' : parseInt(selectedRange);
-
-                    if (currentJobRangeFilter === 'all') {
-                        DOMElements.filterToggleBtn.classList.remove('active');
-                        DOMElements.filterBtnLabel.textContent = 'Filter';
-                    } else {
-                        DOMElements.filterToggleBtn.classList.add('active');
-                        DOMElements.filterBtnLabel.textContent = btn.textContent;
-                    }
-                    
+                    currentJobRangeFilter = btn.dataset.range === 'all' ? 'all' : parseInt(btn.dataset.range);
+                    DOMElements.filterToggleBtn.classList.toggle('active', currentJobRangeFilter !== 'all');
+                    DOMElements.filterBtnLabel.textContent = currentJobRangeFilter === 'all' ? 'Filter' : btn.textContent;
                     DOMElements.filterPopup.classList.remove('visible');
                     handleAllJobsSearch(null);
                 });
             });
         }
-
-        function setupMaterialsTable() {
-            DOMElements.addMaterialBtn.addEventListener('click', () => addMaterialRow());
-            DOMElements.materialsTableBody.addEventListener('click', (e) => {
+        
+        // --- DEVICE TABLE ---
+        function setupDevicesTable() {
+            DOMElements.addDeviceBtn.addEventListener('click', () => addDeviceRow());
+            DOMElements.devicesTableBody.addEventListener('click', (e) => {
                 if(e.target.classList.contains('remove-material-btn')) {
                     e.target.closest('tr').remove();
                 }
             });
         }
 
+        function addDeviceRow(device = {}) {
+            const row = document.createElement('tr');
+            const deviceOptionsHTML = deviceTypeOptions.map(opt => `<option value="${opt}" ${device.type === opt ? 'selected' : ''}>${opt}</option>`).join('');
+            row.innerHTML = `
+                <td><select class="select-field device-type"><option value="">Select Device</option>${deviceOptionsHTML}</select></td>
+                <td><div class="autocomplete"><input type="text" class="input-field device-brand" placeholder="e.g., Dell, HP" value="${device.brand || ''}"></div></td>
+                <td><button class="remove-material-btn">&times;</button></td>
+            `;
+            DOMElements.devicesTableBody.appendChild(row);
+            const brandInput = row.querySelector('.device-brand');
+            setupAutocomplete(brandInput, brandSuggestions);
+        }
+        
+        function getDevices() {
+            const devices = [];
+            DOMElements.devicesTableBody.querySelectorAll('tr').forEach(row => {
+                const type = row.querySelector('.device-type').value;
+                const brand = row.querySelector('.device-brand').value.trim();
+                if (type && brand) {
+                    devices.push({ type: type, brand: toTitleCase(brand) });
+                }
+            });
+            return devices;
+        }
+
+        function renderDevicesTable(devices = []) {
+            DOMElements.devicesTableBody.innerHTML = '';
+            if (devices && devices.length > 0) {
+                devices.forEach(addDeviceRow);
+            } else {
+                addDeviceRow(); // Always have at least one row
+            }
+        }
+
+
+        function setupMaterialsTable() {
+            DOMElements.addMaterialBtn.addEventListener('click', () => addMaterialRow());
+            DOMElements.materialsTableBody.addEventListener('click', (e) => {
+                if(e.target.classList.contains('remove-material-btn')) { e.target.closest('tr').remove(); }
+            });
+        }
+
         function addMaterialRow(material = {}) {
             const row = document.createElement('tr');
-            const statusOptionsHTML = materialStatusOptions.map(opt => 
-                `<option value="${opt}" ${material.status === opt ? 'selected' : ''}>${opt}</option>`
-            ).join('');
-
+            const statusOptionsHTML = materialStatusOptions.map(opt => `<option value="${opt}" ${material.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
             row.innerHTML = `
                 <td><div class="autocomplete"><input type="text" class="input-field part-name" placeholder="e.g., SSD" value="${material.name || ''}"></div></td>
                 <td><input type="text" class="input-field part-details" placeholder="e.g., Samsung 256GB" value="${material.details || ''}"></td>
@@ -573,8 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td><button class="remove-material-btn">&times;</button></td>
             `;
             DOMElements.materialsTableBody.appendChild(row);
-            const partNameInput = row.querySelector('.part-name');
-            setupAutocomplete(partNameInput, partNameSuggestions);
+            setupAutocomplete(row.querySelector('.part-name'), partNameSuggestions);
         }
 
         function getMaterials() {
@@ -583,10 +552,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const name = row.querySelector('.part-name').value.trim();
                 if (name) {
                     materials.push({
-                        name: toTitleCase(name),
-                        details: row.querySelector('.part-details').value.trim(),
-                        qty: parseInt(row.querySelector('.part-qty').value) || 1,
-                        status: row.querySelector('.part-status').value
+                        name: toTitleCase(name), details: row.querySelector('.part-details').value.trim(),
+                        qty: parseInt(row.querySelector('.part-qty').value) || 1, status: row.querySelector('.part-status').value
                     });
                 }
             });
@@ -596,12 +563,23 @@ document.addEventListener('DOMContentLoaded', () => {
         function getReportedProblems() {
             const problems = [];
             document.querySelectorAll('#reported-problems .problem-item').forEach(item => {
-                const checkbox = item.querySelector('input[type="checkbox"]');
-                if (checkbox.checked) {
-                    const problemName = checkbox.value;
-                    const subOptionsSelect = item.querySelector('select');
-                    if (subOptionsSelect) {
-                        problems.push(`${problemName}: ${subOptionsSelect.value}`);
+                const mainCheckbox = item.querySelector('input[type="checkbox"]');
+                if (mainCheckbox.checked) {
+                    const problemName = mainCheckbox.value;
+                    const config = problemOptionsConfig[problemName];
+                    if (config.subOptionType === 'checkbox') {
+                        const selectedSubOptions = [];
+                        item.querySelectorAll('.sub-checkbox-item input:checked').forEach(subCb => {
+                            selectedSubOptions.push(subCb.value);
+                        });
+                        if (selectedSubOptions.length > 0) {
+                            problems.push(`${problemName}: ${selectedSubOptions.join(', ')}`);
+                        } else {
+                            problems.push(problemName); // Push main problem if no sub-options selected
+                        }
+                    } else if (config.subOptionType === 'select') {
+                        const select = item.querySelector('select');
+                        problems.push(`${problemName}: ${select.value}`);
                     } else {
                         problems.push(problemName);
                     }
@@ -612,9 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function renderMaterialsTable(materials = []) {
             DOMElements.materialsTableBody.innerHTML = '';
-            if (materials && materials.length > 0) {
-                materials.forEach(addMaterialRow);
-            }
+            if (materials && materials.length > 0) { materials.forEach(addMaterialRow); }
         }
 
         function renderRecentJobsTable(jobs) {
@@ -623,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tr>
                     <td>${job.jobSheetNo}</td>
                     <td title="${job.customerName}">${job.customerName}</td>
-                    <td title="${job.deviceType}">${job.deviceType}</td>
+                    <td title="${(job.devices || []).map(d => d.type).join(', ')}">${(job.devices || []).map(d => d.type).join(', ')}</td>
                     <td>${job.currentStatus || 'N/A'}</td>
                     <td>${formatTimestamp(job.updatedAt)}</td>
                     <td class="table-actions">
@@ -637,7 +613,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const startIndex = (allJobsCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const pageItems = filteredJobs.slice(startIndex, endIndex);
-
             DOMElements.allJobsTableBody.innerHTML = pageItems.length === 0 ? `<tr><td colspan="7" style="text-align:center; padding: 1rem;">No matching jobs found.</td></tr>` :
             pageItems.map(job => `
                 <tr>
@@ -645,7 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${formatDate(job.date)}</td>
                     <td title="${job.customerName}">${job.customerName}</td>
                     <td title="${job.customerMobile}">${job.customerMobile}</td>
-                    <td>${job.deviceType}</td>
+                    <td>${(job.devices || []).map(d => d.type).join(', ')}</td>
                     <td>${job.currentStatus}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
@@ -656,44 +631,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         let activeDashboardFilter = null;
-        
         function handleAllJobsSearch(dashboardFilter = null) {
-            if (dashboardFilter) {
-                if (dashboardFilter.value === null) activeDashboardFilter = null;
-                else activeDashboardFilter = dashboardFilter;
-            }
-        
+            if (dashboardFilter) { activeDashboardFilter = dashboardFilter.value === null ? null : dashboardFilter; }
             const jobNoTerm = DOMElements.jobNoSearchBox.value.trim();
             const mobileTerm = DOMElements.mobileNoSearchBox.value.trim();
-            
             let tempFilteredJobs = allJobSheets;
-        
             if (activeDashboardFilter) {
-                if (activeDashboardFilter.type === 'currentStatus') {
-                    tempFilteredJobs = tempFilteredJobs.filter(job => job.currentStatus === activeDashboardFilter.value);
-                } else if (activeDashboardFilter.type === 'finalStatus') {
-                    tempFilteredJobs = tempFilteredJobs.filter(job => job.finalStatus === activeDashboardFilter.value);
-                } else if (activeDashboardFilter.type === 'deviceType') {
-                    tempFilteredJobs = tempFilteredJobs.filter(job => job.deviceType === activeDashboardFilter.value);
+                if (activeDashboardFilter.type === 'deviceType') {
+                    tempFilteredJobs = tempFilteredJobs.filter(job => (job.devices || []).some(d => d.type === activeDashboardFilter.value));
+                } else {
+                    tempFilteredJobs = tempFilteredJobs.filter(job => job[activeDashboardFilter.type] === activeDashboardFilter.value);
                 }
             }
-        
             if (currentJobRangeFilter !== 'all') {
-                const lowerBound = currentJobRangeFilter;
-                const upperBound = lowerBound + 99;
-                tempFilteredJobs = tempFilteredJobs.filter(job => job.jobSheetNo >= lowerBound && job.jobSheetNo <= upperBound);
+                const lower = currentJobRangeFilter, upper = lower + 99;
+                tempFilteredJobs = tempFilteredJobs.filter(j => j.jobSheetNo >= lower && j.jobSheetNo <= upper);
             }
-        
-            if (jobNoTerm) {
-                tempFilteredJobs = tempFilteredJobs.filter(job => String(job.jobSheetNo).includes(jobNoTerm));
-            }
-            if (mobileTerm) {
-                tempFilteredJobs = tempFilteredJobs.filter(job => 
-                    (job.customerMobile && String(job.customerMobile).includes(mobileTerm)) ||
-                    (job.altMobile && String(job.altMobile).includes(mobileTerm))
-                );
-            }
-            
+            if (jobNoTerm) tempFilteredJobs = tempFilteredJobs.filter(j => String(j.jobSheetNo).includes(jobNoTerm));
+            if (mobileTerm) tempFilteredJobs = tempFilteredJobs.filter(j => (j.customerMobile && String(j.customerMobile).includes(mobileTerm)) || (j.altMobile && String(j.altMobile).includes(mobileTerm)));
             filteredJobs = tempFilteredJobs;
             allJobsCurrentPage = 1;
             renderAllJobsTable();
@@ -709,26 +664,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function clearJobSheetForm() {
             currentEditingJobId = null;
-            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.serviceNote, DOMElements.estimateAmount];
+            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.serviceNote, DOMElements.estimateAmount];
             fieldsToClear.forEach(el => el.value = '');
-            
-            [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
-            
+            [DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
             document.querySelectorAll('#reported-problems input[type="checkbox"]').forEach(cb => {
                 cb.checked = false;
-                const problemId = cb.value.replace(/[\s/]+/g, '-');
+                const problemId = cb.id.split('problem-')[1];
                 const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
-                if (subOptionsDiv) {
-                    subOptionsDiv.style.display = 'none';
-                }
+                if (subOptionsDiv) subOptionsDiv.style.display = 'none';
             });
-
-            DOMElements.engineerKundan.checked = false; 
-            DOMElements.engineerSachin.checked = false;
-            DOMElements.engineerRushi.checked = false;
-            
+            DOMElements.engineerKundan.checked = false; DOMElements.engineerSachin.checked = false; DOMElements.engineerRushi.checked = false;
             renderMaterialsTable([]);
-
+            renderDevicesTable([]);
             setInitialDate();
             DOMElements.saveRecordBtn.textContent = 'Save Record';
             DOMElements.saveRecordBtn.classList.remove('update-btn');
@@ -736,38 +683,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async function saveJobSheet() {
             const jobSheetNo = Number(DOMElements.jobSheetNo.value.trim() || 0);
-
             if (!currentEditingJobId && allJobSheets.some(job => job.jobSheetNo === jobSheetNo)) {
-                alert("Error: Job Sheet Number " + jobSheetNo + " already exists. Please use a different number.");
-                return;
+                return alert("Error: Job Sheet Number " + jobSheetNo + " already exists.");
             }
-            
             const engineers = [];
             if (DOMElements.engineerKundan.checked) engineers.push("Kundan Sir");
             if (DOMElements.engineerSachin.checked) engineers.push("Sachin Sir");
             if (DOMElements.engineerRushi.checked) engineers.push("Rushi");
 
             const jobData = {
-                jobSheetNo: jobSheetNo,
-                oldJobSheetNo: DOMElements.oldJobSheetNo.value.trim(),
-                date: DOMElements.date.value,
-                customerName: toTitleCase(DOMElements.customerName.value.trim()),
-                customerMobile: DOMElements.customerMobile.value.trim(),
-                altMobile: DOMElements.altMobile.value.trim(),
-                deviceType: DOMElements.deviceType.value,
-                brandName: toTitleCase(DOMElements.brandName.value.trim()),
-                reportedProblems: getReportedProblems(),
-                serviceNote: DOMElements.serviceNote.value.trim(),
-                materials: getMaterials(),
-                currentStatus: DOMElements.currentStatus.value,
-                finalStatus: DOMElements.finalStatus.value,
-                customerStatus: DOMElements.customerStatus.value,
-                estimateAmount: parseFloat(DOMElements.estimateAmount.value) || 0,
-                engineers: engineers,
+                jobSheetNo: jobSheetNo, oldJobSheetNo: DOMElements.oldJobSheetNo.value.trim(), date: DOMElements.date.value,
+                customerName: toTitleCase(DOMElements.customerName.value.trim()), customerMobile: DOMElements.customerMobile.value.trim(),
+                altMobile: DOMElements.altMobile.value.trim(), devices: getDevices(), reportedProblems: getReportedProblems(),
+                serviceNote: DOMElements.serviceNote.value.trim(), materials: getMaterials(), currentStatus: DOMElements.currentStatus.value,
+                finalStatus: DOMElements.finalStatus.value, customerStatus: DOMElements.customerStatus.value,
+                estimateAmount: parseFloat(DOMElements.estimateAmount.value) || 0, engineers: engineers,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
-            
-            if (!jobData.jobSheetNo || !jobData.customerName || !jobData.customerMobile) { alert("Job Sheet No, Customer Name, and Mobile are required."); return; }
+            if (!jobData.jobSheetNo || !jobData.customerName || !jobData.customerMobile) { return alert("Job Sheet No, Customer Name, and Mobile are required."); }
+            if (jobData.devices.length === 0) { return alert("Please add at least one device."); }
 
             try {
                 if (currentEditingJobId) {
@@ -778,10 +712,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     await db.collection("jobSheets").add(jobData);
                     showSuccessModal("Record Saved!");
                 }
-                
-                await addSuggestion(jobData.brandName, 'brands');
+                for(const device of jobData.devices) { await addSuggestion(device.brand, 'brands'); }
                 for (const mat of jobData.materials) { await addSuggestion(mat.name, 'partNames'); }
-                
                 clearJobSheetForm();
                 document.querySelector('.nav-link[data-page="dashboard"]').click();
             } catch (error) { console.error("Error saving job sheet: ", error); alert("Error saving record."); }
@@ -790,40 +722,26 @@ document.addEventListener('DOMContentLoaded', () => {
         function sendWhatsAppMessage() {
             const customerName = DOMElements.customerName.value.trim();
             const jobSheetNo = DOMElements.jobSheetNo.value.trim();
-            const brandName = DOMElements.brandName.value.trim();
-            const deviceType = DOMElements.deviceType.value;
+            const devices = getDevices();
             const estimateAmount = DOMElements.estimateAmount.value.trim();
             const customerMobile = DOMElements.customerMobile.value.trim();
 
-            if (!customerMobile || !customerName || !jobSheetNo || !brandName || !deviceType || !estimateAmount) {
-                alert('Please fill all the required fields to send a WhatsApp message.');
-                return;
+            if (!customerMobile || !customerName || !jobSheetNo || devices.length === 0 || !estimateAmount) {
+                return alert('Please fill all required fields to send a WhatsApp message.');
             }
-
             let phoneNumber = customerMobile;
-            if (phoneNumber.length === 10 && !phoneNumber.startsWith('91')) {
-                phoneNumber = '91' + phoneNumber;
-            }
+            if (phoneNumber.length === 10 && !phoneNumber.startsWith('91')) phoneNumber = '91' + phoneNumber;
 
-            const encodedCustomerName = encodeURIComponent(customerName);
-            const encodedJobSheetNo = encodeURIComponent(jobSheetNo);
-            const encodedBrandName = encodeURIComponent(brandName);
-            const encodedDeviceType = encodeURIComponent(deviceType);
-            const encodedEstimateAmount = encodeURIComponent(`₹${estimateAmount}`);
+            const deviceText = devices.map(d => `${d.brand} ${d.type}`).join(', ');
+            const encodedDeviceText = encodeURIComponent(deviceText);
 
             const textParts = [
-                `Hello, ${encodedCustomerName} %F0%9F%91%8B`, ``,
-                `Your Job No: ${encodedJobSheetNo}`,
-                `Your ${encodedBrandName} ${encodedDeviceType} is now ready %E2%9C%85`, ``,
-                `%F0%9F%92%B0 Amount: ${encodedEstimateAmount}`, ``,
-                `%F0%9F%93%8D Please collect your device between`,
-                `10:30 AM – 07:30 PM`, ``,
-                `Thank you,`, `Korus Computers`
+                `Hello, ${encodeURIComponent(customerName)} %F0%9F%91%8B`, ``, `Your Job No: ${encodeURIComponent(jobSheetNo)}`,
+                `Your ${encodedDeviceText} is now ready %E2%9C%85`, ``, `%F0%9F%92%B0 Amount: ${encodeURIComponent(`₹${estimateAmount}`)}`, ``,
+                `%F0%9F%93%8D Please collect your device between`, `10:30 AM – 07:30 PM`, ``, `Thank you,`, `Korus Computers`
             ];
-
             const finalMessage = textParts.join('%0A');
-            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${finalMessage}`;
-            window.open(whatsappUrl, '_blank');
+            window.open(`https://wa.me/${phoneNumber}?text=${finalMessage}`, '_blank');
         }
 
         function editJob(id) {
@@ -831,23 +749,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!job) return;
             clearJobSheetForm();
             currentEditingJobId = id;
-            
-            DOMElements.jobSheetNo.value = job.jobSheetNo || '';
-            DOMElements.oldJobSheetNo.value = job.oldJobSheetNo || '';
-            DOMElements.date.value = job.date || '';
-            DOMElements.customerName.value = job.customerName || '';
-            DOMElements.customerMobile.value = job.customerMobile || '';
-            DOMElements.altMobile.value = job.altMobile || '';
-            DOMElements.deviceType.value = job.deviceType || '';
-            DOMElements.brandName.value = job.brandName || '';
-            DOMElements.serviceNote.value = job.serviceNote || '';
-            DOMElements.estimateAmount.value = job.estimateAmount || '';
-            DOMElements.currentStatus.value = job.currentStatus || '';
-            DOMElements.finalStatus.value = job.finalStatus || '';
+            DOMElements.jobSheetNo.value = job.jobSheetNo || ''; DOMElements.oldJobSheetNo.value = job.oldJobSheetNo || '';
+            DOMElements.date.value = job.date || ''; DOMElements.customerName.value = job.customerName || '';
+            DOMElements.customerMobile.value = job.customerMobile || ''; DOMElements.altMobile.value = job.altMobile || '';
+            DOMElements.serviceNote.value = job.serviceNote || ''; DOMElements.estimateAmount.value = job.estimateAmount || '';
+            DOMElements.currentStatus.value = job.currentStatus || ''; DOMElements.finalStatus.value = job.finalStatus || '';
             DOMElements.customerStatus.value = job.customerStatus || '';
+            
+            renderDevicesTable(job.devices);
 
             (job.reportedProblems || []).forEach(problemStr => {
-                const [mainProblem, subOption] = problemStr.split(': ');
+                const [mainProblem, subOptionsStr] = problemStr.split(': ');
                 const problemId = mainProblem.replace(/[\s/]+/g, '-');
                 const checkbox = document.querySelector(`#problem-${problemId}`);
                 if (checkbox) {
@@ -855,38 +767,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
                     if (subOptionsDiv) {
                         subOptionsDiv.style.display = 'block';
-                        const select = subOptionsDiv.querySelector('select');
-                        if (select && subOption) select.value = subOption;
+                        const config = problemOptionsConfig[mainProblem];
+                        if (config.subOptionType === 'checkbox' && subOptionsStr) {
+                            const subOptions = subOptionsStr.split(', ');
+                            subOptions.forEach(subOpt => {
+                                const subCheckbox = subOptionsDiv.querySelector(`input[value="${subOpt}"]`);
+                                if (subCheckbox) subCheckbox.checked = true;
+                            });
+                        } else if (config.subOptionType === 'select' && subOptionsStr) {
+                            subOptionsDiv.querySelector('select').value = subOptionsStr;
+                        }
                     }
                 }
             });
-
             DOMElements.engineerKundan.checked = job.engineers?.includes("Kundan Sir") || false;
             DOMElements.engineerSachin.checked = job.engineers?.includes("Sachin Sir") || false;
             DOMElements.engineerRushi.checked = job.engineers?.includes("Rushi") || false;
-            
             renderMaterialsTable(job.materials);
-            
             DOMElements.saveRecordBtn.textContent = 'Update Record';
             DOMElements.saveRecordBtn.classList.add('update-btn');
             document.querySelector('.nav-link[data-page="job-sheet"]').click();
         }
 
         async function deleteJob(id) {
-            const password = prompt("To delete this job, please enter the password:");
-            if (password === "KC21") {
+            if (prompt("To delete this job, please enter the password:") === "KC21") {
                 await db.collection("jobSheets").doc(id).delete();
                 showSuccessModal("Job Sheet Deleted!");
-            } else if (password !== null) {
-                alert("Incorrect password. Deletion cancelled.");
-            }
+            } else { alert("Incorrect password. Deletion cancelled."); }
         }
         
         function renderAllInOutTable() {
             const startIndex = (allInOutCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const pageItems = filteredOutwards.slice(startIndex, endIndex);
-
             DOMElements.allInOutTableBody.innerHTML = pageItems.map(r => `
                 <tr>
                     <td>${r.jobNo || '-'}</td>
@@ -905,21 +818,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function handleAllInOutSearch(dashboardFilter = null) {
             const term = DOMElements.allInOutSearchBox.value.toLowerCase();
             let tempFilteredOutwards = allOutwardRecords;
-
             if (dashboardFilter) {
                  DOMElements.allInOutSearchBox.value = '';
-                if (dashboardFilter.value === 'pending-inward') {
-                    tempFilteredOutwards = tempFilteredOutwards.filter(r => !r.inwardDate);
-                } else if (dashboardFilter.value === 'rahul-sir-pending') {
-                    tempFilteredOutwards = tempFilteredOutwards.filter(r => r.partyName === 'Rahul Sir' && !r.inwardDate);
-                }
+                if (dashboardFilter.value === 'pending-inward') tempFilteredOutwards = tempFilteredOutwards.filter(r => !r.inwardDate);
+                else if (dashboardFilter.value === 'rahul-sir-pending') tempFilteredOutwards = tempFilteredOutwards.filter(r => r.partyName === 'Rahul Sir' && !r.inwardDate);
             } else if (term) {
-                tempFilteredOutwards = tempFilteredOutwards.filter(r =>
-                    (r.partyName && r.partyName.toLowerCase().includes(term)) ||
-                    (r.material && r.material.toLowerCase().includes(term))
-                );
+                tempFilteredOutwards = tempFilteredOutwards.filter(r => (r.partyName && r.partyName.toLowerCase().includes(term)) || (r.material && r.material.toLowerCase().includes(term)));
             }
-
             filteredOutwards = tempFilteredOutwards;
             allInOutCurrentPage = 1;
             renderAllInOutTable();
@@ -945,14 +850,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async function saveOutwardRecord() {
             const recordData = {
-                jobNo: DOMElements.jobNoOutward.value.trim(),
-                partyName: toTitleCase(DOMElements.partyName.value.trim()), 
-                material: DOMElements.materialDesc.value.trim(),
-                customerName: toTitleCase(DOMElements.outwardCustomerName.value.trim()),
-                outwardDate: DOMElements.outwardDate.value, 
-                inwardDate: DOMElements.inwardDate.value || null,
+                jobNo: DOMElements.jobNoOutward.value.trim(), partyName: toTitleCase(DOMElements.partyName.value.trim()),
+                material: DOMElements.materialDesc.value.trim(), customerName: toTitleCase(DOMElements.outwardCustomerName.value.trim()),
+                outwardDate: DOMElements.outwardDate.value, inwardDate: DOMElements.inwardDate.value || null,
             };
-            if (!recordData.partyName || !recordData.material) { alert("Party Name and Material are required."); return; }
+            if (!recordData.partyName || !recordData.material) { return alert("Party Name and Material are required."); }
             try {
                 if (currentEditingOutwardId) {
                     await db.collection("outwardJobs").doc(currentEditingOutwardId).update(recordData);
@@ -973,10 +875,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.nav-link[data-page="inward-outward"]').click();
             currentEditingOutwardId = id;
             DOMElements.outwardFormTitle.textContent = 'Edit Outward Entry';
-            DOMElements.jobNoOutward.value = record.jobNo || '';
-            DOMElements.partyName.value = record.partyName; 
-            DOMElements.materialDesc.value = record.material;
-            DOMElements.outwardCustomerName.value = record.customerName || '';
+            DOMElements.jobNoOutward.value = record.jobNo || ''; DOMElements.partyName.value = record.partyName;
+            DOMElements.materialDesc.value = record.material; DOMElements.outwardCustomerName.value = record.customerName || '';
             DOMElements.outwardDate.value = record.outwardDate; DOMElements.inwardDate.value = record.inwardDate || '';
             DOMElements.saveOutwardBtn.textContent = 'Update Record';
             DOMElements.saveOutwardBtn.classList.add('update-btn');
@@ -984,13 +884,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         async function deleteOutward(id) {
-            const password = prompt("To delete this record, please enter the password:");
-            if (password === "KC21") {
+            if (prompt("To delete this record, please enter the password:") === "KC21") {
                 await db.collection("outwardJobs").doc(id).delete();
                 showSuccessModal("Outward Record Deleted!");
-            } else if (password !== null) {
-                alert("Incorrect password. Deletion cancelled.");
-            }
+            } else { alert("Incorrect password. Deletion cancelled."); }
         }
         
          function autofillOutwardFromJob() {
@@ -998,7 +895,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (jobNo) {
                 const job = allJobSheets.find(j => j.jobSheetNo == jobNo);
                 if (job) {
-                    DOMElements.materialDesc.value = `${job.brandName} ${job.deviceType}`;
+                    const deviceText = (job.devices || []).map(d => `${d.brand} ${d.type}`).join(', ');
+                    DOMElements.materialDesc.value = deviceText;
                     DOMElements.outwardCustomerName.value = job.customerName;
                 }
             }
@@ -1009,7 +907,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const startItem = (currentPage - 1) * itemsPerPage + 1;
             const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-            
             container.innerHTML = `
                 <span class="pagination-info">${startItem}-${endItem} of ${totalItems}</span>
                 <button class="action-btn secondary-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="window.app.${handlerName}(-1)">Previous</button>
@@ -1017,29 +914,19 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         }
 
-        function formatTimestamp(timestamp) {
-            if (!timestamp || !timestamp.toDate) return 'N/A';
-            const date = timestamp.toDate();
-            return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            const userTimezoneOffset = date.getTimezoneOffset() * 60000;
-            const correctedDate = new Date(date.getTime() + userTimezoneOffset);
-            return correctedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+        function formatTimestamp(ts) { return !ts || !ts.toDate ? 'N/A' : ts.toDate().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }); }
+        function formatDate(ds) {
+            if (!ds) return '';
+            const d = new Date(ds);
+            return new Date(d.getTime() + d.getTimezoneOffset() * 60000).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
         }
 
         async function addSuggestion(value, collectionName) {
-            const trimmedValue = value.trim();
-            if (trimmedValue) {
+            const trimmed = value.trim();
+            if (trimmed) {
                 try {
-                    const docRef = db.collection(collectionName).doc(trimmedValue.toLowerCase());
-                    const doc = await docRef.get();
-                    if (!doc.exists) {
-                        await docRef.set({ name: trimmedValue });
-                    }
+                    const docRef = db.collection(collectionName).doc(trimmed.toLowerCase());
+                    if (!(await docRef.get()).exists) await docRef.set({ name: trimmed });
                 } catch (e) { console.error("Error adding suggestion:", e); }
             }
         }
@@ -1051,22 +938,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.className = 'autocomplete-items';
                 input.parentNode.appendChild(container);
             }
-            
-            const showSuggestions = () => {
-                 container.innerHTML = !input.value ? '' : suggestionsArray
-                    .filter(item => item.toLowerCase().includes(input.value.toLowerCase()))
-                    .map(item => `<div data-value="${item}">${item}</div>`).join('');
-            };
-
-            input.addEventListener('input', showSuggestions);
-            input.addEventListener('focus', showSuggestions);
-
-            container.addEventListener('click', e => { 
-                if (e.target.dataset.value) { 
-                    input.value = e.target.dataset.value; 
-                    container.innerHTML = ''; 
-                } 
-            });
+            const show = () => container.innerHTML = !input.value ? '' : suggestionsArray.filter(i => i.toLowerCase().includes(input.value.toLowerCase())).map(i => `<div data-value="${i}">${i}</div>`).join('');
+            input.addEventListener('input', show); input.addEventListener('focus', show);
+            container.addEventListener('click', e => { if (e.target.dataset.value) { input.value = e.target.dataset.value; container.innerHTML = ''; } });
             document.addEventListener('click', e => { if (e.target !== input) container.innerHTML = ''; });
         }
 
@@ -1081,35 +955,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const dataToExport = allJobSheets.map(job => ({
                 "Job No": job.jobSheetNo, "Old Job No": job.oldJobSheetNo, "Date": formatDate(job.date),
                 "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
-                "Device Type": job.deviceType, "Brand": job.brandName,
-                "Problems": (job.reportedProblems || []).join(', '),
-                 "Service Note": job.serviceNote,
+                "Devices": (job.devices || []).map(d => `${d.brand} ${d.type}`).join('; '),
+                "Problems": (job.reportedProblems || []).join(', '), "Service Note": job.serviceNote,
                 "Materials Used": (job.materials || []).map(m => `${m.qty}x ${m.name} (${m.details || 'N/A'}) - ${m.status}`).join('; '),
-                "Current Status": job.currentStatus,
-                "Final Status": job.finalStatus,
-                "Customer Status": job.customerStatus,
-                "Engineer(s)": (job.engineers || []).join(', '),
-                "Estimate Amount": job.estimateAmount,
+                "Current Status": job.currentStatus, "Final Status": job.finalStatus, "Customer Status": job.customerStatus,
+                "Engineer(s)": (job.engineers || []).join(', '), "Estimate Amount": job.estimateAmount,
             }));
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "JobSheets");
-            XLSX.writeFile(workbook, "Korus_Job_Sheets_Export.xlsx");
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "JobSheets");
+            XLSX.writeFile(wb, "Korus_Job_Sheets_Export.xlsx");
             showSuccessModal("Downloading Excel file...");
         }
 
         function downloadAllInOutAsExcel() {
             const dataToExport = allOutwardRecords.map(r => ({
-                 "Job No": r.jobNo,
-                "Party Name": r.partyName, 
-                "Customer Name": r.customerName,
+                 "Job No": r.jobNo, "Party Name": r.partyName, "Customer Name": r.customerName,
                 "Material": r.material, "Outward Date": formatDate(r.outwardDate),
                 "Inward Date": r.inwardDate ? formatDate(r.inwardDate) : 'Pending',
             }));
-            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "AllInwardOutward");
-            XLSX.writeFile(workbook, "Korus_All_Inward_Outward_Export.xlsx");
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "AllInwardOutward");
+            XLSX.writeFile(wb, "Korus_All_Inward_Outward_Export.xlsx");
             showSuccessModal("Downloading Excel file...");
         }
 
@@ -1117,6 +985,3 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
-
-
-
