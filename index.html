@@ -62,19 +62,25 @@
             
             <header class="main-header">
                 <h1 id="desktop-page-title">Dashboard</h1>
+                
                 <div id="job-sheet-header-actions" class="header-actions" style="display: none;">
                     <button id="new-job-btn" class="action-btn primary-btn">+ New</button>
                 </div>
                 <div id="all-jobs-header-actions" class="header-actions" style="display: none;">
                     <input id="job-no-search-box" type="text" placeholder="Search by Job No..." class="search-input">
                     <input id="mobile-no-search-box" type="text" placeholder="Search by Mobile..." class="search-input">
+                    
                     <div class="filter-dropdown">
                         <button id="filter-toggle-btn" class="action-btn secondary-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.74.439L7 12.439V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.74.439L7 12.439V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                            </svg>
                             <span id="filter-btn-label">Filter</span>
                         </button>
-                        <div id="job-range-filters" class="filter-popup"></div>
+                        <div id="job-range-filters" class="filter-popup">
+                            </div>
                     </div>
+
                     <button id="download-excel-btn" class="action-btn primary-btn">Excel</button>
                 </div>
                 <div id="inward-outward-header-actions" class="header-actions" style="display: none;">
@@ -84,30 +90,48 @@
                     <input id="all-in-out-search-box" type="text" placeholder="Search by Party Name..." class="search-input">
                     <button id="download-all-in-out-excel-btn" class="action-btn primary-btn">Excel</button>
                 </div>
+
                 <div class="header-spacer"></div>
+
                 <div class="user-profile-area">
                     <span id="welcome-message">Welcome, User</span>
                     <div class="user-avatar">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="user-icon"><path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="user-icon">
+                            <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
+                        </svg>
                     </div>
                 </div>
             </header>
 
             <div id="dashboard-page" class="page active">
                 <div class="stats-grid">
-                    <div class="stat-card clickable-card" data-filter-type="all" data-filter-value="all"><h3>Total Jobs</h3><p id="total-jobs-stat">0</p></div>
-                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Pending Diagnosis"><h3>Pending Diagnosis</h3><p id="pending-jobs-stat">0</p></div>
-                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Working"><h3>Working</h3><p id="working-jobs-stat">0</p></div>
-                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Delivered"><h3>Delivered</h3><p id="delivered-jobs-stat">0</p></div>
-                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Not Delivered"><h3>Not Delivered</h3><p id="not-delivered-jobs-stat">0</p></div>
-                    <div class="stat-card clickable-card" data-filter-type="inward-outward" data-filter-value="pending-inward"><h3>Pending Inward</h3><p id="pending-inward-stat">0</p></div>
-                    <div class="stat-card clickable-card" data-filter-type="inward-outward" data-filter-value="rahul-sir-pending"><h3>Rahul Sir Pending</h3><p id="rahul-sir-pending-stat">0</p></div>
+                    <div class="stat-card clickable-card" data-filter-type="all" data-filter-value="all">
+                        <h3>Total Jobs</h3><p id="total-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Pending Diagnosis">
+                        <h3>Pending Diagnosis</h3><p id="pending-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="currentStatus" data-filter-value="Working">
+                        <h3>Working</h3><p id="working-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Delivered">
+                        <h3>Delivered</h3><p id="delivered-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="finalStatus" data-filter-value="Not Delivered">
+                        <h3>Not Delivered</h3><p id="not-delivered-jobs-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="inward-outward" data-filter-value="pending-inward">
+                        <h3>Pending Inward</h3><p id="pending-inward-stat">0</p>
+                    </div>
+                    <div class="stat-card clickable-card" data-filter-type="inward-outward" data-filter-value="rahul-sir-pending">
+                        <h3>Rahul Sir Pending</h3><p id="rahul-sir-pending-stat">0</p>
+                    </div>
                 </div>
                 <div class="recent-jobs-container card">
                     <h2>Recent Job Sheets</h2>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>Job #</th><th>Customer</th><th>Device(s)</th><th>Status</th><th>Last Updated</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Job #</th><th>Customer</th><th>Device</th><th>Status</th><th>Last Updated</th><th>Actions</th></tr></thead>
                             <tbody id="recent-jobs-table-body"></tbody>
                         </table>
                     </div>
@@ -131,35 +155,44 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="card form-section">
-                        <h2>Devices & Problems</h2>
-                        <div class="table-wrapper">
-                            <table class="materials-table" id="devices-table">
-                                <thead><tr><th>Device Type</th><th>Brand</th><th>Reported Problems</th><th></th></tr></thead>
-                                <tbody id="devices-table-body"></tbody>
-                            </table>
+                        <h2>Device Details</h2>
+                        <div class="form-stack">
+                            <label for="device-type">Device Type</label>
+                            <select id="device-type" class="select-field"></select>
+                            <label for="brand-name">Company / Brand Name</label>
+                            <div class="autocomplete">
+                                <input id="brand-name" type="text" placeholder="e.g., Dell, HP, Lenovo" class="input-field" autocomplete="off">
+                            </div>
                         </div>
-                        <button id="add-device-btn" class="action-btn secondary-btn" style="margin-top: 1rem;">+ Add Device</button>
                     </div>
 
-                    <div class="card form-section">
+                    <div class="card form-section full-width">
+                        <h2>Reported Problems</h2>
+                        <div id="reported-problems" class="checkbox-grid"></div>
+                    </div>
+
+                    <div class="card form-section full-width">
                         <h2>Service Note</h2>
                         <textarea id="service-note" class="input-field" rows="4" placeholder="e.g., Password = 123, Customer Given Adaptor..."></textarea>
                     </div>
 
-                    <div class="card form-section">
+                    <div class="card form-section full-width">
                         <h2>Parts & Materials Used</h2>
                         <div class="table-wrapper">
                             <table class="materials-table">
-                                <thead><tr><th>Part Name</th><th>Details</th><th>Qty</th><th>Status</th><th></th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>Part Name</th><th>Details / Specification</th><th>Qty</th><th>Status</th><th></th>
+                                    </tr>
+                                </thead>
                                 <tbody id="materials-table-body"></tbody>
                             </table>
                         </div>
                         <button id="add-material-btn" class="action-btn secondary-btn" style="margin-top: 1rem;">+ Add Material</button>
                     </div>
                     
-                    <div class="card form-section">
+                    <div class="card form-section full-width">
                         <h2>Service Status</h2>
                         <div class="status-grid">
                             <select id="current-status" class="select-field"></select>
@@ -169,22 +202,27 @@
                     </div>
 
                     <div class="card form-section">
-                        <h2>Estimate & Engineer</h2>
-                        <div class="grid-2-col" style="align-items: end;">
+                        <h2>Estimate Amount</h2>
+                        <div class="estimate-input">
+                            <span>₹</span>
+                            <input id="estimate-amount" type="number" placeholder="0" class="input-field">
+                        </div>
+                    </div>
+                    
+                    <div class="card form-section">
+                        <h2>Engineer Name</h2>
+                        <div class="engineer-checkboxes">
+                            <div>
+                                <input type="checkbox" id="engineer-kundan" value="Kundan Sir">
+                                <label for="engineer-kundan">Kundan Sir</label>
+                            </div>
                              <div>
-                                <label>Estimate Amount</label>
-                                <div class="estimate-input">
-                                    <span>₹</span>
-                                    <input id="estimate-amount" type="number" placeholder="0" class="input-field">
-                                </div>
+                                <input type="checkbox" id="engineer-sachin" value="Sachin Sir">
+                                <label for="engineer-sachin">Sachin Sir</label>
                             </div>
                             <div>
-                                <label>Engineer Name</label>
-                                <div class="engineer-checkboxes">
-                                    <div><input type="checkbox" id="engineer-kundan" value="Kundan Sir"><label for="engineer-kundan">Kundan</label></div>
-                                    <div><input type="checkbox" id="engineer-sachin" value="Sachin Sir"><label for="engineer-sachin">Sachin</label></div>
-                                    <div><input type="checkbox" id="engineer-rushi" value="Rushi"><label for="engineer-rushi">Rushi</label></div>
-                                </div>
+                                <input type="checkbox" id="engineer-rushi" value="Rushi">
+                                <label for="engineer-rushi">Rushi</label>
                             </div>
                         </div>
                     </div>
@@ -197,10 +235,34 @@
             </div>
             
             <div id="all-jobs-page" class="page">
-                 <div class="card table-container">
+                <div class="card table-container">
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>Job #</th><th>Date</th><th>Customer</th><th>Mobile</th><th>Device(s)</th><th>Status</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Job #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Mobile</th>
+                                    <th class="th-with-filter">
+                                        Device
+                                        <button id="device-filter-btn" class="filter-icon-btn" title="Filter by Device">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.74.439L7 12.439V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                                            </svg>
+                                        </button>
+                                    </th>
+                                    <th class="th-with-filter">
+                                        Status
+                                        <button id="status-filter-btn" class="filter-icon-btn" title="Filter by Status">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.74.439L7 12.439V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5v-2z"/>
+                                            </svg>
+                                        </button>
+                                    </th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
                             <tbody id="all-jobs-table-body"></tbody>
                         </table>
                     </div>
@@ -213,16 +275,35 @@
                      <h2 id="outward-form-title">New Outward Entry</h2>
                      <div class="form-stack">
                         <div class="grid-2-col">
-                             <div><label for="job-no-outward">Job No. (Optional)</label><input id="job-no-outward" type="number" placeholder="e.g., 1234" class="input-field"></div>
-                            <div><label for="party-name">Party Name</label><div class="input-with-button"><div class="autocomplete"><input id="party-name" type="text" placeholder="Select or type new party" class="input-field" autocomplete="off"></div><button id="add-party-btn" class="action-btn primary-btn" title="Add New Party">+</button></div></div>
+                             <div>
+                                <label for="job-no-outward">Job No. (Optional)</label>
+                                <input id="job-no-outward" type="number" placeholder="e.g., 1234" class="input-field">
+                            </div>
+                            <div>
+                               <label for="party-name">Party Name</label>
+                               <div class="input-with-button">
+                                   <div class="autocomplete">
+                                       <input id="party-name" type="text" placeholder="Select or type new party" class="input-field" autocomplete="off">
+                                   </div>
+                                   <button id="add-party-btn" class="action-btn primary-btn" title="Add New Party">+</button>
+                               </div>
+                           </div>
                         </div>
                         <label for="material-desc">Material Description</label>
                         <textarea id="material-desc" placeholder="e.g., HP Laptop 15s, SN: 12345" class="input-field" rows="4"></textarea>
+                        
                         <label for="outward-customer-name">Customer / Company Name (Optional)</label>
                         <input id="outward-customer-name" type="text" placeholder="e.g., Prime Graphite" class="input-field">
+
                         <div class="grid-2-col">
-                            <div><label>Outward Date</label><input id="outward-date" type="date" class="input-field"></div>
-                            <div><label>Inward Date (when returned)</label><input id="inward-date" type="date" class="input-field"></div>
+                            <div>
+                                <label>Outward Date</label>
+                                <input id="outward-date" type="date" class="input-field">
+                            </div>
+                            <div>
+                                <label>Inward Date (when returned)</label>
+                                <input id="inward-date" type="date" class="input-field">
+                            </div>
                         </div>
                         <div class="action-footer" style="justify-content: flex-start; gap: 1rem;">
                             <button id="save-outward-btn" class="action-btn primary-btn">Save Record</button>
@@ -237,7 +318,16 @@
                      <h2>All Inward & Outward Records</h2>
                     <div class="table-wrapper">
                         <table class="data-table">
-                            <thead><tr><th>Job No.</th><th>Party Name</th><th>Material</th><th>Outward Date</th><th>Inward Date</th><th>Actions</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Job No.</th>
+                                    <th>Party Name</th>
+                                    <th>Material</th>
+                                    <th>Outward Date</th>
+                                    <th>Inward Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
                             <tbody id="all-in-out-table-body"></tbody>
                         </table>
                     </div>
@@ -245,28 +335,19 @@
                 </div>
             </div>
 
-            <footer class="app-footer">© 2025 CodeByRushi. All rights reserved.</footer>
+            <footer class="app-footer">
+                © 2025 CodeByRushi. All rights reserved.
+            </footer>
         </main>
     </div>
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-    <div id="problem-modal" class="modal-overlay">
-        <div class="problem-modal-content">
-            <div class="problem-modal-header">
-                <h2>Select Problems for <span id="modal-device-name">Device</span></h2>
-            </div>
-            <div id="problem-modal-body" class="problem-modal-body">
-                </div>
-            <div class="problem-modal-footer">
-                <button id="modal-cancel-btn" class="action-btn secondary-btn">Cancel</button>
-                <button id="modal-save-btn" class="action-btn primary-btn">Save Problems</button>
-            </div>
-        </div>
-    </div>
+    <div id="success-modal" class="modal-overlay"><div class="modal-content"><div class="modal-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div><p id="success-message"></p></div></div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="script.js"></script>
+
 </body>
 </html>
