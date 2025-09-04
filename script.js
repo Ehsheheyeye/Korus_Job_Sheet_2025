@@ -99,27 +99,37 @@ document.addEventListener('DOMContentLoaded', () => {
     },
 
     "Replacement": {
-        subOptions: ["Battery", "Keybpard", "Mouse", "SSD", "HDD", "Laptop Scrren", "Desktop Scrren", "SMPS", "Router", "RAM"],
+        subOptions: ["Battery", "Keyboard", "Mouse", "SSD", "HDD", "Laptop Screen", "Desktop Screen", "SMPS", "Router", "RAM"],
         subOptionType: "select",
         subOptionLabel: "Select Replacement"
     },
+    "Hardware Issue": {
+        subOptions: [
+            "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue",   "Speaker Issue",  "SMPS Issue",  "CPU Fan Issue",   "WiFi Not Working",  "LAN Port Issue",  "HDMI / VGA Port Issue",   "BIOS Current",  "CMOS Issue",   "Auto Shutdown",   "Auto Restart",  "Bluetooth Issue",  "Power Button Issue" ],
+        subOptionType: "select",
+        subOptionLabel: "Select Hardware Issue"
+    },
 
+    "Data Backup": {},
+    "Password Crack / Reset": {},
+    "OS Recovery": {},
+
+    "Hang / Stuck Issue": {},
+    "Overheating": {},
+    "RAM Issue": {},
+    "Battery Issue": {},
+    "HDD / SSD Issue": {},
+    "Screen Issue": {},
+    "Booting Issue": {},
     "Dead / No Power": {},
     "No Display": {},
     "Hinge Repair": {},
     "Dump Error": {},
     "Beep Sound": {},
-    "Battery Issue": {},
-    "HDD / SSD Issue": {},
-    "Screen Issue": {},
-    "Booting Issue": {},
-    "Head Block": {},
-    "Paper Jam": {},
     "Moulding / ABH": {},
-    "Keyboard / Touchpad": {},
-    "Keyboard Replacement": {},
-    "Battery Replacement": {}
+    "Keyboard / Touchpad": {}
 };
+
 
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
         
@@ -1107,4 +1117,5 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
+
 
