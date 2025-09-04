@@ -68,53 +68,77 @@ document.addEventListener('DOMContentLoaded', () => {
         let partNameSuggestions = [...initialPartNames];
 
         const problemOptionsConfig = {
-            "Formatting": {
-                subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP", "Ubantu", "Mac OS", "Other"],
-                subOptionType: "checkbox", // CHANGED
-                subOptionLabel: "Select OS"
-            },
-            "Software Installation": {
-                subOptions: ["AutoCAD", "CATIA", "SolidWorks", "PowerMill", "CoralDraw", "SolidEdge", "Premiere Pro", "After Effect", "MasterCam", "SketchUp", "Photoshop", "MS Office", "Tally Prime", "Tally ERP9", "Siemens NX", "PTC Creo", "Revit", "Illustrator", "3ds Max", "Maya", "ISM", "Other"],
-                subOptionType: "checkbox", // CHANGED
-                subOptionLabel: "Select Software"
-            },
-            "Toner Refill": {
-                subOptions: ["12A", "88A", "337A", "285A", "78A", "925A", "TN-1020", "Samsung", "Ricoh", "Pantum", "Xerox", "Other"],
-                subOptionType: "checkbox", // CHANGED
-                subOptionLabel: "Select Toner Model"
-            },
-            "Antivirus": {
-                subOptions: ["Quick Heal", "NPAV", "Bitdefender", "Other"],
-                subOptionType: "select",
-                subOptionLabel: "Select Antivirus"
-            },
-            "Printer Problem": {
-                subOptions: ["Paper Jam", "Head Cleaning", "Servicing", "Head Block", "Low Ink/Toner", "Slow Printing", "Faded Printouts", "Strange Noises", "Blank Pages Printing", "Paper Misfeed", "Scanner Not Working", "Other"],
-                subOptionType: "select",
-                subOptionLabel: "Select Printer Issue"
-            },
-            "Replacement": {
-                subOptions: ["Battery", "Keyboard", "Mouse", "SSD", "HDD", "Laptop Screen", "Desktop Screen", "SMPS", "Router", "RAM", "Other"],
-                subOptionType: "select",
-                subOptionLabel: "Select Replacement"
-            },
-            "Hardware Issue": {
-                subOptions: [ "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue", "Speaker Issue", "SMPS Issue", "CPU Fan Issue", "WiFi Not Working", "LAN Port Issue", "HDMI / VGA Port Issue", "BIOS Current", "CMOS Issue", "Auto Shutdown", "Auto Restart", "Bluetooth Issue", "Power Button Issue", "Other" ],
-                subOptionType: "select",
-                subOptionLabel: "Select Hardware Issue"
-            },
-            "Dead / No Power": {}, "No Display": {}, "Moulding / ABH": {}, "HDD / SSD Issue": {}, "Data Backup": {},
-            "Password Crack / Reset": {}, "OS Recovery": {}, "Hang / Stuck Issue": {}, "Overheating": {}, "RAM Issue": {},
-            "Keyboard / Touchpad": {}, "Battery Issue": {}, "Screen Issue": {}, "Booting Issue": {}, "Dump Error": {},
-            "Beep Sound": {}, "Other": {}
-        };
+    "Formatting": {
+        subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP", "Ubantu", "Mac OS", "Other"],
+        subOptionType: "select",
+        subOptionLabel: "Select OS"
+    },
+
+    "Software Installation": {
+        subOptions: ["AutoCAD", "CATIA", "SolidWorks", "PowerMill", "CoralDraw", "SolidEdge", "Premiere Pro", "After Effect", "MasterCam", "SketchUp", "Photoshop", "MS Office", "Tally Prime", "Tally ERP9", "Siemens NX", "PTC Creo", "Revit", "Illustrator", "3ds Max", "Maya", "ISM", "Other"],
+        subOptionType: "select",
+        subOptionLabel: "Select Software"
+    },
+
+    "Toner Refill": {
+        subOptions: ["12A", "88A", "337A", "285A", "78A", "925A", "TN-1020", "Samsung", "Ricoh", "Pantum", "Xerox", "Other"],
+        subOptionType: "select",
+        subOptionLabel: "Select Toner Model"
+    },
+
+    "Antivirus": {
+        subOptions: ["Quick Heal", "NPAV", "Bitdefender", "Other"],
+        subOptionType: "select",
+        subOptionLabel: "Select Antivirus"
+    },
+
+    "Printer Problem": {
+        subOptions: ["Paper Jam", "Head Cleaning", "Servicing", "Head Block", "Low Ink/Toner", "Slow Printing", "Faded Printouts", "Strange Noises", "Blank Pages Printing", "Paper Misfeed", "Scanner Not Working", "Other"],
+        subOptionType: "select",
+        subOptionLabel: "Select Printer Issue"
+    },
+
+    "Replacement": {
+        subOptions: ["Battery", "Keyboard", "Mouse", "SSD", "HDD", "Laptop Screen", "Desktop Screen", "SMPS", "Router", "RAM", "Other"],
+        subOptionType: "select",
+        subOptionLabel: "Select Replacement"
+    },
+
+    "Hardware Issue": {
+        subOptions: [
+            "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue", "Speaker Issue", "SMPS Issue", "CPU Fan Issue", "WiFi Not Working", "LAN Port Issue", "HDMI / VGA Port Issue", "BIOS Current", "CMOS Issue", "Auto Shutdown", "Auto Restart", "Bluetooth Issue", "Power Button Issue", "Other"
+        ],
+        subOptionType: "select",
+        subOptionLabel: "Select Hardware Issue"
+    },
+
+    "Dead / No Power": {},
+    "No Display": {},
+    "Moulding / ABH": {},
+    "HDD / SSD Issue": {},
+    "Data Backup": {},
+    "Password Crack / Reset": {},
+    "OS Recovery": {},
+    "Hang / Stuck Issue": {},
+    "Overheating": {},
+    "RAM Issue": {},
+    "Keyboard / Touchpad": {},
+    "Battery Issue": {},
+    "Screen Issue": {},
+    "Booting Issue": {},
+    "Dump Error": {},
+    "Beep Sound": {},
+    "Other": {}
+};
 
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
+        
         const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement", "Ready", "Dead"];
         const finalStatusOptions = ["Not Delivered", "Delivered", "Returned"];
         const customerStatusOptions = ["Not Called", "Called", "Called - No Response", "Called - Will Visit", "Called - Not pickup yet"];
         const materialStatusOptions = ["Installed", "Ordered", "Pending", "Customer Provided", "Not Available"];
 
+        // --- Element Selectors ---
         const DOMElements = {
             menuBtn: document.getElementById('menu-btn'), sidebar: document.getElementById('sidebar'),
             sidebarOverlay: document.getElementById('sidebar-overlay'), sidebarCloseBtn: document.getElementById('sidebar-close-btn'),
@@ -168,8 +192,11 @@ document.addEventListener('DOMContentLoaded', () => {
             filterToggleBtn: document.getElementById('filter-toggle-btn'),
             filterPopup: document.getElementById('job-range-filters'),
             filterBtnLabel: document.getElementById('filter-btn-label'),
+            deviceFilterBtn: document.getElementById('device-filter-btn'),
+            statusFilterBtn: document.getElementById('status-filter-btn'),
         };
         
+        // --- Helper Functions ---
         function toTitleCase(str) {
             if (!str) return '';
             return str.toLowerCase().replace(/\b(\w)/g, s => s.toUpperCase());
@@ -205,7 +232,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     DOMElements.inwardOutwardHeaderActions.style.display = 'none';
                     DOMElements.allInOutHeaderActions.style.display = 'none';
                     
+                    // Reset filters when changing pages
                     handleAllJobsSearch(null);
+
 
                     if (page === 'job-sheet') {
                         DOMElements.jobSheetHeaderActions.style.display = 'flex';
@@ -292,6 +321,84 @@ document.addEventListener('DOMContentLoaded', () => {
             setupAutocomplete(DOMElements.brandName, brandSuggestions);
             setupAutocomplete(DOMElements.partyName, partySuggestions);
             setupMaterialsTable();
+            setupDashboardCardClickListeners();
+            setupSmartFilters();
+        }
+        
+        function setupSmartFilters() {
+            DOMElements.deviceFilterBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const options = ["CPU", "Laptop", "Printer", "Toner", "All-in-One"];
+                showFilterPopup(e.currentTarget, 'deviceType', options);
+            });
+        
+            DOMElements.statusFilterBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const options = [...new Set(allJobSheets.map(j => j.currentStatus).filter(Boolean))];
+                options.sort();
+                showFilterPopup(e.currentTarget, 'currentStatus', options);
+            });
+        }
+        
+        function showFilterPopup(button, filterKey, options) {
+            const existingPopup = document.querySelector('.filter-popup-dynamic');
+            if (existingPopup) existingPopup.remove();
+        
+            const popup = document.createElement('div');
+            popup.className = 'filter-popup-dynamic';
+            
+            const allButton = document.createElement('button');
+            allButton.textContent = 'All';
+            allButton.onclick = () => {
+                handleAllJobsSearch({ type: filterKey, value: null });
+                popup.remove();
+            };
+            popup.appendChild(allButton);
+        
+            options.forEach(option => {
+                const optionButton = document.createElement('button');
+                optionButton.textContent = option;
+                optionButton.onclick = () => {
+                    handleAllJobsSearch({ type: filterKey, value: option });
+                    popup.remove();
+                };
+                popup.appendChild(optionButton);
+            });
+        
+            document.body.appendChild(popup);
+            const rect = button.getBoundingClientRect();
+            popup.style.top = `${rect.bottom + window.scrollY + 5}px`;
+            popup.style.left = `${rect.left + window.scrollX}px`;
+        
+            setTimeout(() => {
+                document.addEventListener('click', function closePopup(event) {
+                    if (!popup.contains(event.target)) {
+                        popup.remove();
+                        document.removeEventListener('click', closePopup);
+                    }
+                });
+            }, 0);
+        }
+
+        function setupDashboardCardClickListeners() {
+            document.querySelectorAll('.clickable-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const filterType = card.dataset.filterType;
+                    const filterValue = card.dataset.filterValue;
+
+                    if (filterType === 'inward-outward') {
+                        document.querySelector('.nav-link[data-page="all-in-out"]').click();
+                        const outwardFilter = { value: filterValue };
+                        handleAllInOutSearch(outwardFilter);
+                    } else {
+                        const jobFilter = { type: filterType, value: filterValue };
+                        document.querySelector('.nav-link[data-page="all-jobs"]').click();
+                        DOMElements.jobNoSearchBox.value = '';
+                        DOMElements.mobileNoSearchBox.value = '';
+                        handleAllJobsSearch(jobFilter);
+                    }
+                });
+            });
         }
 
         function populateSelects() {
@@ -326,25 +433,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 let subOptionsHTML = '';
                 if (config.subOptions) {
                     const subOptionsId = `sub-options-${problemId}`;
-                    if (config.subOptionType === 'checkbox') {
-                        const checkboxOptions = config.subOptions.map(opt => `
-                            <div class="sub-checkbox-item">
-                                <input type="checkbox" id="sub-opt-${problemId}-${opt.replace(/\s/g, '')}" value="${opt}">
-                                <label for="sub-opt-${problemId}-${opt.replace(/\s/g, '')}">${opt}</label>
-                            </div>`).join('');
-                        subOptionsHTML = `
-                            <div class="problem-sub-options" id="${subOptionsId}">
-                                <label>${config.subOptionLabel}</label>
-                                <div class="sub-checkbox-grid">${checkboxOptions}</div>
-                            </div>`;
-                    } else { // 'select'
-                        const selectOptions = config.subOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-                        subOptionsHTML = `
-                            <div class="problem-sub-options" id="${subOptionsId}">
-                                <label for="select-${problemId}">${config.subOptionLabel}</label>
-                                <select id="select-${problemId}" class="select-field"><option value="">Select...</option>${selectOptions}</select>
-                            </div>`;
-                    }
+                    const selectOptions = config.subOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                    subOptionsHTML = `
+                        <div class="problem-sub-options" id="${subOptionsId}">
+                            <label for="select-${problemId}">${config.subOptionLabel}</label>
+                            <select id="select-${problemId}" class="select-field">${selectOptions}</select>
+                        </div>`;
                 }
         
                 itemWrapper.innerHTML = mainCheckboxHTML + subOptionsHTML;
@@ -370,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
             db.collection(collectionName).onSnapshot(snapshot => {
                 const dbSuggestions = snapshot.docs.map(doc => doc.data().name);
                 const combined = [...new Set([...initialArray, ...dbSuggestions])].sort();
+                // Clear and repopulate the target array
                 targetArray.length = 0;
                 Array.prototype.push.apply(targetArray, combined);
             }, error => {
@@ -501,31 +596,12 @@ document.addEventListener('DOMContentLoaded', () => {
         function getReportedProblems() {
             const problems = [];
             document.querySelectorAll('#reported-problems .problem-item').forEach(item => {
-                const mainCheckbox = item.querySelector('.problem-main input[type="checkbox"]');
-                if (mainCheckbox.checked) {
-                    const problemName = mainCheckbox.value;
-                    const config = problemOptionsConfig[problemName];
-                    const subOptionsDiv = item.querySelector('.problem-sub-options');
-
-                    if (subOptionsDiv && config) {
-                        if (config.subOptionType === 'checkbox') {
-                            const selectedSubOptions = [];
-                            subOptionsDiv.querySelectorAll('input[type="checkbox"]:checked').forEach(subCb => {
-                                selectedSubOptions.push(subCb.value);
-                            });
-                            if (selectedSubOptions.length > 0) {
-                                problems.push(`${problemName}: ${selectedSubOptions.join(', ')}`);
-                            } else {
-                                problems.push(problemName);
-                            }
-                        } else { // 'select'
-                            const select = subOptionsDiv.querySelector('select');
-                            if (select && select.value) {
-                                problems.push(`${problemName}: ${select.value}`);
-                            } else {
-                                problems.push(problemName);
-                            }
-                        }
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                if (checkbox.checked) {
+                    const problemName = checkbox.value;
+                    const subOptionsSelect = item.querySelector('select');
+                    if (subOptionsSelect) {
+                        problems.push(`${problemName}: ${subOptionsSelect.value}`);
                     } else {
                         problems.push(problemName);
                     }
@@ -597,6 +673,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     tempFilteredJobs = tempFilteredJobs.filter(job => job.currentStatus === activeDashboardFilter.value);
                 } else if (activeDashboardFilter.type === 'finalStatus') {
                     tempFilteredJobs = tempFilteredJobs.filter(job => job.finalStatus === activeDashboardFilter.value);
+                } else if (activeDashboardFilter.type === 'deviceType') {
+                    tempFilteredJobs = tempFilteredJobs.filter(job => job.deviceType === activeDashboardFilter.value);
                 }
             }
         
@@ -642,8 +720,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
                 if (subOptionsDiv) {
                     subOptionsDiv.style.display = 'none';
-                    subOptionsDiv.querySelectorAll('input[type="checkbox"]').forEach(subCb => subCb.checked = false);
-                    subOptionsDiv.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
                 }
             });
 
@@ -771,7 +847,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.customerStatus.value = job.customerStatus || '';
 
             (job.reportedProblems || []).forEach(problemStr => {
-                const [mainProblem, subOptionsStr] = problemStr.split(': ');
+                const [mainProblem, subOption] = problemStr.split(': ');
                 const problemId = mainProblem.replace(/[\s/]+/g, '-');
                 const checkbox = document.querySelector(`#problem-${problemId}`);
                 if (checkbox) {
@@ -779,19 +855,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
                     if (subOptionsDiv) {
                         subOptionsDiv.style.display = 'block';
-                        const config = problemOptionsConfig[mainProblem];
-                        if (config && subOptionsStr) {
-                            const subOptions = subOptionsStr.split(', ');
-                            if (config.subOptionType === 'checkbox') {
-                                subOptions.forEach(subOptValue => {
-                                    const subCheckbox = subOptionsDiv.querySelector(`input[value="${subOptValue}"]`);
-                                    if (subCheckbox) subCheckbox.checked = true;
-                                });
-                            } else { // 'select'
-                                const select = subOptionsDiv.querySelector('select');
-                                if (select) select.value = subOptionsStr;
-                            }
-                        }
+                        const select = subOptionsDiv.querySelector('select');
+                        if (select && subOption) select.value = subOption;
                     }
                 }
             });
@@ -1007,8 +1072,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function showSuccessModal(message) {
             const modal = document.getElementById('success-modal');
-            const messageEl = document.getElementById('success-message');
-            if(messageEl) messageEl.textContent = message;
+            document.getElementById('success-message').textContent = message;
             modal.classList.add('visible');
             setTimeout(() => modal.classList.remove('visible'), 2000);
         }
@@ -1053,3 +1117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
+
+
+
