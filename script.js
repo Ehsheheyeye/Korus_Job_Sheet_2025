@@ -57,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let allInOutCurrentPage = 1;
         const itemsPerPage = 10;
         let currentJobRangeFilter = 'all'; 
-        let tempDeviceProblems = {}; // Holds problems for devices before saving
 
         // --- Pre-populated Data ---
         const initialBrandOptions = ["Dell", "HP", "Lenovo", "ASUS", "Acer", "Intex", "I-Ball", "Artist", "Lapcare", "EVM", "Crucial", "Logitech", "Apple (MacBook)", "MSI", "Samsung", "Avita", "Fujitsu", "LG", "Toshiba", "HCL", "Redmi", "Sony", "OnePlus", "TCL", "Panasonic", "Sansui", "BenQ", "Zebronics", "ViewSonic", "AOC", "Philips", "Gigabyte", "Cooler Master", "Foxin", "Western Digital (WD)", "Seagate", "Kingston", "XPG", "ADATA", "SanDisk", "Intel", "Ant Esports", "Antec", "Deepcool", "Circle", "Frontech", "Enter", "Canon", "Epson", "Brother", "TVS", "Zebra", "Xerox", "Kyocera", "Ricoh", "Pantum", "Delta", "Vertiv", "12A", "88A", "78A", "925A", "337A", "ProDot"];
@@ -69,33 +68,45 @@ document.addEventListener('DOMContentLoaded', () => {
         let partNameSuggestions = [...initialPartNames];
 
         const problemOptionsConfig = {
-            "General": {
-                problems: ["Dead / No Power", "No Display", "Moulding / ABH", "HDD / SSD Issue", "Data Backup", "Password Crack / Reset", "OS Recovery", "Hang / Stuck Issue", "Overheating", "RAM Issue", "Keyboard / Touchpad", "Battery Issue", "Screen Issue", "Booting Issue", "Dump Error", "Beep Sound", "Other"]
-            },
             "Formatting": {
                 subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP", "Ubantu", "Mac OS", "Other"],
-                subOptionType: "checkbox", subOptionLabel: "Select OS"
+                subOptionType: "checkbox", // CHANGED
+                subOptionLabel: "Select OS"
             },
             "Software Installation": {
                 subOptions: ["AutoCAD", "CATIA", "SolidWorks", "PowerMill", "CoralDraw", "SolidEdge", "Premiere Pro", "After Effect", "MasterCam", "SketchUp", "Photoshop", "MS Office", "Tally Prime", "Tally ERP9", "Siemens NX", "PTC Creo", "Revit", "Illustrator", "3ds Max", "Maya", "ISM", "Other"],
-                subOptionType: "checkbox", subOptionLabel: "Select Software"
+                subOptionType: "checkbox", // CHANGED
+                subOptionLabel: "Select Software"
             },
             "Toner Refill": {
                 subOptions: ["12A", "88A", "337A", "285A", "78A", "925A", "TN-1020", "Samsung", "Ricoh", "Pantum", "Xerox", "Other"],
-                subOptionType: "checkbox", subOptionLabel: "Select Toner Model"
+                subOptionType: "checkbox", // CHANGED
+                subOptionLabel: "Select Toner Model"
             },
             "Antivirus": {
                 subOptions: ["Quick Heal", "NPAV", "Bitdefender", "Other"],
-                subOptionType: "select", subOptionLabel: "Select Antivirus"
+                subOptionType: "select",
+                subOptionLabel: "Select Antivirus"
             },
             "Printer Problem": {
                 subOptions: ["Paper Jam", "Head Cleaning", "Servicing", "Head Block", "Low Ink/Toner", "Slow Printing", "Faded Printouts", "Strange Noises", "Blank Pages Printing", "Paper Misfeed", "Scanner Not Working", "Other"],
-                subOptionType: "select", subOptionLabel: "Select Printer Issue"
+                subOptionType: "select",
+                subOptionLabel: "Select Printer Issue"
+            },
+            "Replacement": {
+                subOptions: ["Battery", "Keyboard", "Mouse", "SSD", "HDD", "Laptop Screen", "Desktop Screen", "SMPS", "Router", "RAM", "Other"],
+                subOptionType: "select",
+                subOptionLabel: "Select Replacement"
             },
             "Hardware Issue": {
-                subOptions: [ "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue", "Speaker Issue", "SMPS Issue", "CPU Fan Issue", "WiFi Not Working", "LAN Port Issue", "HDMI / VGA Port Issue", "BIOS Current", "CMOS Issue", "Auto Shutdown", "Auto Restart", "Bluetooth Issue", "Power Button Issue", "Other"],
-                subOptionType: "select", subOptionLabel: "Select Hardware Issue"
+                subOptions: [ "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue", "Speaker Issue", "SMPS Issue", "CPU Fan Issue", "WiFi Not Working", "LAN Port Issue", "HDMI / VGA Port Issue", "BIOS Current", "CMOS Issue", "Auto Shutdown", "Auto Restart", "Bluetooth Issue", "Power Button Issue", "Other" ],
+                subOptionType: "select",
+                subOptionLabel: "Select Hardware Issue"
             },
+            "Dead / No Power": {}, "No Display": {}, "Moulding / ABH": {}, "HDD / SSD Issue": {}, "Data Backup": {},
+            "Password Crack / Reset": {}, "OS Recovery": {}, "Hang / Stuck Issue": {}, "Overheating": {}, "RAM Issue": {},
+            "Keyboard / Touchpad": {}, "Battery Issue": {}, "Screen Issue": {}, "Booting Issue": {}, "Dump Error": {},
+            "Beep Sound": {}, "Other": {}
         };
 
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
@@ -104,65 +115,61 @@ document.addEventListener('DOMContentLoaded', () => {
         const customerStatusOptions = ["Not Called", "Called", "Called - No Response", "Called - Will Visit", "Called - Not pickup yet"];
         const materialStatusOptions = ["Installed", "Ordered", "Pending", "Customer Provided", "Not Available"];
 
-        // --- Element Selectors ---
         const DOMElements = {
-            // Layout
             menuBtn: document.getElementById('menu-btn'), sidebar: document.getElementById('sidebar'),
             sidebarOverlay: document.getElementById('sidebar-overlay'), sidebarCloseBtn: document.getElementById('sidebar-close-btn'),
             mobilePageTitle: document.getElementById('mobile-page-title'),
             desktopPageTitle: document.getElementById('desktop-page-title'), themeToggle: document.getElementById('theme-toggle'),
             logoutBtn: document.getElementById('logout-btn'),
-
-            // Job Sheet Form
-            jobSheetPage: document.getElementById('job-sheet-page'),
             jobSheetNo: document.getElementById('job-sheet-no'), oldJobSheetNo: document.getElementById('old-job-sheet-no'),
             date: document.getElementById('date'), customerName: document.getElementById('customer-name'),
             customerMobile: document.getElementById('customer-mobile'), altMobile: document.getElementById('alt-mobile'),
-            devicesTableBody: document.getElementById('devices-table-body'), addDeviceBtn: document.getElementById('add-device-btn'),
+            deviceType: document.getElementById('device-type'), brandName: document.getElementById('brand-name'),
+            reportedProblems: document.getElementById('reported-problems'), 
             serviceNote: document.getElementById('service-note'),
-            materialsTableBody: document.getElementById('materials-table-body'), addMaterialBtn: document.getElementById('add-material-btn'),
-            currentStatus: document.getElementById('current-status'), finalStatus: document.getElementById('final-status'),
-            customerStatus: document.getElementById('customer-status'),
             estimateAmount: document.getElementById('estimate-amount'),
             engineerKundan: document.getElementById('engineer-kundan'), engineerRushi: document.getElementById('engineer-rushi'),
             engineerSachin: document.getElementById('engineer-sachin'),
-            saveRecordBtn: document.getElementById('save-record-btn'), sendWhatsAppBtn: document.getElementById('send-whatsapp-btn'),
+            saveRecordBtn: document.getElementById('save-record-btn'),
+            sendWhatsAppBtn: document.getElementById('send-whatsapp-btn'),
             newJobBtn: document.getElementById('new-job-btn'),
-
-            // Dashboard
             totalJobsStat: document.getElementById('total-jobs-stat'), pendingJobsStat: document.getElementById('pending-jobs-stat'),
             workingJobsStat: document.getElementById('working-jobs-stat'), deliveredJobsStat: document.getElementById('delivered-jobs-stat'),
             notDeliveredJobsStat: document.getElementById('not-delivered-jobs-stat'),
             pendingInwardStat: document.getElementById('pending-inward-stat'),
             rahulSirPendingStat: document.getElementById('rahul-sir-pending-stat'),
             recentJobsTableBody: document.getElementById('recent-jobs-table-body'),
-
-            // All Jobs Page
-            jobSheetHeaderActions: document.getElementById('job-sheet-header-actions'), allJobsHeaderActions: document.getElementById('all-jobs-header-actions'),
-            jobNoSearchBox: document.getElementById('job-no-search-box'), mobileNoSearchBox: document.getElementById('mobile-no-search-box'),
-            downloadExcelBtn: document.getElementById('download-excel-btn'), allJobsTableBody: document.getElementById('all-jobs-table-body'),
+            jobSheetHeaderActions: document.getElementById('job-sheet-header-actions'),
+            allJobsHeaderActions: document.getElementById('all-jobs-header-actions'),
+            jobNoSearchBox: document.getElementById('job-no-search-box'),
+            mobileNoSearchBox: document.getElementById('mobile-no-search-box'),
+            downloadExcelBtn: document.getElementById('download-excel-btn'),
+            allJobsTableBody: document.getElementById('all-jobs-table-body'),
             allJobsPagination: document.getElementById('all-jobs-pagination'),
-            filterToggleBtn: document.getElementById('filter-toggle-btn'), filterPopup: document.getElementById('job-range-filters'),
-            filterBtnLabel: document.getElementById('filter-btn-label'),
-            
-            // Inward/Outward
             outwardFormTitle: document.getElementById('outward-form-title'), partyName: document.getElementById('party-name'),
-            addPartyBtn: document.getElementById('add-party-btn'), materialDesc: document.getElementById('material-desc'),
-            outwardDate: document.getElementById('outward-date'), inwardDate: document.getElementById('inward-date'),
-            saveOutwardBtn: document.getElementById('save-outward-btn'), cancelOutwardEditBtn: document.getElementById('cancel-outward-edit-btn'),
-            jobNoOutward: document.getElementById('job-no-outward'), outwardCustomerName: document.getElementById('outward-customer-name'),
-            newOutwardBtn: document.getElementById('new-outward-btn'), inwardOutwardHeaderActions: document.getElementById('inward-outward-header-actions'),
-            allInOutHeaderActions: document.getElementById('all-in-out-header-actions'), allInOutSearchBox: document.getElementById('all-in-out-search-box'),
-            downloadAllInOutExcelBtn: document.getElementById('download-all-in-out-excel-btn'), allInOutTableBody: document.getElementById('all-in-out-table-body'),
+            addPartyBtn: document.getElementById('add-party-btn'),
+            materialDesc: document.getElementById('material-desc'), outwardDate: document.getElementById('outward-date'),
+            inwardDate: document.getElementById('inward-date'), saveOutwardBtn: document.getElementById('save-outward-btn'),
+            cancelOutwardEditBtn: document.getElementById('cancel-outward-edit-btn'),
+            jobNoOutward: document.getElementById('job-no-outward'),
+            outwardCustomerName: document.getElementById('outward-customer-name'),
+            newOutwardBtn: document.getElementById('new-outward-btn'),
+            inwardOutwardHeaderActions: document.getElementById('inward-outward-header-actions'),
+            allInOutHeaderActions: document.getElementById('all-in-out-header-actions'),
+            allInOutSearchBox: document.getElementById('all-in-out-search-box'),
+            downloadAllInOutExcelBtn: document.getElementById('download-all-in-out-excel-btn'),
+            allInOutTableBody: document.getElementById('all-in-out-table-body'),
             allInOutPagination: document.getElementById('all-in-out-pagination'),
-
-            // Problem Modal
-            problemModal: document.getElementById('problem-modal'), problemModalBody: document.getElementById('problem-modal-body'),
-            modalDeviceName: document.getElementById('modal-device-name'), modalSaveBtn: document.getElementById('modal-save-btn'),
-            modalCancelBtn: document.getElementById('modal-cancel-btn'),
+            materialsTableBody: document.getElementById('materials-table-body'),
+            addMaterialBtn: document.getElementById('add-material-btn'),
+            currentStatus: document.getElementById('current-status'),
+            finalStatus: document.getElementById('final-status'),
+            customerStatus: document.getElementById('customer-status'),
+            filterToggleBtn: document.getElementById('filter-toggle-btn'),
+            filterPopup: document.getElementById('job-range-filters'),
+            filterBtnLabel: document.getElementById('filter-btn-label'),
         };
         
-        // --- Helper Functions ---
         function toTitleCase(str) {
             if (!str) return '';
             return str.toLowerCase().replace(/\b(\w)/g, s => s.toUpperCase());
@@ -174,10 +181,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setupTheme();
             setupEventListeners();
             populateSelects();
-            buildProblemModal();
+            populateCheckboxes();
             setInitialDate();
             loadInitialData();
-            addDeviceRow(); // Add one device row by default
         }
 
         function setupNavigation() {
@@ -201,8 +207,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     handleAllJobsSearch(null);
 
-                    if (page === 'job-sheet') DOMElements.jobSheetHeaderActions.style.display = 'flex';
-                    else if (page === 'all-jobs') {
+                    if (page === 'job-sheet') {
+                        DOMElements.jobSheetHeaderActions.style.display = 'flex';
+                    } else if (page === 'all-jobs') {
                         DOMElements.jobNoSearchBox.value = '';
                         DOMElements.mobileNoSearchBox.value = '';
                         handleAllJobsSearch(null); 
@@ -215,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         handleAllInOutSearch(null);
                         DOMElements.allInOutHeaderActions.style.display = 'flex';
                     }
+
                     document.body.classList.remove('sidebar-open');
                 });
             });
@@ -244,31 +252,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function setupEventListeners() {
-            DOMElements.logoutBtn.addEventListener('click', () => auth.signOut());
-            DOMElements.newJobBtn.addEventListener('click', clearJobSheetForm);
             DOMElements.saveRecordBtn.addEventListener('click', saveJobSheet);
             DOMElements.sendWhatsAppBtn.addEventListener('click', sendWhatsAppMessage);
-
-            // Devices and Materials
-            DOMElements.addDeviceBtn.addEventListener('click', () => addDeviceRow());
-            DOMElements.devicesTableBody.addEventListener('click', handleDevicesTableClick);
-            DOMElements.addMaterialBtn.addEventListener('click', () => addMaterialRow());
-            DOMElements.materialsTableBody.addEventListener('click', (e) => { if (e.target.classList.contains('remove-material-btn')) e.target.closest('tr').remove(); });
-            
-            // Problem Modal
-            DOMElements.modalSaveBtn.addEventListener('click', handleSaveProblems);
-            DOMElements.modalCancelBtn.addEventListener('click', () => DOMElements.problemModal.classList.remove('visible'));
-            
-            // Search and Filter
-            DOMElements.jobNoSearchBox.addEventListener('input', () => handleAllJobsSearch(null));
-            DOMElements.mobileNoSearchBox.addEventListener('input', () => handleAllJobsSearch(null));
-            DOMElements.filterToggleBtn.addEventListener('click', (e) => { e.stopPropagation(); DOMElements.filterPopup.classList.toggle('visible'); });
-            document.addEventListener('click', (e) => { if (!DOMElements.filterPopup.contains(e.target) && !DOMElements.filterToggleBtn.contains(e.target)) DOMElements.filterPopup.classList.remove('visible'); });
-
-            // Inward/Outward
+            DOMElements.newJobBtn.addEventListener('click', clearJobSheetForm);
             DOMElements.saveOutwardBtn.addEventListener('click', saveOutwardRecord);
             DOMElements.cancelOutwardEditBtn.addEventListener('click', clearOutwardForm);
-            DOMElements.newOutwardBtn.addEventListener('click', () => document.querySelector('.nav-link[data-page="inward-outward"]').click());
+            DOMElements.newOutwardBtn.addEventListener('click', () => {
+                 document.querySelector('.nav-link[data-page="inward-outward"]').click();
+            });
+            DOMElements.logoutBtn.addEventListener('click', () => auth.signOut());
+            DOMElements.jobNoSearchBox.addEventListener('input', () => handleAllJobsSearch(null));
+            DOMElements.mobileNoSearchBox.addEventListener('input', () => handleAllJobsSearch(null));
+            DOMElements.allInOutSearchBox.addEventListener('input', () => handleAllInOutSearch(null));
+            DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
+            DOMElements.downloadAllInOutExcelBtn.addEventListener('click', downloadAllInOutAsExcel);
+            DOMElements.jobNoOutward.addEventListener('input', autofillOutwardFromJob);
+            
+            DOMElements.filterToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                DOMElements.filterPopup.classList.toggle('visible');
+            });
+            
             DOMElements.addPartyBtn.addEventListener('click', async () => {
                 const newParty = prompt("Enter the new party name:");
                 if (newParty && newParty.trim() !== '') {
@@ -278,15 +282,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert(`Party "${trimmedParty}" added successfully!`);
                 }
             });
-            DOMElements.jobNoOutward.addEventListener('input', autofillOutwardFromJob);
-            DOMElements.allInOutSearchBox.addEventListener('input', () => handleAllInOutSearch(null));
-            
-            // Excel Downloads
-            DOMElements.downloadExcelBtn.addEventListener('click', downloadJobsAsExcel);
-            DOMElements.downloadAllInOutExcelBtn.addEventListener('click', downloadAllInOutAsExcel);
+    
+            document.addEventListener('click', (e) => {
+                if (!DOMElements.filterPopup.contains(e.target) && !DOMElements.filterToggleBtn.contains(e.target)) {
+                    DOMElements.filterPopup.classList.remove('visible');
+                }
+            });
+
+            setupAutocomplete(DOMElements.brandName, brandSuggestions);
+            setupAutocomplete(DOMElements.partyName, partySuggestions);
+            setupMaterialsTable();
         }
-        
+
         function populateSelects() {
+            populateOptions(DOMElements.deviceType, deviceTypeOptions, "Select Device Type");
             populateOptions(DOMElements.currentStatus, currentStatusOptions, "Select Current Status");
             populateOptions(DOMElements.finalStatus, finalStatusOptions, "Select Final Status");
             populateOptions(DOMElements.customerStatus, customerStatusOptions, "Select Customer Status");
@@ -297,9 +306,64 @@ document.addEventListener('DOMContentLoaded', () => {
             options.forEach(o => select.innerHTML += `<option value="${o}">${o}</option>`);
         }
 
+        function populateCheckboxes() {
+            const container = DOMElements.reportedProblems;
+            container.innerHTML = '';
+        
+            for (const problem in problemOptionsConfig) {
+                const config = problemOptionsConfig[problem];
+                const problemId = problem.replace(/[\s/]+/g, '-');
+        
+                const itemWrapper = document.createElement('div');
+                itemWrapper.className = 'problem-item';
+        
+                let mainCheckboxHTML = `
+                    <div class="problem-main">
+                        <input type="checkbox" id="problem-${problemId}" value="${problem}">
+                        <label for="problem-${problemId}">${problem}</label>
+                    </div>`;
+        
+                let subOptionsHTML = '';
+                if (config.subOptions) {
+                    const subOptionsId = `sub-options-${problemId}`;
+                    if (config.subOptionType === 'checkbox') {
+                        const checkboxOptions = config.subOptions.map(opt => `
+                            <div class="sub-checkbox-item">
+                                <input type="checkbox" id="sub-opt-${problemId}-${opt.replace(/\s/g, '')}" value="${opt}">
+                                <label for="sub-opt-${problemId}-${opt.replace(/\s/g, '')}">${opt}</label>
+                            </div>`).join('');
+                        subOptionsHTML = `
+                            <div class="problem-sub-options" id="${subOptionsId}">
+                                <label>${config.subOptionLabel}</label>
+                                <div class="sub-checkbox-grid">${checkboxOptions}</div>
+                            </div>`;
+                    } else { // 'select'
+                        const selectOptions = config.subOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
+                        subOptionsHTML = `
+                            <div class="problem-sub-options" id="${subOptionsId}">
+                                <label for="select-${problemId}">${config.subOptionLabel}</label>
+                                <select id="select-${problemId}" class="select-field"><option value="">Select...</option>${selectOptions}</select>
+                            </div>`;
+                    }
+                }
+        
+                itemWrapper.innerHTML = mainCheckboxHTML + subOptionsHTML;
+                container.appendChild(itemWrapper);
+        
+                if (config.subOptions) {
+                    const checkbox = itemWrapper.querySelector(`#problem-${problemId}`);
+                    const subOptionsDiv = itemWrapper.querySelector(`#sub-options-${problemId}`);
+                    checkbox.addEventListener('change', () => {
+                        subOptionsDiv.style.display = checkbox.checked ? 'block' : 'none';
+                    });
+                }
+            }
+        }
+
         function setInitialDate() {
-            DOMElements.date.value = new Date().toISOString().split('T')[0];
-            DOMElements.outwardDate.value = new Date().toISOString().split('T')[0];
+            const today = new Date().toISOString().split('T')[0];
+            DOMElements.date.value = today;
+            DOMElements.outwardDate.value = today;
         }
 
         function listenForSuggestions(collectionName, initialArray, targetArray) {
@@ -308,334 +372,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 const combined = [...new Set([...initialArray, ...dbSuggestions])].sort();
                 targetArray.length = 0;
                 Array.prototype.push.apply(targetArray, combined);
-            }, error => console.error(`Error listening for ${collectionName} suggestions:`, error));
+            }, error => {
+                console.error(`Error listening for ${collectionName} suggestions:`, error);
+            });
         }
 
         function loadInitialData() {
             db.collection("jobSheets").orderBy("jobSheetNo", "desc").onSnapshot(snap => {
                 allJobSheets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 allJobSheets.sort((a, b) => (b.jobSheetNo || 0) - (a.jobSheetNo || 0));
+
                 renderJobRangeFilters();
                 updateDashboardStats();
                 handleAllJobsSearch(null);
             });
+
             db.collection("jobSheets").orderBy("updatedAt", "desc").limit(5).onSnapshot(snap => {
-                renderRecentJobsTable(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                const recentJobs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderRecentJobsTable(recentJobs);
             });
+
             db.collection("outwardJobs").orderBy("outwardDate", "desc").onSnapshot(snap => {
                 allOutwardRecords = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 updateDashboardStats();
                 handleAllInOutSearch(null);
             });
+
             listenForSuggestions('brands', initialBrandOptions, brandSuggestions);
             listenForSuggestions('parties', initialPartyOptions, partySuggestions);
             listenForSuggestions('partNames', initialPartNames, partNameSuggestions);
         }
-
-        function handleDevicesTableClick(e) {
-            if (e.target.classList.contains('remove-material-btn')) {
-                const row = e.target.closest('tr');
-                const rowIndex = Array.from(DOMElements.devicesTableBody.children).indexOf(row);
-                delete tempDeviceProblems[rowIndex];
-                row.remove();
-            } else if (e.target.id === 'add-problem-btn') {
-                const deviceRow = e.target.closest('tr');
-                const rowIndex = Array.from(DOMElements.devicesTableBody.children).indexOf(deviceRow);
-                const deviceType = deviceRow.querySelector('.device-type').value || 'Device';
-                const deviceBrand = deviceRow.querySelector('.device-brand').value || '';
-                openProblemModal(rowIndex, `${deviceBrand} ${deviceType}`);
-            }
-        }
-
-        function openProblemModal(rowIndex, deviceName) {
-            DOMElements.modalDeviceName.textContent = deviceName;
-            DOMElements.problemModal.dataset.rowIndex = rowIndex;
-
-            // Reset modal form
-            DOMElements.problemModalBody.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-            DOMElements.problemModalBody.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
-            DOMElements.problemModalBody.querySelectorAll('.problem-sub-options').forEach(el => el.style.display = 'none');
-
-            // Populate modal with existing problems
-            const existingProblems = tempDeviceProblems[rowIndex] || [];
-            existingProblems.forEach(problemStr => {
-                const [mainProblem, subOptionsStr] = problemStr.split(': ');
-                const problemId = `problem-${mainProblem.replace(/[\s/]+/g, '-')}`;
-                const checkbox = DOMElements.problemModalBody.querySelector(`#${problemId}`);
-
-                if (checkbox) {
-                    checkbox.checked = true;
-                    const subOptionsDiv = DOMElements.problemModalBody.querySelector(`#sub-options-${checkbox.dataset.key}`);
-                    if (subOptionsDiv) {
-                        subOptionsDiv.style.display = 'block';
-                        if (subOptionsStr) {
-                            subOptionsStr.split(', ').forEach(subOpt => {
-                                const subInput = subOptionsDiv.querySelector(`input[value="${subOpt}"], select`);
-                                if (subInput) {
-                                    if (subInput.type === 'checkbox') subInput.checked = true;
-                                    else subInput.value = subOpt;
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-            DOMElements.problemModal.classList.add('visible');
-        }
-        
-        function handleSaveProblems() {
-            const rowIndex = DOMElements.problemModal.dataset.rowIndex;
-            const problems = getProblemsFromModal();
-            tempDeviceProblems[rowIndex] = problems;
-            renderProblemTags(rowIndex, problems);
-            DOMElements.problemModal.classList.remove('visible');
-        }
-
-        function renderProblemTags(rowIndex, problems) {
-            const deviceRow = DOMElements.devicesTableBody.rows[rowIndex];
-            if (deviceRow) {
-                const container = deviceRow.querySelector('.device-problems-list');
-                container.innerHTML = problems.map(p => `<span class="problem-tag">${p}</span>`).join('') +
-                                      `<button id="add-problem-btn" class="action-btn secondary-btn" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">+ Problems</button>`;
-            }
-        }
-        
-        function getProblemsFromModal() {
-            const problems = [];
-            DOMElements.problemModalBody.querySelectorAll('.problem-main-checkbox:checked').forEach(cb => {
-                const mainProblem = cb.value;
-                const configKey = Object.keys(problemOptionsConfig).find(k => k.replace(/[\s/]+/g, '-') === cb.dataset.key);
-                const config = problemOptionsConfig[configKey];
-                
-                if (config && config.subOptions) {
-                    const subOptionsDiv = document.getElementById(`sub-options-${cb.dataset.key}`);
-                    const selectedSubOptions = [];
-                    if (config.subOptionType === 'checkbox') {
-                        subOptionsDiv.querySelectorAll('input[type="checkbox"]:checked').forEach(subCb => selectedSubOptions.push(subCb.value));
-                        if(selectedSubOptions.length > 0) problems.push(`${mainProblem}: ${selectedSubOptions.join(', ')}`);
-                        else problems.push(mainProblem);
-                    } else { // select
-                        const select = subOptionsDiv.querySelector('select');
-                        if (select.value) problems.push(`${mainProblem}: ${select.value}`);
-                        else problems.push(mainProblem);
-                    }
-                } else {
-                    problems.push(mainProblem);
-                }
-            });
-            return problems;
-        }
-
-        async function saveJobSheet() {
-            const jobSheetNo = Number(DOMElements.jobSheetNo.value.trim());
-            if (!currentEditingJobId && allJobSheets.some(j => j.jobSheetNo === jobSheetNo)) {
-                return alert("Error: Job Sheet Number " + jobSheetNo + " already exists.");
-            }
-            const engineers = [];
-            if (DOMElements.engineerKundan.checked) engineers.push("Kundan Sir");
-            if (DOMElements.engineerSachin.checked) engineers.push("Sachin Sir");
-            if (DOMElements.engineerRushi.checked) engineers.push("Rushi");
-
-            const devices = getDevicesWithProblems();
-            if (devices.length === 0) return alert("Please add at least one device with its type and brand.");
-
-            const jobData = {
-                jobSheetNo,
-                oldJobSheetNo: DOMElements.oldJobSheetNo.value.trim(),
-                date: DOMElements.date.value,
-                customerName: toTitleCase(DOMElements.customerName.value.trim()),
-                customerMobile: DOMElements.customerMobile.value.trim(),
-                altMobile: DOMElements.altMobile.value.trim(),
-                devices,
-                serviceNote: DOMElements.serviceNote.value.trim(),
-                materials: getMaterials(),
-                currentStatus: DOMElements.currentStatus.value,
-                finalStatus: DOMElements.finalStatus.value,
-                customerStatus: DOMElements.customerStatus.value,
-                estimateAmount: parseFloat(DOMElements.estimateAmount.value) || 0,
-                engineers,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            if (!jobData.jobSheetNo || !jobData.customerName || !jobData.customerMobile) { return alert("Job Sheet No, Customer Name, and Mobile are required."); }
-
-            try {
-                if (currentEditingJobId) {
-                    await db.collection("jobSheets").doc(currentEditingJobId).update(jobData);
-                    showSuccessModal("Record Updated!");
-                } else {
-                    jobData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection("jobSheets").add(jobData);
-                    showSuccessModal("Record Saved!");
-                }
-                clearJobSheetForm();
-                document.querySelector('.nav-link[data-page="dashboard"]').click();
-            } catch (error) { console.error("Error saving job sheet:", error); alert("Error saving record."); }
-        }
-
-        function editJob(id) {
-            const job = allJobSheets.find(j => j.id === id);
-            if (!job) return;
-            clearJobSheetForm();
-            currentEditingJobId = id;
-            
-            DOMElements.jobSheetNo.value = job.jobSheetNo || '';
-            DOMElements.oldJobSheetNo.value = job.oldJobSheetNo || '';
-            DOMElements.date.value = job.date || '';
-            DOMElements.customerName.value = job.customerName || '';
-            DOMElements.customerMobile.value = job.customerMobile || '';
-            DOMElements.altMobile.value = job.altMobile || '';
-            DOMElements.serviceNote.value = job.serviceNote || '';
-            DOMElements.estimateAmount.value = job.estimateAmount || '';
-            DOMElements.currentStatus.value = job.currentStatus || '';
-            DOMElements.finalStatus.value = job.finalStatus || '';
-            DOMElements.customerStatus.value = job.customerStatus || '';
-            
-            (job.engineers || []).forEach(eng => {
-                if(eng.includes("Kundan")) DOMElements.engineerKundan.checked = true;
-                if(eng.includes("Sachin")) DOMElements.engineerSachin.checked = true;
-                if(eng.includes("Rushi")) DOMElements.engineerRushi.checked = true;
-            });
-            
-            DOMElements.devicesTableBody.innerHTML = '';
-            tempDeviceProblems = {};
-            (job.devices || []).forEach((device, index) => {
-                addDeviceRow(device);
-                tempDeviceProblems[index] = device.problems || [];
-                renderProblemTags(index, device.problems || []);
-            });
-
-            DOMElements.materialsTableBody.innerHTML = '';
-            (job.materials || []).forEach(mat => addMaterialRow(mat));
-            
-            DOMElements.saveRecordBtn.textContent = 'Update Record';
-            DOMElements.saveRecordBtn.classList.add('update-btn');
-            document.querySelector('.nav-link[data-page="job-sheet"]').click();
-        }
-        
-        async function deleteJob(id) {
-            if (prompt("To delete this job, please enter the password:") === "KC21") {
-                await db.collection("jobSheets").doc(id).delete();
-                showSuccessModal("Job Sheet Deleted!");
-            } else { alert("Incorrect password. Deletion cancelled."); }
-        }
-
-        function getDevicesWithProblems() {
-            const devices = [];
-            Array.from(DOMElements.devicesTableBody.rows).forEach((row, index) => {
-                const type = row.querySelector('.device-type').value;
-                const brand = row.querySelector('.device-brand').value.trim();
-                if (type && brand) {
-                    devices.push({
-                        type: type, brand: toTitleCase(brand),
-                        problems: tempDeviceProblems[index] || []
-                    });
-                }
-            });
-            return devices;
-        }
-
-        function clearJobSheetForm() {
-            currentEditingJobId = null;
-            tempDeviceProblems = {};
-            // More robust reset
-            const formPage = DOMElements.jobSheetPage;
-            formPage.querySelectorAll('input[type="text"], input[type="number"], input[type="tel"], textarea').forEach(el => el.value = '');
-            formPage.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
-            formPage.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
-
-            DOMElements.devicesTableBody.innerHTML = '';
-            DOMElements.materialsTableBody.innerHTML = '';
-            addDeviceRow();
-            DOMElements.saveRecordBtn.textContent = 'Save Record';
-            DOMElements.saveRecordBtn.classList.remove('update-btn');
-            setInitialDate();
-        }
-
-        function buildProblemModal() {
-            let html = '';
-            for (const category in problemOptionsConfig) {
-                const config = problemOptionsConfig[category];
-                const categoryKey = category.replace(/[\s/]+/g, '-');
-                html += `<div class="problem-category"><h3>${category}</h3>`;
-                if (config.problems) { // Simple checkbox list for General
-                    html += `<div class="problem-checkbox-grid">`;
-                    config.problems.forEach(problem => {
-                        const problemKey = problem.replace(/[\s/]+/g, '-');
-                        html += `<div class="problem-item"><input type="checkbox" class="problem-main-checkbox" id="problem-${problemKey}" data-key="${problemKey}" value="${problem}"><label for="problem-${problemKey}">${problem}</label></div>`;
-                    });
-                    html += `</div>`;
-                } else { // Main problem with sub-options
-                     html += `<div class="problem-item"><input type="checkbox" class="problem-main-checkbox" id="problem-${categoryKey}" data-key="${categoryKey}" value="${category}"><label for="problem-${categoryKey}">${category}</label></div>`;
-                     let subOptionsHTML = '';
-                     if (config.subOptionType === 'checkbox') {
-                         subOptionsHTML = config.subOptions.map(opt => `<div class="problem-item"><input type="checkbox" value="${opt}"><label>${opt}</label></div>`).join('');
-                         html += `<div class="problem-sub-options" id="sub-options-${categoryKey}"><label>${config.subOptionLabel}</label><div class="sub-checkbox-grid">${subOptionsHTML}</div></div>`;
-                     } else { // select
-                         subOptionsHTML = config.subOptions.map(opt => `<option value="${opt}">${opt}</option>`).join('');
-                         html += `<div class="problem-sub-options" id="sub-options-${categoryKey}"><label>${config.subOptionLabel}</label><select class="select-field"><option value="">Select...</option>${subOptionsHTML}</select></div>`;
-                     }
-                }
-                html += `</div>`;
-            }
-            DOMElements.problemModalBody.innerHTML = html;
-
-            // Add event listeners for showing sub-options
-            DOMElements.problemModalBody.querySelectorAll('.problem-main-checkbox').forEach(checkbox => {
-                const subOptionsDiv = DOMElements.problemModalBody.querySelector(`#sub-options-${checkbox.dataset.key}`);
-                if (subOptionsDiv) {
-                    checkbox.addEventListener('change', () => { subOptionsDiv.style.display = checkbox.checked ? 'block' : 'none'; });
-                }
-            });
-        }
-        
-        function addDeviceRow(device = {}) {
-            const rowIndex = DOMElements.devicesTableBody.rows.length;
-            const row = DOMElements.devicesTableBody.insertRow();
-            row.innerHTML = `
-                <td><select class="select-field device-type"><option value="">Select Device</option>${deviceTypeOptions.map(opt => `<option value="${opt}" ${device.type === opt ? 'selected' : ''}>${opt}</option>`).join('')}</select></td>
-                <td><div class="autocomplete"><input type="text" class="input-field device-brand" placeholder="e.g., Dell, HP" value="${device.brand || ''}"></div></td>
-                <td><div class="device-problems-list"><button id="add-problem-btn" class="action-btn secondary-btn" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;">+ Problems</button></div></td>
-                <td><button class="remove-material-btn">&times;</button></td>
-            `;
-            setupAutocomplete(row.querySelector('.device-brand'), brandSuggestions);
-            if (!device.problems) {
-                tempDeviceProblems[rowIndex] = [];
-            }
-        }
-        
-        function addMaterialRow(material = {}) {
-            const row = document.createElement('tr');
-            const statusOptionsHTML = materialStatusOptions.map(opt => `<option value="${opt}" ${material.status === opt ? 'selected' : ''}>${opt}</option>`).join('');
-            row.innerHTML = `
-                <td><div class="autocomplete"><input type="text" class="input-field part-name" placeholder="e.g., SSD" value="${material.name || ''}"></div></td>
-                <td><input type="text" class="input-field part-details" placeholder="e.g., Samsung 256GB" value="${material.details || ''}"></td>
-                <td><input type="number" class="input-field part-qty" placeholder="1" value="${material.qty || '1'}"></td>
-                <td><select class="select-field part-status">${statusOptionsHTML}</select></td>
-                <td><button class="remove-material-btn">&times;</button></td>
-            `;
-            DOMElements.materialsTableBody.appendChild(row);
-            setupAutocomplete(row.querySelector('.part-name'), partNameSuggestions);
-        }
-
-        function getMaterials() {
-            const materials = [];
-            DOMElements.materialsTableBody.querySelectorAll('tr').forEach(row => {
-                const name = row.querySelector('.part-name').value.trim();
-                if (name) {
-                    materials.push({
-                        name: toTitleCase(name),
-                        details: row.querySelector('.part-details').value.trim(),
-                        qty: parseInt(row.querySelector('.part-qty').value) || 1,
-                        status: row.querySelector('.part-status').value
-                    });
-                }
-            });
-            return materials;
-        }
-
-        // --- All the other functions from your original file are included below ---
-        // This is the crucial part that was missing.
         
         function updateDashboardStats() {
             DOMElements.totalJobsStat.textContent = allJobSheets.length;
@@ -689,13 +455,99 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        function setupMaterialsTable() {
+            DOMElements.addMaterialBtn.addEventListener('click', () => addMaterialRow());
+            DOMElements.materialsTableBody.addEventListener('click', (e) => {
+                if(e.target.classList.contains('remove-material-btn')) {
+                    e.target.closest('tr').remove();
+                }
+            });
+        }
+
+        function addMaterialRow(material = {}) {
+            const row = document.createElement('tr');
+            const statusOptionsHTML = materialStatusOptions.map(opt => 
+                `<option value="${opt}" ${material.status === opt ? 'selected' : ''}>${opt}</option>`
+            ).join('');
+
+            row.innerHTML = `
+                <td><div class="autocomplete"><input type="text" class="input-field part-name" placeholder="e.g., SSD" value="${material.name || ''}"></div></td>
+                <td><input type="text" class="input-field part-details" placeholder="e.g., Samsung 256GB" value="${material.details || ''}"></td>
+                <td><input type="number" class="input-field part-qty" placeholder="1" value="${material.qty || '1'}"></td>
+                <td><select class="select-field part-status">${statusOptionsHTML}</select></td>
+                <td><button class="remove-material-btn">&times;</button></td>
+            `;
+            DOMElements.materialsTableBody.appendChild(row);
+            const partNameInput = row.querySelector('.part-name');
+            setupAutocomplete(partNameInput, partNameSuggestions);
+        }
+
+        function getMaterials() {
+            const materials = [];
+            DOMElements.materialsTableBody.querySelectorAll('tr').forEach(row => {
+                const name = row.querySelector('.part-name').value.trim();
+                if (name) {
+                    materials.push({
+                        name: toTitleCase(name),
+                        details: row.querySelector('.part-details').value.trim(),
+                        qty: parseInt(row.querySelector('.part-qty').value) || 1,
+                        status: row.querySelector('.part-status').value
+                    });
+                }
+            });
+            return materials;
+        }
+        
+        function getReportedProblems() {
+            const problems = [];
+            document.querySelectorAll('#reported-problems .problem-item').forEach(item => {
+                const mainCheckbox = item.querySelector('.problem-main input[type="checkbox"]');
+                if (mainCheckbox.checked) {
+                    const problemName = mainCheckbox.value;
+                    const config = problemOptionsConfig[problemName];
+                    const subOptionsDiv = item.querySelector('.problem-sub-options');
+
+                    if (subOptionsDiv && config) {
+                        if (config.subOptionType === 'checkbox') {
+                            const selectedSubOptions = [];
+                            subOptionsDiv.querySelectorAll('input[type="checkbox"]:checked').forEach(subCb => {
+                                selectedSubOptions.push(subCb.value);
+                            });
+                            if (selectedSubOptions.length > 0) {
+                                problems.push(`${problemName}: ${selectedSubOptions.join(', ')}`);
+                            } else {
+                                problems.push(problemName);
+                            }
+                        } else { // 'select'
+                            const select = subOptionsDiv.querySelector('select');
+                            if (select && select.value) {
+                                problems.push(`${problemName}: ${select.value}`);
+                            } else {
+                                problems.push(problemName);
+                            }
+                        }
+                    } else {
+                        problems.push(problemName);
+                    }
+                }
+            });
+            return problems;
+        }
+
+        function renderMaterialsTable(materials = []) {
+            DOMElements.materialsTableBody.innerHTML = '';
+            if (materials && materials.length > 0) {
+                materials.forEach(addMaterialRow);
+            }
+        }
+
         function renderRecentJobsTable(jobs) {
             DOMElements.recentJobsTableBody.innerHTML = jobs.length === 0 ? `<tr><td colspan="6" style="text-align:center; padding: 1rem;">No recent activity.</td></tr>` :
             jobs.map(job => `
                 <tr>
                     <td>${job.jobSheetNo}</td>
                     <td title="${job.customerName}">${job.customerName}</td>
-                    <td title="${(job.devices || []).map(d => d.type).join(', ')}">${(job.devices || []).map(d => d.type).join(', ')}</td>
+                    <td title="${job.deviceType}">${job.deviceType}</td>
                     <td>${job.currentStatus || 'N/A'}</td>
                     <td>${formatTimestamp(job.updatedAt)}</td>
                     <td class="table-actions">
@@ -717,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${formatDate(job.date)}</td>
                     <td title="${job.customerName}">${job.customerName}</td>
                     <td title="${job.customerMobile}">${job.customerMobile}</td>
-                    <td title="${(job.devices || []).map(d=>d.type).join(', ')}">${(job.devices || []).map(d=>d.type).join(', ')}</td>
+                    <td>${job.deviceType}</td>
                     <td>${job.currentStatus}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
@@ -777,6 +629,194 @@ document.addEventListener('DOMContentLoaded', () => {
             renderAllJobsTable();
         }
 
+        function clearJobSheetForm() {
+            currentEditingJobId = null;
+            const fieldsToClear = [DOMElements.jobSheetNo, DOMElements.oldJobSheetNo, DOMElements.customerName, DOMElements.customerMobile, DOMElements.altMobile, DOMElements.brandName, DOMElements.serviceNote, DOMElements.estimateAmount];
+            fieldsToClear.forEach(el => el.value = '');
+            
+            [DOMElements.deviceType, DOMElements.currentStatus, DOMElements.finalStatus, DOMElements.customerStatus].forEach(el => el.selectedIndex = 0);
+            
+            document.querySelectorAll('#reported-problems input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+                const problemId = cb.value.replace(/[\s/]+/g, '-');
+                const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
+                if (subOptionsDiv) {
+                    subOptionsDiv.style.display = 'none';
+                    subOptionsDiv.querySelectorAll('input[type="checkbox"]').forEach(subCb => subCb.checked = false);
+                    subOptionsDiv.querySelectorAll('select').forEach(sel => sel.selectedIndex = 0);
+                }
+            });
+
+            DOMElements.engineerKundan.checked = false; 
+            DOMElements.engineerSachin.checked = false;
+            DOMElements.engineerRushi.checked = false;
+            
+            renderMaterialsTable([]);
+
+            setInitialDate();
+            DOMElements.saveRecordBtn.textContent = 'Save Record';
+            DOMElements.saveRecordBtn.classList.remove('update-btn');
+        }
+
+        async function saveJobSheet() {
+            const jobSheetNo = Number(DOMElements.jobSheetNo.value.trim() || 0);
+
+            if (!currentEditingJobId && allJobSheets.some(job => job.jobSheetNo === jobSheetNo)) {
+                alert("Error: Job Sheet Number " + jobSheetNo + " already exists. Please use a different number.");
+                return;
+            }
+            
+            const engineers = [];
+            if (DOMElements.engineerKundan.checked) engineers.push("Kundan Sir");
+            if (DOMElements.engineerSachin.checked) engineers.push("Sachin Sir");
+            if (DOMElements.engineerRushi.checked) engineers.push("Rushi");
+
+            const jobData = {
+                jobSheetNo: jobSheetNo,
+                oldJobSheetNo: DOMElements.oldJobSheetNo.value.trim(),
+                date: DOMElements.date.value,
+                customerName: toTitleCase(DOMElements.customerName.value.trim()),
+                customerMobile: DOMElements.customerMobile.value.trim(),
+                altMobile: DOMElements.altMobile.value.trim(),
+                deviceType: DOMElements.deviceType.value,
+                brandName: toTitleCase(DOMElements.brandName.value.trim()),
+                reportedProblems: getReportedProblems(),
+                serviceNote: DOMElements.serviceNote.value.trim(),
+                materials: getMaterials(),
+                currentStatus: DOMElements.currentStatus.value,
+                finalStatus: DOMElements.finalStatus.value,
+                customerStatus: DOMElements.customerStatus.value,
+                estimateAmount: parseFloat(DOMElements.estimateAmount.value) || 0,
+                engineers: engineers,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            if (!jobData.jobSheetNo || !jobData.customerName || !jobData.customerMobile) { alert("Job Sheet No, Customer Name, and Mobile are required."); return; }
+
+            try {
+                if (currentEditingJobId) {
+                    await db.collection("jobSheets").doc(currentEditingJobId).update(jobData);
+                    showSuccessModal("Record Updated!");
+                } else {
+                    jobData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection("jobSheets").add(jobData);
+                    showSuccessModal("Record Saved!");
+                }
+                
+                await addSuggestion(jobData.brandName, 'brands');
+                for (const mat of jobData.materials) { await addSuggestion(mat.name, 'partNames'); }
+                
+                clearJobSheetForm();
+                document.querySelector('.nav-link[data-page="dashboard"]').click();
+            } catch (error) { console.error("Error saving job sheet: ", error); alert("Error saving record."); }
+        }
+        
+        function sendWhatsAppMessage() {
+            const customerName = DOMElements.customerName.value.trim();
+            const jobSheetNo = DOMElements.jobSheetNo.value.trim();
+            const brandName = DOMElements.brandName.value.trim();
+            const deviceType = DOMElements.deviceType.value;
+            const estimateAmount = DOMElements.estimateAmount.value.trim();
+            const customerMobile = DOMElements.customerMobile.value.trim();
+
+            if (!customerMobile || !customerName || !jobSheetNo || !brandName || !deviceType || !estimateAmount) {
+                alert('Please fill all the required fields to send a WhatsApp message.');
+                return;
+            }
+
+            let phoneNumber = customerMobile;
+            if (phoneNumber.length === 10 && !phoneNumber.startsWith('91')) {
+                phoneNumber = '91' + phoneNumber;
+            }
+
+            const encodedCustomerName = encodeURIComponent(customerName);
+            const encodedJobSheetNo = encodeURIComponent(jobSheetNo);
+            const encodedBrandName = encodeURIComponent(brandName);
+            const encodedDeviceType = encodeURIComponent(deviceType);
+            const encodedEstimateAmount = encodeURIComponent(`₹${estimateAmount}`);
+
+            const textParts = [
+                `Hello, ${encodedCustomerName} %F0%9F%91%8B`, ``,
+                `Your Job No: ${encodedJobSheetNo}`,
+                `Your ${encodedBrandName} ${encodedDeviceType} is now ready %E2%9C%85`, ``,
+                `%F0%9F%92%B0 Amount: ${encodedEstimateAmount}`, ``,
+                `%F0%9F%93%8D Please collect your device between`,
+                `10:30 AM – 07:30 PM`, ``,
+                `Thank you,`, `Korus Computers`
+            ];
+
+            const finalMessage = textParts.join('%0A');
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${finalMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+
+        function editJob(id) {
+            const job = allJobSheets.find(j => j.id === id);
+            if (!job) return;
+            clearJobSheetForm();
+            currentEditingJobId = id;
+            
+            DOMElements.jobSheetNo.value = job.jobSheetNo || '';
+            DOMElements.oldJobSheetNo.value = job.oldJobSheetNo || '';
+            DOMElements.date.value = job.date || '';
+            DOMElements.customerName.value = job.customerName || '';
+            DOMElements.customerMobile.value = job.customerMobile || '';
+            DOMElements.altMobile.value = job.altMobile || '';
+            DOMElements.deviceType.value = job.deviceType || '';
+            DOMElements.brandName.value = job.brandName || '';
+            DOMElements.serviceNote.value = job.serviceNote || '';
+            DOMElements.estimateAmount.value = job.estimateAmount || '';
+            DOMElements.currentStatus.value = job.currentStatus || '';
+            DOMElements.finalStatus.value = job.finalStatus || '';
+            DOMElements.customerStatus.value = job.customerStatus || '';
+
+            (job.reportedProblems || []).forEach(problemStr => {
+                const [mainProblem, subOptionsStr] = problemStr.split(': ');
+                const problemId = mainProblem.replace(/[\s/]+/g, '-');
+                const checkbox = document.querySelector(`#problem-${problemId}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                    const subOptionsDiv = document.getElementById(`sub-options-${problemId}`);
+                    if (subOptionsDiv) {
+                        subOptionsDiv.style.display = 'block';
+                        const config = problemOptionsConfig[mainProblem];
+                        if (config && subOptionsStr) {
+                            const subOptions = subOptionsStr.split(', ');
+                            if (config.subOptionType === 'checkbox') {
+                                subOptions.forEach(subOptValue => {
+                                    const subCheckbox = subOptionsDiv.querySelector(`input[value="${subOptValue}"]`);
+                                    if (subCheckbox) subCheckbox.checked = true;
+                                });
+                            } else { // 'select'
+                                const select = subOptionsDiv.querySelector('select');
+                                if (select) select.value = subOptionsStr;
+                            }
+                        }
+                    }
+                }
+            });
+
+            DOMElements.engineerKundan.checked = job.engineers?.includes("Kundan Sir") || false;
+            DOMElements.engineerSachin.checked = job.engineers?.includes("Sachin Sir") || false;
+            DOMElements.engineerRushi.checked = job.engineers?.includes("Rushi") || false;
+            
+            renderMaterialsTable(job.materials);
+            
+            DOMElements.saveRecordBtn.textContent = 'Update Record';
+            DOMElements.saveRecordBtn.classList.add('update-btn');
+            document.querySelector('.nav-link[data-page="job-sheet"]').click();
+        }
+
+        async function deleteJob(id) {
+            const password = prompt("To delete this job, please enter the password:");
+            if (password === "KC21") {
+                await db.collection("jobSheets").doc(id).delete();
+                showSuccessModal("Job Sheet Deleted!");
+            } else if (password !== null) {
+                alert("Incorrect password. Deletion cancelled.");
+            }
+        }
+        
         function renderAllInOutTable() {
             const startIndex = (allInOutCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
@@ -888,13 +928,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        function autofillOutwardFromJob() {
+         function autofillOutwardFromJob() {
             const jobNo = DOMElements.jobNoOutward.value;
             if (jobNo) {
                 const job = allJobSheets.find(j => j.jobSheetNo == jobNo);
                 if (job) {
-                    const deviceText = (job.devices || []).map(d => `${d.brand} ${d.type}`).join(', ');
-                    DOMElements.materialDesc.value = deviceText;
+                    DOMElements.materialDesc.value = `${job.brandName} ${job.deviceType}`;
                     DOMElements.outwardCustomerName.value = job.customerName;
                 }
             }
@@ -968,54 +1007,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function showSuccessModal(message) {
             const modal = document.getElementById('success-modal');
-            if (!modal) { // Fallback for the success modal
-                alert(message);
-                return;
-            }
             const messageEl = document.getElementById('success-message');
             if(messageEl) messageEl.textContent = message;
             modal.classList.add('visible');
             setTimeout(() => modal.classList.remove('visible'), 2000);
         }
 
-        function sendWhatsAppMessage() {
-            const customerName = DOMElements.customerName.value.trim();
-            const jobSheetNo = DOMElements.jobSheetNo.value.trim();
-            const devices = getDevicesWithProblems();
-            const estimateAmount = DOMElements.estimateAmount.value.trim();
-            const customerMobile = DOMElements.customerMobile.value.trim();
-
-            if (!customerMobile || !customerName || !jobSheetNo || devices.length === 0 || !estimateAmount) {
-                return alert('Please fill all required fields to send a WhatsApp message.');
-            }
-            let phoneNumber = customerMobile;
-            if (phoneNumber.length === 10 && !phoneNumber.startsWith('91')) phoneNumber = '91' + phoneNumber;
-
-            const deviceText = devices.map(d => `${d.brand} ${d.type}`).join(', ');
-            const encodedDeviceText = encodeURIComponent(deviceText);
-
-            const textParts = [
-                `Hello, ${encodeURIComponent(customerName)} %F0%9F%91%8B`, ``, `Your Job No: ${encodeURIComponent(jobSheetNo)}`,
-                `Your ${encodedDeviceText} is now ready %E2%9C%85`, ``, `%F0%9F%92%B0 Amount: ${encodeURIComponent(`₹${estimateAmount}`)}`, ``,
-                `%F0%9F%93%8D Please collect your device between`, `10:30 AM – 07:30 PM`, ``, `Thank you,`, `Korus Computers`
-            ];
-            const finalMessage = textParts.join('%0A');
-            window.open(`https://wa.me/${phoneNumber}?text=${finalMessage}`, '_blank');
-        }
-
         function downloadJobsAsExcel() {
-            const dataToExport = allJobSheets.map(job => {
-                const deviceData = job.devices ? job.devices.map(d => `${d.brand} ${d.type} (${(d.problems || []).join(', ')})`).join('; ') : '';
-                return {
-                    "Job No": job.jobSheetNo, "Old Job No": job.oldJobSheetNo, "Date": formatDate(job.date),
-                    "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
-                    "Devices & Problems": deviceData,
-                    "Service Note": job.serviceNote,
-                    "Materials Used": (job.materials || []).map(m => `${m.qty}x ${m.name} (${m.details || 'N/A'}) - ${m.status}`).join('; '),
-                    "Current Status": job.currentStatus, "Final Status": job.finalStatus, "Customer Status": job.customerStatus,
-                    "Engineer(s)": (job.engineers || []).join(', '), "Estimate Amount": job.estimateAmount,
-                };
-            });
+            const dataToExport = allJobSheets.map(job => ({
+                "Job No": job.jobSheetNo, "Old Job No": job.oldJobSheetNo, "Date": formatDate(job.date),
+                "Customer Name": job.customerName, "Mobile": job.customerMobile, "Alt Mobile": job.altMobile,
+                "Device Type": job.deviceType, "Brand": job.brandName,
+                "Problems": (job.reportedProblems || []).join(', '),
+                 "Service Note": job.serviceNote,
+                "Materials Used": (job.materials || []).map(m => `${m.qty}x ${m.name} (${m.details || 'N/A'}) - ${m.status}`).join('; '),
+                "Current Status": job.currentStatus,
+                "Final Status": job.finalStatus,
+                "Customer Status": job.customerStatus,
+                "Engineer(s)": (job.engineers || []).join(', '),
+                "Estimate Amount": job.estimateAmount,
+            }));
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "JobSheets");
@@ -1025,7 +1036,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function downloadAllInOutAsExcel() {
             const dataToExport = allOutwardRecords.map(r => ({
-                 "Job No": r.jobNo, "Party Name": r.partyName, "Customer Name": r.customerName,
+                 "Job No": r.jobNo,
+                "Party Name": r.partyName, 
+                "Customer Name": r.customerName,
                 "Material": r.material, "Outward Date": formatDate(r.outwardDate),
                 "Inward Date": r.inwardDate ? formatDate(r.inwardDate) : 'Pending',
             }));
@@ -1036,9 +1049,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showSuccessModal("Downloading Excel file...");
         }
 
-        // --- Make functions globally accessible for inline HTML onclicks ---
         window.app = { editJob, deleteJob, editOutward, deleteOutward, changeAllJobsPage, changeAllInOutPage };
-        
-        init(); // Start the app
+        init();
     }
 });
