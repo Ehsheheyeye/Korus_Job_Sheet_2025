@@ -69,67 +69,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const problemOptionsConfig = {
     "Formatting": {
-        subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP", "Ubantu", "Mac OS"],
+        subOptions: ["Windows 7", "Windows 8", "Windows 10", "Windows 11", "Windows XP", "Ubantu", "Mac OS", "Other"],
         subOptionType: "select",
         subOptionLabel: "Select OS"
     },
 
     "Software Installation": {
-        subOptions: ["AutoCAD", "CATIA", "SolidWorks", "PowerMill", "CoralDraw", "SolidEdge", "Premiere Pro", "After Effect", "MasterCam", "SketchUp", "Photoshop", "MS Office", "Tally Prime", "Tally ERP9", "Siemens NX", "PTC Creo", "Revit", "Illustrator", "3ds Max", "Maya", "ISM"],
+        subOptions: ["AutoCAD", "CATIA", "SolidWorks", "PowerMill", "CoralDraw", "SolidEdge", "Premiere Pro", "After Effect", "MasterCam", "SketchUp", "Photoshop", "MS Office", "Tally Prime", "Tally ERP9", "Siemens NX", "PTC Creo", "Revit", "Illustrator", "3ds Max", "Maya", "ISM", "Other"],
         subOptionType: "select",
         subOptionLabel: "Select Software"
     },
 
     "Toner Refill": {
-        subOptions: ["12A", "88A", "337A", "285A", "78A", "925A", "TN-1020", "Samsung", "Ricoh", "Pantum", "Xerox"],
+        subOptions: ["12A", "88A", "337A", "285A", "78A", "925A", "TN-1020", "Samsung", "Ricoh", "Pantum", "Xerox", "Other"],
         subOptionType: "select",
         subOptionLabel: "Select Toner Model"
     },
 
     "Antivirus": {
-        subOptions: ["Quick Heal", "NPAV", "Bitdefender"],
+        subOptions: ["Quick Heal", "NPAV", "Bitdefender", "Other"],
         subOptionType: "select",
         subOptionLabel: "Select Antivirus"
     },
 
     "Printer Problem": {
-        subOptions: ["Paper Jam", "Head Cleaning", "Servicing", "Head Block", "Low Ink/Toner", "Slow Printing", "Faded Printouts", "Strange Noises", "Blank Pages Printing", "Paper Misfeed", "Scanner Not Working"],
+        subOptions: ["Paper Jam", "Head Cleaning", "Servicing", "Head Block", "Low Ink/Toner", "Slow Printing", "Faded Printouts", "Strange Noises", "Blank Pages Printing", "Paper Misfeed", "Scanner Not Working", "Other"],
         subOptionType: "select",
         subOptionLabel: "Select Printer Issue"
     },
 
     "Replacement": {
-        subOptions: ["Battery", "Keyboard", "Mouse", "SSD", "HDD", "Laptop Screen", "Desktop Screen", "SMPS", "Router", "RAM"],
+        subOptions: ["Battery", "Keyboard", "Mouse", "SSD", "HDD", "Laptop Screen", "Desktop Screen", "SMPS", "Router", "RAM", "Other"],
         subOptionType: "select",
         subOptionLabel: "Select Replacement"
     },
+
     "Hardware Issue": {
         subOptions: [
-            "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue",   "Speaker Issue",  "SMPS Issue",  "CPU Fan Issue",   "WiFi Not Working",  "LAN Port Issue",  "HDMI / VGA Port Issue",   "BIOS Current",  "CMOS Issue",   "Auto Shutdown",   "Auto Restart",  "Bluetooth Issue",  "Power Button Issue" ],
+            "Mic Not Working", "Camera Not Working", "USB Port Issue", "DC Jack Issue", "Speaker Issue", "SMPS Issue", "CPU Fan Issue", "WiFi Not Working", "LAN Port Issue", "HDMI / VGA Port Issue", "BIOS Current", "CMOS Issue", "Auto Shutdown", "Auto Restart", "Bluetooth Issue", "Power Button Issue", "Other"
+        ],
         subOptionType: "select",
         subOptionLabel: "Select Hardware Issue"
     },
 
+    "Dead / No Power": {},
+    "No Display": {},
+    "Moulding / ABH": {},
+    "HDD / SSD Issue": {},
     "Data Backup": {},
     "Password Crack / Reset": {},
     "OS Recovery": {},
-
     "Hang / Stuck Issue": {},
     "Overheating": {},
     "RAM Issue": {},
+    "Keyboard / Touchpad": {},
     "Battery Issue": {},
-    "HDD / SSD Issue": {},
     "Screen Issue": {},
     "Booting Issue": {},
-    "Dead / No Power": {},
-    "No Display": {},
-    "Hinge Repair": {},
     "Dump Error": {},
     "Beep Sound": {},
-    "Moulding / ABH": {},
-    "Keyboard / Touchpad": {}
+    "Other": {}
 };
-
 
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
         
@@ -1117,5 +1117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
+
 
 
