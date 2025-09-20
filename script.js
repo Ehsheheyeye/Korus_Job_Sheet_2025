@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const deviceTypeOptions = ["CPU", "Laptop", "Printer", "All-in-One", "Toner", "UPS", "Speaker", "Monitor", "TV", "Charger", "CCTV", "DVR", "NVR", "Projector", "Attendence Device", "Keyboard", "Mouse", "Combo", "Motherboard", "RAM", "HDD", "SSD", "Battery", "Switch", "Cables", "SMPS", "Router", "Wifi Adaptor", "Converter", "Enternal HDD", "Adaptor", "UPS Battery"];
         
-        const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement", "Ready", "Dead"];
+        const currentStatusOptions = ["Pending Diagnosis", "Working", "Repaired", "Water Damaged", "Awaiting Approval", "Software Issue", "Data issue", "Hardware Issue", "Given for Replacement", "Ready", "Dead", "Given to RS"];
         const finalStatusOptions = ["Not Delivered", "Delivered", "Returned"];
         const customerStatusOptions = ["Not Called", "Called", "Called - No Response", "Called - Will Visit", "Called - Not pickup yet"];
         const materialStatusOptions = ["Installed", "Ordered", "Pending", "Customer Provided", "Not Available"];
@@ -153,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
             serviceNote: document.getElementById('service-note'),
             estimateAmount: document.getElementById('estimate-amount'),
             engineerKundan: document.getElementById('engineer-kundan'), engineerRushi: document.getElementById('engineer-rushi'),
-            engineerSachin: document.getElementById('engineer-sachin'),
             saveRecordBtn: document.getElementById('save-record-btn'),
             sendWhatsAppBtn: document.getElementById('send-whatsapp-btn'),
             newJobBtn: document.getElementById('new-job-btn'),
@@ -625,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td title="${job.customerName}">${job.customerName}</td>
                     <td title="${job.deviceType}">${job.deviceType}</td>
                     <td>${job.currentStatus || 'N/A'}</td>
-                    <td>${formatTimestamp(job.updatedAt)}</td>
+                    <td>${formatDate(job.date)}</td>
                     <td class="table-actions">
                         <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
                         <button title="Delete" class="delete-btn" onclick="window.app.deleteJob('${job.id}')">🗑️</button>
@@ -724,13 +723,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             DOMElements.engineerKundan.checked = false; 
-            DOMElements.engineerSachin.checked = false;
             DOMElements.engineerRushi.checked = false;
             
             renderMaterialsTable([]);
 
             setInitialDate();
-            DOMElements.date.disabled = false; // SOLUTION: Re-enable date field for new entries
             DOMElements.saveRecordBtn.textContent = 'Save Record';
             DOMElements.saveRecordBtn.classList.remove('update-btn');
         }
@@ -745,7 +742,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const engineers = [];
             if (DOMElements.engineerKundan.checked) engineers.push("Kundan Sir");
-            if (DOMElements.engineerSachin.checked) engineers.push("Sachin Sir");
             if (DOMElements.engineerRushi.checked) engineers.push("Rushi");
 
             const jobData = {
@@ -846,7 +842,6 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.currentStatus.value = job.currentStatus || '';
             DOMElements.finalStatus.value = job.finalStatus || '';
             DOMElements.customerStatus.value = job.customerStatus || '';
-            DOMElements.date.disabled = true; // SOLUTION: Disable the date field when editing
 
             (job.reportedProblems || []).forEach(problemStr => {
                 const [mainProblem, subOption] = problemStr.split(': ');
@@ -864,7 +859,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             DOMElements.engineerKundan.checked = job.engineers?.includes("Kundan Sir") || false;
-            DOMElements.engineerSachin.checked = job.engineers?.includes("Sachin Sir") || false;
             DOMElements.engineerRushi.checked = job.engineers?.includes("Rushi") || false;
             
             renderMaterialsTable(job.materials);
@@ -1031,8 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = new Date(dateString);
             const userTimezoneOffset = date.getTimezoneOffset() * 60000;
             const correctedDate = new Date(date.getTime() + userTimezoneOffset);
-            // SOLUTION: Return date in dd/mm/yyyy format
-            return correctedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            return correctedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
         }
 
         async function addSuggestion(value, collectionName) {
