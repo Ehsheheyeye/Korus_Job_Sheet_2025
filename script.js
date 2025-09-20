@@ -730,6 +730,7 @@ document.addEventListener('DOMContentLoaded', () => {
             renderMaterialsTable([]);
 
             setInitialDate();
+            DOMElements.date.disabled = false; // SOLUTION: Re-enable date field for new entries
             DOMElements.saveRecordBtn.textContent = 'Save Record';
             DOMElements.saveRecordBtn.classList.remove('update-btn');
         }
@@ -845,6 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.currentStatus.value = job.currentStatus || '';
             DOMElements.finalStatus.value = job.finalStatus || '';
             DOMElements.customerStatus.value = job.customerStatus || '';
+            DOMElements.date.disabled = true; // SOLUTION: Disable the date field when editing
 
             (job.reportedProblems || []).forEach(problemStr => {
                 const [mainProblem, subOption] = problemStr.split(': ');
@@ -1029,7 +1031,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = new Date(dateString);
             const userTimezoneOffset = date.getTimezoneOffset() * 60000;
             const correctedDate = new Date(date.getTime() + userTimezoneOffset);
-            return correctedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+            // SOLUTION: Return date in dd/mm/yyyy format
+            return correctedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
         }
 
         async function addSuggestion(value, collectionName) {
