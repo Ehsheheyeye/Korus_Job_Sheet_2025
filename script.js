@@ -200,6 +200,30 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!str) return '';
             return str.toLowerCase().replace(/\b(\w)/g, s => s.toUpperCase());
         }
+        
+        // NEW: Custom sort function for alphanumeric job sheet numbers
+        function compareJobNumbers(a, b) {
+            const jobA = String(a.jobSheetNo || '');
+            const jobB = String(b.jobSheetNo || '');
+
+            const partsA = jobA.split('-');
+            const numA = parseInt(partsA[0], 10) || 0;
+            const suffixA = partsA.length > 1 ? partsA[1] : '';
+
+            const partsB = jobB.split('-');
+            const numB = parseInt(partsB[0], 10) || 0;
+            const suffixB = partsB.length > 1 ? partsB[1] : '';
+            
+            if (numB !== numA) {
+                return numB - numA; // Descending by number part
+            }
+
+            // If numbers are the same, sort by suffix ascending ('', 'A', 'B', etc.)
+            if (suffixA < suffixB) return -1;
+            if (suffixA > suffixB) return 1;
+            return 0;
+        }
+
 
         function init() {
             setupNavigation();
@@ -474,7 +498,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function loadInitialData() {
             db.collection("jobSheets").orderBy("jobSheetNo", "desc").onSnapshot(snap => {
                 allJobSheets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                allJobSheets.sort((a, b) => (b.jobSheetNo || 0) - (a.jobSheetNo || 0));
+                // MODIFIED: Use new custom sorting function
+                allJobSheets.sort(compareJobNumbers);
 
                 renderJobRangeFilters();
                 updateDashboardStats();
@@ -512,9 +537,13 @@ document.addEventListener('DOMContentLoaded', () => {
         function renderJobRangeFilters() {
             const container = DOMElements.filterPopup;
             if (!container) return;
-
+            
+            // MODIFIED: Logic to handle string-based job numbers
             const ranges = [...new Set(allJobSheets
-                .map(j => Math.floor(j.jobSheetNo / 100) * 100)
+                .map(j => {
+                    const numPart = parseInt(String(j.jobSheetNo).split('-')[0], 10);
+                    return isNaN(numPart) ? 0 : Math.floor(numPart / 100) * 100;
+                })
                 .filter(r => r > 0)
             )].sort((a, b) => b - a);
 
@@ -615,7 +644,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 materials.forEach(addMaterialRow);
             }
         }
-
+        
+        // MODIFIED: New button styles in tables
         function renderRecentJobsTable(jobs) {
             DOMElements.recentJobsTableBody.innerHTML = jobs.length === 0 ? `<tr><td colspan="6" style="text-align:center; padding: 1rem;">No recent activity.</td></tr>` :
             jobs.map(job => `
@@ -626,12 +656,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${job.currentStatus || 'N/A'}</td>
                     <td>${formatDate(job.date)}</td>
                     <td class="table-actions">
-                        <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
-                        <button title="Delete" class="delete-btn" onclick="window.app.deleteJob('${job.id}')">🗑️</button>
+                        <button title="Edit" class="table-action-btn edit-action-btn" onclick="window.app.editJob('${job.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg> <span>Edit</span></button>
+                        <button title="Delete" class="table-action-btn delete-action-btn" onclick="window.app.deleteJob('${job.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg> <span>Delete</span></button>
                     </td>
                 </tr>`).join('');
         }
 
+        // MODIFIED: New button styles in tables
         function renderAllJobsTable() {
             const startIndex = (allJobsCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
@@ -647,8 +678,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${job.deviceType}</td>
                     <td>${job.currentStatus}</td>
                     <td class="table-actions">
-                        <button title="Edit" onclick="window.app.editJob('${job.id}')">✏️</button>
-                        <button title="Delete" class="delete-btn" onclick="window.app.deleteJob('${job.id}')">🗑️</button>
+                        <button title="Edit" class="table-action-btn edit-action-btn" onclick="window.app.editJob('${job.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg> <span>Edit</span></button>
+                        <button title="Delete" class="table-action-btn delete-action-btn" onclick="window.app.deleteJob('${job.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg> <span>Delete</span></button>
                     </td>
                 </tr>`).join('');
             renderPagination(DOMElements.allJobsPagination, filteredJobs.length, allJobsCurrentPage, 'changeAllJobsPage');
@@ -680,11 +711,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (currentJobRangeFilter !== 'all') {
                 const lowerBound = currentJobRangeFilter;
                 const upperBound = lowerBound + 99;
-                tempFilteredJobs = tempFilteredJobs.filter(job => job.jobSheetNo >= lowerBound && job.jobSheetNo <= upperBound);
+                tempFilteredJobs = tempFilteredJobs.filter(job => {
+                    const numPart = parseInt(String(job.jobSheetNo).split('-')[0], 10);
+                    return numPart >= lowerBound && numPart <= upperBound;
+                });
             }
         
             if (jobNoTerm) {
-                tempFilteredJobs = tempFilteredJobs.filter(job => String(job.jobSheetNo).includes(jobNoTerm));
+                tempFilteredJobs = tempFilteredJobs.filter(job => String(job.jobSheetNo).toLowerCase().includes(jobNoTerm.toLowerCase()));
             }
             if (mobileTerm) {
                 tempFilteredJobs = tempFilteredJobs.filter(job => 
@@ -731,12 +765,18 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.saveRecordBtn.textContent = 'Save Record';
             DOMElements.saveRecordBtn.classList.remove('update-btn');
         }
-
+        
+        // MODIFIED: Save logic for new Job Sheet Number system
         async function saveJobSheet() {
-            const jobSheetNo = Number(DOMElements.jobSheetNo.value.trim() || 0);
+            const jobSheetNo = DOMElements.jobSheetNo.value.trim().toUpperCase();
+
+            if (!jobSheetNo) {
+                alert("Error: Job Sheet Number cannot be empty.");
+                return;
+            }
 
             if (!currentEditingJobId && allJobSheets.some(job => job.jobSheetNo === jobSheetNo)) {
-                alert("Error: Job Sheet Number " + jobSheetNo + " already exists. Please use a different number.");
+                alert("Error: Job Sheet Number " + jobSheetNo + " already exists. Please use a different number or suffix (e.g., -A, -B).");
                 return;
             }
             
@@ -764,7 +804,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            if (!jobData.jobSheetNo || !jobData.customerName || !jobData.customerMobile) { alert("Job Sheet No, Customer Name, and Mobile are required."); return; }
+            if (!jobData.customerName || !jobData.customerMobile) { alert("Customer Name and Mobile are required."); return; }
 
             try {
                 if (currentEditingJobId) {
@@ -878,6 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
+        // MODIFIED: New button styles in tables
         function renderAllInOutTable() {
             const startIndex = (allInOutCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
@@ -891,8 +932,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${formatDate(r.outwardDate)}</td>
                     <td>${r.inwardDate ? formatDate(r.inwardDate) : `<button class="action-btn primary-btn pending-btn" onclick="window.app.editOutward('${r.id}')">Pending</button>`}</td>
                     <td class="table-actions">
-                        <button title="Edit" onclick="window.app.editOutward('${r.id}')">✏️</button>
-                        <button class="delete-btn" title="Delete" onclick="window.app.deleteOutward('${r.id}')">🗑️</button>
+                        <button title="Edit" class="table-action-btn edit-action-btn" onclick="window.app.editOutward('${r.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg> <span>Edit</span></button>
+                        <button title="Delete" class="table-action-btn delete-action-btn" onclick="window.app.deleteOutward('${r.id}')"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg> <span>Delete</span></button>
                     </td>
                 </tr>`).join('');
             renderPagination(DOMElements.allInOutPagination, filteredOutwards.length, allInOutCurrentPage, 'changeAllInOutPage');
