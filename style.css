@@ -8,7 +8,8 @@
     --text-primary-dark: #f8fafc; --text-secondary-dark: #9ca3af; --border-dark: #374151;
     --accent-dark: #60a5fa; --accent-hover-dark: #3b82f6;
     
-    --danger-color: #ef4444; --secondary-color: #6b7280; --secondary-hover: #4b5563;
+    --danger-color: #ef4444; --danger-hover: #dc2626;
+    --secondary-color: #6b7280; --secondary-hover: #4b5563;
     --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
     --font-family: 'Inter', sans-serif; --transition-speed: 0.3s;
 }
@@ -152,6 +153,8 @@ body.dark #theme-icon-moon { display: block; }
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: var(--shadow);
+    position: relative; /* Needed for the hover triangle */
+    overflow: hidden; /* Keeps triangle contained */
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
                 box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
                 background-color var(--transition-speed) ease;
@@ -167,6 +170,27 @@ body.dark #theme-icon-moon { display: block; }
 }
 .stat-card h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
 .stat-card p { margin: 0; font-size: 2.5rem; font-weight: 800; color: var(--accent-color); }
+
+/* NEW: Dashboard card hover effect */
+.stat-card.clickable-card::after {
+    content: '';
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 15px solid var(--accent-color);
+    transform: rotate(-45deg) scale(0);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.stat-card.clickable-card:hover::after {
+    opacity: 0.6;
+    transform: rotate(-45deg) scale(1);
+}
 
 /* --- FORMS & INPUTS --- */
 label {
@@ -325,23 +349,63 @@ textarea.input-field { resize: vertical; }
 }
 .data-table tbody tr { transition: background-color 0.2s ease; }
 .data-table tbody tr:hover { background-color: color-mix(in srgb, var(--border-color) 50%, transparent); }
-.table-actions { overflow: visible; }
-.table-actions button { background: none; border: none; cursor: pointer; padding: 0.25rem; margin-right: 0.5rem; color: var(--text-secondary); font-size: 1.1rem; }
-.table-actions button:hover { color: var(--accent-color); }
-.table-actions .delete-btn:hover { color: var(--danger-color); }
 
-#all-jobs-page .data-table th:nth-child(1) { width: 6%; } /* Job # */
+/* NEW/MODIFIED: Table action button styles */
+.table-actions {
+    overflow: visible;
+    text-align: center !important;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+.table-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.table-action-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+.edit-action-btn {
+    background-color: var(--accent-color);
+    color: white;
+}
+.edit-action-btn:hover {
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
+}
+.delete-action-btn {
+    background-color: var(--danger-color);
+    color: white;
+}
+.delete-action-btn:hover {
+    background-color: var(--danger-hover);
+    transform: translateY(-1px);
+}
+
+
+#all-jobs-page .data-table th:nth-child(1) { width: 8%; } /* Job # */
 #all-jobs-page .data-table th:nth-child(2) { width: 10%; } /* Date */
-#all-jobs-page .data-table th:nth-child(3) { width: 20%; } /* Customer */
+#all-jobs-page .data-table th:nth-child(3) { width: 22%; } /* Customer */
 #all-jobs-page .data-table th:nth-child(4) { width: 13%; } /* Mobile */
 #all-jobs-page .data-table th:nth-child(6) { width: 15%; } /* Status */
-#all-jobs-page .data-table th:nth-child(7) { width: 10%; text-align: center;} /* Actions */
+#all-jobs-page .data-table th:nth-child(7) { width: 16%; text-align: center;} /* Actions */
 
 #all-in-out-page .data-table th:nth-child(1) { width: 10%; } /* Job No */
 #all-in-out-page .data-table th:nth-child(2) { width: 20%; } /* Party Name */
 #all-in-out-page .data-table th:nth-child(4) { width: 15%; } /* Outward */
 #all-in-out-page .data-table th:nth-child(5) { width: 15%; } /* Inward */
-#all-in-out-page .data-table th:nth-child(6) { width: 12%; text-align: center; } /* Actions */
+#all-in-out-page .data-table th:nth-child(6) { width: 16%; text-align: center; } /* Actions */
 
 
 .pagination-controls {
@@ -506,11 +570,12 @@ textarea.input-field { resize: vertical; }
     border-color: var(--accent-color);
 }
 
-/* Smart Filter Styles */
+/* NEW/MODIFIED: Smart Filter Styles */
 .th-with-filter > div {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 0.5rem;
     width: 100%;
 }
 
@@ -519,7 +584,7 @@ textarea.input-field { resize: vertical; }
     border: none;
     cursor: pointer;
     padding: 0.25rem;
-    margin-left: 0.5rem;
+    margin-left: 0;
     color: var(--text-secondary);
 }
 .filter-icon-btn:hover {
