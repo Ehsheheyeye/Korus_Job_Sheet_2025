@@ -153,8 +153,8 @@ body.dark #theme-icon-moon { display: block; }
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: var(--shadow);
-    position: relative; /* Needed for the hover triangle */
-    overflow: hidden; /* Keeps triangle contained */
+    position: relative; 
+    overflow: hidden; 
     transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
                 box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
                 background-color var(--transition-speed) ease;
@@ -171,26 +171,27 @@ body.dark #theme-icon-moon { display: block; }
 .stat-card h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
 .stat-card p { margin: 0; font-size: 2.5rem; font-weight: 800; color: var(--accent-color); }
 
-/* NEW: Dashboard card hover effect */
+/* UPDATED: Dashboard card hover effect to match your image */
 .stat-card.clickable-card::after {
     content: '';
     position: absolute;
-    bottom: 12px;
-    right: 12px;
+    bottom: 0;
+    right: 0;
     width: 0;
     height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 15px solid var(--accent-color);
-    transform: rotate(-45deg) scale(0);
+    border-style: solid;
+    border-width: 0 0 22px 22px; /* Creates the triangle shape */
+    border-color: transparent transparent var(--accent-color) transparent;
     opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateX(10px) translateY(10px);
+    transition: all 0.3s ease;
 }
 
 .stat-card.clickable-card:hover::after {
-    opacity: 0.6;
-    transform: rotate(-45deg) scale(1);
+    opacity: 0.5;
+    transform: translateX(0) translateY(0);
 }
+
 
 /* --- FORMS & INPUTS --- */
 label {
@@ -350,7 +351,6 @@ textarea.input-field { resize: vertical; }
 .data-table tbody tr { transition: background-color 0.2s ease; }
 .data-table tbody tr:hover { background-color: color-mix(in srgb, var(--border-color) 50%, transparent); }
 
-/* NEW/MODIFIED: Table action button styles */
 .table-actions {
     overflow: visible;
     text-align: center !important;
@@ -393,13 +393,14 @@ textarea.input-field { resize: vertical; }
     transform: translateY(-1px);
 }
 
-
-#all-jobs-page .data-table th:nth-child(1) { width: 8%; } /* Job # */
+/* FIXED: Restored Device column and adjusted all column widths */
+#all-jobs-page .data-table th:nth-child(1) { width: 8%; }  /* Job # */
 #all-jobs-page .data-table th:nth-child(2) { width: 10%; } /* Date */
-#all-jobs-page .data-table th:nth-child(3) { width: 22%; } /* Customer */
-#all-jobs-page .data-table th:nth-child(4) { width: 13%; } /* Mobile */
+#all-jobs-page .data-table th:nth-child(3) { width: 20%; } /* Customer */
+#all-jobs-page .data-table th:nth-child(4) { width: 12%; } /* Mobile */
+#all-jobs-page .data-table th:nth-child(5) { width: 15%; } /* Device */
 #all-jobs-page .data-table th:nth-child(6) { width: 15%; } /* Status */
-#all-jobs-page .data-table th:nth-child(7) { width: 16%; text-align: center;} /* Actions */
+#all-jobs-page .data-table th:nth-child(7) { width: 20%; text-align: center;} /* Actions */
 
 #all-in-out-page .data-table th:nth-child(1) { width: 10%; } /* Job No */
 #all-in-out-page .data-table th:nth-child(2) { width: 20%; } /* Party Name */
@@ -570,7 +571,7 @@ textarea.input-field { resize: vertical; }
     border-color: var(--accent-color);
 }
 
-/* NEW/MODIFIED: Smart Filter Styles */
+/* Smart Filter Styles */
 .th-with-filter > div {
     display: flex;
     align-items: center;
