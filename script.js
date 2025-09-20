@@ -201,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return str.toLowerCase().replace(/\b(\w)/g, s => s.toUpperCase());
         }
         
-        // NEW: Custom sort function for alphanumeric job sheet numbers
         function compareJobNumbers(a, b) {
             const jobA = String(a.jobSheetNo || '');
             const jobB = String(b.jobSheetNo || '');
@@ -496,9 +495,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function loadInitialData() {
-            db.collection("jobSheets").orderBy("jobSheetNo", "desc").onSnapshot(snap => {
+            db.collection("jobSheets").orderBy("createdAt", "desc").onSnapshot(snap => {
                 allJobSheets = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                // MODIFIED: Use new custom sorting function
                 allJobSheets.sort(compareJobNumbers);
 
                 renderJobRangeFilters();
@@ -538,7 +536,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const container = DOMElements.filterPopup;
             if (!container) return;
             
-            // MODIFIED: Logic to handle string-based job numbers
             const ranges = [...new Set(allJobSheets
                 .map(j => {
                     const numPart = parseInt(String(j.jobSheetNo).split('-')[0], 10);
@@ -645,7 +642,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // MODIFIED: New button styles in tables
         function renderRecentJobsTable(jobs) {
             DOMElements.recentJobsTableBody.innerHTML = jobs.length === 0 ? `<tr><td colspan="6" style="text-align:center; padding: 1rem;">No recent activity.</td></tr>` :
             jobs.map(job => `
@@ -662,12 +658,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 </tr>`).join('');
         }
 
-        // MODIFIED: New button styles in tables
         function renderAllJobsTable() {
             const startIndex = (allJobsCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
             const pageItems = filteredJobs.slice(startIndex, endIndex);
-
+            
+            // FIXED: Set colspan to 7 to account for all columns
             DOMElements.allJobsTableBody.innerHTML = pageItems.length === 0 ? `<tr><td colspan="7" style="text-align:center; padding: 1rem;">No matching jobs found.</td></tr>` :
             pageItems.map(job => `
                 <tr>
@@ -766,7 +762,6 @@ document.addEventListener('DOMContentLoaded', () => {
             DOMElements.saveRecordBtn.classList.remove('update-btn');
         }
         
-        // MODIFIED: Save logic for new Job Sheet Number system
         async function saveJobSheet() {
             const jobSheetNo = DOMElements.jobSheetNo.value.trim().toUpperCase();
 
@@ -918,7 +913,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // MODIFIED: New button styles in tables
         function renderAllInOutTable() {
             const startIndex = (allInOutCurrentPage - 1) * itemsPerPage;
             const endIndex = startIndex + itemsPerPage;
@@ -1042,7 +1036,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderPagination(container, totalItems, currentPage, handlerName) {
-            // UPDATED LINE: This will now show pagination even if there's only one page.
             if (totalItems === 0) { container.innerHTML = ''; return; }
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const startItem = (currentPage - 1) * itemsPerPage + 1;
