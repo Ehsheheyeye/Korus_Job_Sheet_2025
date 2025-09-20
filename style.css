@@ -152,14 +152,18 @@ body.dark #theme-icon-moon { display: block; }
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: var(--shadow);
-    transition: background-color var(--transition-speed) ease, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+                background-color var(--transition-speed) ease;
 }
+
 .stat-card.clickable-card {
     cursor: pointer;
 }
+
 .stat-card.clickable-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 20px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -4px rgba(0, 0, 0, 0.08);
 }
 .stat-card h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--text-secondary); font-weight: 500; }
 .stat-card p { margin: 0; font-size: 2.5rem; font-weight: 800; color: var(--accent-color); }
@@ -326,11 +330,12 @@ textarea.input-field { resize: vertical; }
 .table-actions button:hover { color: var(--accent-color); }
 .table-actions .delete-btn:hover { color: var(--danger-color); }
 
-#all-jobs-page .data-table th:nth-child(1) { width: 8%; }
-#all-jobs-page .data-table th:nth-child(2) { width: 12%; }
-#all-jobs-page .data-table th:nth-child(4) { width: 13%; }
-#all-jobs-page .data-table th:nth-child(6) { width: 15%; }
-#all-jobs-page .data-table th:nth-child(7) { width: 10%; text-align: center;}
+#all-jobs-page .data-table th:nth-child(1) { width: 6%; } /* Job # */
+#all-jobs-page .data-table th:nth-child(2) { width: 10%; } /* Date */
+#all-jobs-page .data-table th:nth-child(3) { width: 20%; } /* Customer */
+#all-jobs-page .data-table th:nth-child(4) { width: 13%; } /* Mobile */
+#all-jobs-page .data-table th:nth-child(6) { width: 15%; } /* Status */
+#all-jobs-page .data-table th:nth-child(7) { width: 10%; text-align: center;} /* Actions */
 
 #all-in-out-page .data-table th:nth-child(1) { width: 10%; } /* Job No */
 #all-in-out-page .data-table th:nth-child(2) { width: 20%; } /* Party Name */
