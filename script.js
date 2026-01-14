@@ -521,12 +521,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         function updateDashboardStats() {
-            DOMElements.totalJobsStat.textContent = allJobSheets.length;
+            // 1. Total Jobs
+            const totalJobs = allJobSheets.length;
+            DOMElements.totalJobsStat.textContent = totalJobs;
+
+            // 2. Delivered Jobs
+            const deliveredJobs = allJobSheets.filter(j => j.finalStatus === 'Delivered').length;
+            DOMElements.deliveredJobsStat.textContent = deliveredJobs;
+
+            // 3. Returned Jobs (Optional, but good to know)
+            const returnedJobs = allJobSheets.filter(j => j.finalStatus === 'Returned').length;
+
+            // 4. Calculate "Active in Shop" (Everything NOT delivered and NOT returned)
+            // This captures Pending, Working, Ready, Not Delivered, and Empty statuses
+            const activeJobs = totalJobs - deliveredJobs - returnedJobs;
+            DOMElements.notDeliveredJobsStat.textContent = activeJobs;
+
+            // 5. Other Statuses (Keep these as they are)
             DOMElements.pendingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Pending Diagnosis').length;
             DOMElements.workingJobsStat.textContent = allJobSheets.filter(j => j.currentStatus === 'Working').length;
-            DOMElements.deliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Delivered').length;
-            DOMElements.notDeliveredJobsStat.textContent = allJobSheets.filter(j => j.finalStatus === 'Not Delivered').length;
 
+            // 6. Inward/Outward Stats
             const pendingInwards = allOutwardRecords.filter(r => !r.inwardDate);
             DOMElements.pendingInwardStat.textContent = pendingInwards.length;
             DOMElements.rahulSirPendingStat.textContent = pendingInwards.filter(r => r.partyName === 'Rahul Sir').length;
@@ -1148,3 +1163,4 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
+
