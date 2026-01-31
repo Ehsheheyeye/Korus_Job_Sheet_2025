@@ -1165,13 +1165,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- PRINT RECEIPT FUNCTION ---
+// --- IMPROVED PRINT RECEIPT FUNCTION ---
 function printJobReceipt() {
-    // 1. Gather Data from the form
+    // 1. Gather Data
     const jobNo = document.getElementById('job-sheet-no').value || '-';
-    const date = document.getElementById('date').value || '-';
+    // Format the date to be more readable (e.g., DD-MM-YYYY)
+    const rawDate = document.getElementById('date').value;
+    const dateObj = new Date(rawDate);
+    const date = rawDate ? dateObj.toLocaleDateString('en-GB') : '-';
+    
     const oldNo = document.getElementById('old-job-sheet-no').value || '';
-    const name = document.getElementById('customer-name').value || '-';
+    
+    // Capitalize names for better look
+    const nameRaw = document.getElementById('customer-name').value || '-';
+    const name = nameRaw.replace(/\b\w/g, l => l.toUpperCase());
+    
     const mobile = document.getElementById('customer-mobile').value || '-';
     const estimate = document.getElementById('estimate-amount').value || '0';
     
@@ -1179,12 +1187,22 @@ function printJobReceipt() {
     const brand = document.getElementById('brand-name').value || '-';
     const serviceNote = document.getElementById('service-note').value || '';
 
-    // Get Problems
+    // --- SMART PROBLEM GATHERING ---
+    // This looks at the checkbox AND the specific dropdown selected (e.g., Antivirus -> Quick Heal)
     const problems = [];
-    document.querySelectorAll('#reported-problems .problem-item input:checked').forEach(cb => {
-        problems.push(cb.value);
+    document.querySelectorAll('#reported-problems .problem-item').forEach(item => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        if (checkbox && checkbox.checked) {
+            let problemText = checkbox.value;
+            // Check if there is a visible dropdown associated with this problem
+            const subSelect = item.querySelector('select');
+            if (subSelect && subSelect.style.display !== 'none' && subSelect.value) {
+                problemText += ` (${subSelect.value})`;
+            }
+            problems.push(problemText);
+        }
     });
-    const problemString = problems.length > 0 ? problems.join(', ') : '-';
+    const problemString = problems.length > 0 ? problems.map(p => `• ${p}`).join('<br>') : '-';
 
     // Get Materials
     const materials = [];
@@ -1195,62 +1213,224 @@ function printJobReceipt() {
     });
     const materialString = materials.length > 0 ? materials.join(', ') : 'None';
 
-    // 2. Define the HTML Structure (The Red Receipt)
+    // 2. Define the Attractive HTML Structure
     const printWindow = window.open('', '', 'height=800,width=600');
     
     const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <title>Print Job Sheet - ${jobNo}</title>
+        <title>Job Sheet - ${jobNo}</title>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
-            :root { --theme-color: #c00000; --border-color: #c00000; }
+            @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap');
+            
+            :root { 
+                --primary-color: #c00000; 
+                --text-dark: #1f2937;
+                --border-color: #e5e7eb;
+            }
+            
             * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            body { font-family: 'Roboto', Arial, sans-serif; margin: 0; padding: 0; background: white; }
+            
+            body { 
+                font-family: 'Open Sans', sans-serif; 
+                margin: 0; 
+                padding: 0; 
+                background: white; 
+                color: var(--text-dark);
+                font-size: 13px; /* Slightly larger base font for readability */
+            }
             
             @page { size: A5; margin: 0.5cm; }
             
             .page { 
-                width: 100%; max-width: 210mm; margin: 0 auto; 
-                border: 2px solid var(--border-color); color: var(--theme-color); 
+                width: 100%; 
+                max-width: 210mm; 
+                margin: 0 auto; 
+                border: 2px solid var(--primary-color); 
+                height: 98vh; /* Ensure full height usage */
+                display: flex;
+                flex-direction: column;
             }
             
-            /* Header */
-            header { display: flex; border-bottom: 2px solid var(--border-color); }
-            .header-left { width: 70%; padding: 10px; border-right: 2px solid var(--border-color); }
-            .header-right { width: 30%; display: flex; flex-direction: column; }
+            /* --- HEADER --- */
+            header { 
+                display: flex; 
+                border-bottom: 2px solid var(--primary-color); 
+            }
+            .header-left { 
+                width: 65%; 
+                padding: 15px; 
+                border-right: 1px solid var(--primary-color); 
+            }
+            .header-right { 
+                width: 35%; 
+                display: flex; 
+                flex-direction: column; 
+            }
             
-            .logo-section { display: flex; align-items: center; margin-bottom: 5px; }
-            .logo-img { width: 50px; height: 50px; margin-right: 10px; }
-            h1 { font-size: 24px; margin: 0; font-weight: 900; text-transform: uppercase; line-height: 1; }
-            .sub-header { font-size: 10px; font-weight: 700; margin: 5px 0; color: #333; }
-            .address { font-size: 10px; font-weight: 600; line-height: 1.3; color: #000; }
+            .logo-section { display: flex; align-items: center; margin-bottom: 8px; }
+            .logo-img { width: 55px; height: 55px; margin-right: 12px; }
             
-            .box-row { border-bottom: 1px solid var(--border-color); padding: 5px 8px; font-weight: 700; font-size: 12px; height: 33.3%; display: flex; align-items: center; }
+            h1 { 
+                font-size: 26px; 
+                margin: 0; 
+                font-weight: 800; 
+                color: var(--primary-color);
+                line-height: 1;
+                text-transform: uppercase;
+                letter-spacing: -0.5px;
+            }
+            
+            .slogan {
+                font-size: 14px;
+                font-weight: 700;
+                color: var(--text-dark);
+                margin-top: 4px;
+                font-style: italic;
+            }
+
+            .sub-header { 
+                font-size: 11px; 
+                font-weight: 600; 
+                margin: 8px 0; 
+                color: #4b5563; 
+                line-height: 1.4;
+            }
+            .address { 
+                font-size: 10px; 
+                color: #6b7280; 
+                line-height: 1.4; 
+            }
+            
+            /* Header Data Boxes */
+            .box-row { 
+                border-bottom: 1px solid var(--primary-color); 
+                padding: 0 12px; 
+                flex: 1;
+                display: flex; 
+                align-items: center; 
+                justify-content: space-between;
+                font-weight: 700; 
+                font-size: 12px; 
+                color: var(--primary-color);
+            }
             .box-row:last-child { border-bottom: none; }
-            .val-large { font-size: 16px; color: #000; margin-left: 5px; }
+            .val-large { 
+                font-size: 18px; 
+                color: #000; 
+                font-weight: 800;
+            }
+            .val-normal { color: #000; font-weight: 600; font-size: 14px; }
 
-            /* Customer Info */
-            .info-bar { display: flex; border-bottom: 2px solid var(--border-color); font-size: 12px; font-weight: 700; }
-            .info-name { width: 60%; padding: 5px 8px; border-right: 1px solid var(--border-color); color: #000; }
-            .info-contact { width: 40%; padding: 5px 8px; color: #000; }
+            /* --- CUSTOMER INFO --- */
+            .info-bar { 
+                display: flex; 
+                background-color: #f9fafb; /* Light gray background */
+                border-bottom: 2px solid var(--primary-color); 
+                font-size: 13px; 
+            }
+            .info-item { padding: 10px 15px; }
+            .info-name { 
+                flex: 1.5; 
+                border-right: 1px solid var(--primary-color); 
+                font-weight: 700; 
+                color: var(--primary-color);
+            }
+            .info-contact { 
+                flex: 1; 
+                font-weight: 700; 
+                color: var(--primary-color);
+            }
+            .info-val { color: #000; font-weight: 600; margin-left: 5px; }
 
-            /* Main Data Table */
-            .data-section { width: 100%; border-collapse: collapse; }
-            .data-section td { border: 1px solid var(--border-color); padding: 8px; vertical-align: top; font-size: 12px; }
-            .label { font-weight: 700; color: var(--theme-color); width: 120px; }
-            .value { color: #000; font-weight: 500; }
+            /* --- MAIN TABLE --- */
+            .data-section { 
+                width: 100%; 
+                border-collapse: collapse; 
+                flex-grow: 1; /* Pushes footer down */
+            }
+            .data-section td { 
+                border: 1px solid #e5e7eb; 
+                padding: 10px 15px; 
+                vertical-align: top; 
+            }
+            
+            .label-cell { 
+                width: 30%; 
+                background-color: #fff1f2; /* Very light red bg */
+                color: var(--primary-color);
+                font-weight: 700;
+                font-size: 12px;
+                text-transform: uppercase;
+                border-right: 2px solid var(--primary-color);
+            }
+            
+            .value-cell { 
+                color: #111827; 
+                font-weight: 600; 
+                font-size: 13px;
+                line-height: 1.5;
+            }
 
-            /* Terms */
-            .terms-section { padding: 8px; border-top: 2px solid var(--border-color); font-size: 10px; color: #c00000; }
-            .terms-header { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
-            .terms-text { text-align: justify; line-height: 1.2; }
-            .terms-highlight { text-align: center; font-weight: 700; font-size: 12px; margin-top: 5px; display: block; }
+            .device-detail-row {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 4px;
+                border-bottom: 1px dashed #e5e7eb;
+                padding-bottom: 4px;
+            }
+            .device-detail-row:last-child { border: none; margin: 0; padding: 0; }
+            .detail-label { color: #6b7280; font-size: 11px; font-weight: 600; }
 
-            /* Footer */
-            .footer { display: flex; border-top: 2px solid var(--border-color); height: 40px; align-items: flex-end; font-size: 10px; font-weight: 700; }
-            .sig-block { padding: 5px; flex: 1; border-right: 1px solid var(--border-color); }
+            /* --- TERMS --- */
+            .terms-section { 
+                padding: 10px 15px; 
+                border-top: 2px solid var(--primary-color); 
+                background-color: #fff;
+                margin-top: auto; /* Push to bottom */
+            }
+            .terms-header { 
+                font-weight: 800; 
+                font-size: 11px; 
+                color: var(--primary-color); 
+                margin-bottom: 4px; 
+                text-transform: uppercase;
+            }
+            .terms-text { 
+                text-align: justify; 
+                line-height: 1.3; 
+                font-size: 9px; 
+                color: #4b5563;
+            }
+            .terms-highlight { 
+                text-align: center; 
+                font-weight: 700; 
+                font-size: 12px; 
+                margin-top: 8px; 
+                display: block; 
+                color: var(--primary-color);
+                border: 1px dashed var(--primary-color);
+                padding: 4px;
+                border-radius: 4px;
+            }
+
+            /* --- FOOTER --- */
+            .footer { 
+                display: flex; 
+                border-top: 1px solid var(--primary-color); 
+                height: 50px; 
+                align-items: flex-end; 
+                font-size: 10px; 
+                font-weight: 700; 
+                background-color: #fff;
+            }
+            .sig-block { 
+                padding: 8px; 
+                flex: 1; 
+                border-right: 1px solid var(--primary-color); 
+                color: #4b5563;
+            }
             .sig-block:last-child { border-right: none; }
         </style>
     </head>
@@ -1262,56 +1442,78 @@ function printJobReceipt() {
                         <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" class="logo-img" alt="Logo">
                         <div>
                             <h1>KORUS ENTERPRISES</h1>
-                            <span style="font-size: 12px; font-weight: bold; color: #000;">ESTIMATE</span>
+                            <div class="slogan">ध्यास तंत्रज्ञानाचा !</div>
                         </div>
                     </div>
                     <div class="sub-header">
-                        NEW / Refurbished Laptop, Computer, Peripherals,<br>
-                        <span style="color: #c00000;">ध्यास तंत्रज्ञानाचा !</span> Sales, Service, AMC, Repairing, CCTV Camera's
+                        Sales, Service, AMC, Repairing & CCTV Camera Installation.<br>
+                        Specialist in: New / Refurbished Laptop, Computer & Peripherals.
                     </div>
                     <div class="address">
-                        39, 'Balchandra', Ashok nagar, Satpur, Nashik- 12<br>
-                        PH: SACHIN- 7841863517, KUNDAN- 7841863518<br>
+                        39, 'Balchandra', Ashok Nagar, Satpur, Nashik - 422012<br>
+                        <strong>Contact:</strong> Sachin - 7841863517 | Kundan - 7841863518<br>
                         Email: korus.sachin2018@gmail.com
                     </div>
                 </div>
                 <div class="header-right">
-                    <div class="box-row">J.S.NO: <span class="val-large">${jobNo}</span></div>
-                    <div class="box-row">DATE: <span style="color:#000; margin-left:5px;">${date}</span></div>
-                    <div class="box-row">OLD NO: <span style="color:#000; margin-left:5px;">${oldNo}</span></div>
+                    <div class="box-row">
+                        <span>JOB NO.</span>
+                        <span class="val-large">${jobNo}</span>
+                    </div>
+                    <div class="box-row">
+                        <span>DATE</span>
+                        <span class="val-normal">${date}</span>
+                    </div>
+                    <div class="box-row">
+                        <span>OLD JOB NO.</span>
+                        <span class="val-normal">${oldNo}</span>
+                    </div>
                 </div>
             </header>
 
             <div class="info-bar">
-                <div class="info-name">NAME: ${name}</div>
-                <div class="info-contact">CONTACT: ${mobile}</div>
+                <div class="info-item info-name">
+                    CUSTOMER: <span class="info-val">${name}</span>
+                </div>
+                <div class="info-item info-contact">
+                    MOBILE: <span class="info-val">${mobile}</span>
+                </div>
             </div>
 
             <table class="data-section">
                 <tr>
-                    <td class="label">Device Details</td>
-                    <td class="value"><strong>${brand} ${deviceType}</strong></td>
+                    <td class="label-cell">Device Details</td>
+                    <td class="value-cell">
+                        <div class="device-detail-row">
+                            <span class="detail-label">DEVICE TYPE</span>
+                            <span>${deviceType}</span>
+                        </div>
+                        <div class="device-detail-row">
+                            <span class="detail-label">BRAND / COMPANY</span>
+                            <span>${brand}</span>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
-                    <td class="label">Reported Problems</td>
-                    <td class="value">${problemString}</td>
-                </tr>
-                <tr style="height: 60px;">
-                    <td class="label">Service Note</td>
-                    <td class="value">${serviceNote}</td>
+                    <td class="label-cell">Reported Problems</td>
+                    <td class="value-cell" style="line-height: 1.6;">${problemString}</td>
                 </tr>
                 <tr>
-                    <td class="label">Parts / Materials</td>
-                    <td class="value">${materialString}</td>
+                    <td class="label-cell">Service Note</td>
+                    <td class="value-cell" style="font-style: italic; color: #555;">${serviceNote || '-'}</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">Parts / Materials</td>
+                    <td class="value-cell">${materialString}</td>
                 </tr>
                  <tr>
-                    <td class="label">Estimate Amount</td>
-                    <td class="value" style="font-size: 14px; font-weight: bold;">₹ ${estimate}</td>
+                    <td class="label-cell" style="background-color: #fff; border-right: none; font-size: 14px;">Estimate Cost</td>
+                    <td class="value-cell" style="font-size: 18px; font-weight: 800; color: var(--primary-color);">₹ ${estimate}</td>
                 </tr>
             </table>
 
             <div class="terms-section">
-                <div class="terms-header">* नियम व अटी *</div>
+                <div class="terms-header">* नियम व अटी (Terms & Conditions) *</div>
                 <div class="terms-text">
                     हा फक्त एक अंदाज आहे. करार नाही. आमच्या अंदाजानुसार वर वर्णन केलेल काम पूर्ण करण्यासाठी हि किंमत आहे. यात आवश्यक किंमतीतील वाढ किंवा अतिरिक्त कामगार शुल्क आणि समस्या उद्भवल्यास आवश्यक असलेल्या साहित्याचा समावेश नाही. जर दुरुस्तीची डेस्कटॉपसाठी किंमत रु.350/- लॅपटॉपसाठी रु.1800/- किंवा त्यापेक्षा कमी असल्यास कुठलीही पूर्वसूचना न देता दुरुस्ती केली जाईल. तपासणी/आवक शुल्क-150/- दुरुस्त केलेल्या वस्तूंची कोणतीही हमी नसते. सॉफ्टवेअर इंस्टालेशनची कुठलीही वारंटी नसते. दुरुस्ती वेळी सिस्टम डेड होऊ शकतो, तसेच डेटा लॉस/करप्ट झाल्यास त्यास आम्ही जबाबदार नाही. कृपया महिण्याभरात आपल्या वस्तू घेऊन जाणे अन्यथा त्यासाठी आम्ही जबाबदार नाही.
                 </div>
@@ -1320,11 +1522,12 @@ function printJobReceipt() {
 
             <div class="footer">
                 <div class="sig-block">Customer Sign</div>
-                <div class="sig-block" style="text-align: right;">Advance Cost: _________</div>
-                <div class="sig-block" style="text-align: center;">I Agree</div>
+                <div class="sig-block" style="text-align: center;">Advance Received: _________</div>
+                <div class="sig-block" style="text-align: center;">Subject to Nashik Jurisdiction</div>
             </div>
         </div>
         <script>
+            // Automatically print when window loads
             window.onload = function() { window.print(); }
         </script>
     </body>
@@ -1334,4 +1537,3 @@ function printJobReceipt() {
     printWindow.document.write(htmlContent);
     printWindow.document.close();
 }
-
