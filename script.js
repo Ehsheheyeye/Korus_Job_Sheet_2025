@@ -305,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function setupEventListeners() {
             DOMElements.saveRecordBtn.addEventListener('click', saveJobSheet);
             DOMElements.sendWhatsAppBtn.addEventListener('click', sendWhatsAppMessage);
+            document.getElementById('print-job-btn').addEventListener('click', printJobReceipt);
             DOMElements.newJobBtn.addEventListener('click', clearJobSheetForm);
             DOMElements.saveOutwardBtn.addEventListener('click', saveOutwardRecord);
             DOMElements.cancelOutwardEditBtn.addEventListener('click', clearOutwardForm);
@@ -1163,4 +1164,174 @@ document.addEventListener('DOMContentLoaded', () => {
         init();
     }
 });
+
+// --- PRINT RECEIPT FUNCTION ---
+function printJobReceipt() {
+    // 1. Gather Data from the form
+    const jobNo = document.getElementById('job-sheet-no').value || '-';
+    const date = document.getElementById('date').value || '-';
+    const oldNo = document.getElementById('old-job-sheet-no').value || '';
+    const name = document.getElementById('customer-name').value || '-';
+    const mobile = document.getElementById('customer-mobile').value || '-';
+    const estimate = document.getElementById('estimate-amount').value || '0';
+    
+    const deviceType = document.getElementById('device-type').value || '-';
+    const brand = document.getElementById('brand-name').value || '-';
+    const serviceNote = document.getElementById('service-note').value || '';
+
+    // Get Problems
+    const problems = [];
+    document.querySelectorAll('#reported-problems .problem-item input:checked').forEach(cb => {
+        problems.push(cb.value);
+    });
+    const problemString = problems.length > 0 ? problems.join(', ') : '-';
+
+    // Get Materials
+    const materials = [];
+    document.querySelectorAll('#materials-table-body tr').forEach(row => {
+        const pName = row.querySelector('.part-name').value;
+        const pQty = row.querySelector('.part-qty').value;
+        if(pName) materials.push(`${pQty}x ${pName}`);
+    });
+    const materialString = materials.length > 0 ? materials.join(', ') : 'None';
+
+    // 2. Define the HTML Structure (The Red Receipt)
+    const printWindow = window.open('', '', 'height=800,width=600');
+    
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <title>Print Job Sheet - ${jobNo}</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+            :root { --theme-color: #c00000; --border-color: #c00000; }
+            * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            body { font-family: 'Roboto', Arial, sans-serif; margin: 0; padding: 0; background: white; }
+            
+            @page { size: A5; margin: 0.5cm; }
+            
+            .page { 
+                width: 100%; max-width: 210mm; margin: 0 auto; 
+                border: 2px solid var(--border-color); color: var(--theme-color); 
+            }
+            
+            /* Header */
+            header { display: flex; border-bottom: 2px solid var(--border-color); }
+            .header-left { width: 70%; padding: 10px; border-right: 2px solid var(--border-color); }
+            .header-right { width: 30%; display: flex; flex-direction: column; }
+            
+            .logo-section { display: flex; align-items: center; margin-bottom: 5px; }
+            .logo-img { width: 50px; height: 50px; margin-right: 10px; }
+            h1 { font-size: 24px; margin: 0; font-weight: 900; text-transform: uppercase; line-height: 1; }
+            .sub-header { font-size: 10px; font-weight: 700; margin: 5px 0; color: #333; }
+            .address { font-size: 10px; font-weight: 600; line-height: 1.3; color: #000; }
+            
+            .box-row { border-bottom: 1px solid var(--border-color); padding: 5px 8px; font-weight: 700; font-size: 12px; height: 33.3%; display: flex; align-items: center; }
+            .box-row:last-child { border-bottom: none; }
+            .val-large { font-size: 16px; color: #000; margin-left: 5px; }
+
+            /* Customer Info */
+            .info-bar { display: flex; border-bottom: 2px solid var(--border-color); font-size: 12px; font-weight: 700; }
+            .info-name { width: 60%; padding: 5px 8px; border-right: 1px solid var(--border-color); color: #000; }
+            .info-contact { width: 40%; padding: 5px 8px; color: #000; }
+
+            /* Main Data Table */
+            .data-section { width: 100%; border-collapse: collapse; }
+            .data-section td { border: 1px solid var(--border-color); padding: 8px; vertical-align: top; font-size: 12px; }
+            .label { font-weight: 700; color: var(--theme-color); width: 120px; }
+            .value { color: #000; font-weight: 500; }
+
+            /* Terms */
+            .terms-section { padding: 8px; border-top: 2px solid var(--border-color); font-size: 10px; color: #c00000; }
+            .terms-header { font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+            .terms-text { text-align: justify; line-height: 1.2; }
+            .terms-highlight { text-align: center; font-weight: 700; font-size: 12px; margin-top: 5px; display: block; }
+
+            /* Footer */
+            .footer { display: flex; border-top: 2px solid var(--border-color); height: 40px; align-items: flex-end; font-size: 10px; font-weight: 700; }
+            .sig-block { padding: 5px; flex: 1; border-right: 1px solid var(--border-color); }
+            .sig-block:last-child { border-right: none; }
+        </style>
+    </head>
+    <body>
+        <div class="page">
+            <header>
+                <div class="header-left">
+                    <div class="logo-section">
+                        <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" class="logo-img" alt="Logo">
+                        <div>
+                            <h1>KORUS ENTERPRISES</h1>
+                            <span style="font-size: 12px; font-weight: bold; color: #000;">ESTIMATE</span>
+                        </div>
+                    </div>
+                    <div class="sub-header">
+                        NEW / Refurbished Laptop, Computer, Peripherals,<br>
+                        <span style="color: #c00000;">ध्यास तंत्रज्ञानाचा !</span> Sales, Service, AMC, Repairing, CCTV Camera's
+                    </div>
+                    <div class="address">
+                        39, 'Balchandra', Ashok nagar, Satpur, Nashik- 12<br>
+                        PH: SACHIN- 7841863517, KUNDAN- 7841863518<br>
+                        Email: korus.sachin2018@gmail.com
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="box-row">J.S.NO: <span class="val-large">${jobNo}</span></div>
+                    <div class="box-row">DATE: <span style="color:#000; margin-left:5px;">${date}</span></div>
+                    <div class="box-row">OLD NO: <span style="color:#000; margin-left:5px;">${oldNo}</span></div>
+                </div>
+            </header>
+
+            <div class="info-bar">
+                <div class="info-name">NAME: ${name}</div>
+                <div class="info-contact">CONTACT: ${mobile}</div>
+            </div>
+
+            <table class="data-section">
+                <tr>
+                    <td class="label">Device Details</td>
+                    <td class="value"><strong>${brand} ${deviceType}</strong></td>
+                </tr>
+                <tr>
+                    <td class="label">Reported Problems</td>
+                    <td class="value">${problemString}</td>
+                </tr>
+                <tr style="height: 60px;">
+                    <td class="label">Service Note</td>
+                    <td class="value">${serviceNote}</td>
+                </tr>
+                <tr>
+                    <td class="label">Parts / Materials</td>
+                    <td class="value">${materialString}</td>
+                </tr>
+                 <tr>
+                    <td class="label">Estimate Amount</td>
+                    <td class="value" style="font-size: 14px; font-weight: bold;">₹ ${estimate}</td>
+                </tr>
+            </table>
+
+            <div class="terms-section">
+                <div class="terms-header">* नियम व अटी *</div>
+                <div class="terms-text">
+                    हा फक्त एक अंदाज आहे. करार नाही. आमच्या अंदाजानुसार वर वर्णन केलेल काम पूर्ण करण्यासाठी हि किंमत आहे. यात आवश्यक किंमतीतील वाढ किंवा अतिरिक्त कामगार शुल्क आणि समस्या उद्भवल्यास आवश्यक असलेल्या साहित्याचा समावेश नाही. जर दुरुस्तीची डेस्कटॉपसाठी किंमत रु.350/- लॅपटॉपसाठी रु.1800/- किंवा त्यापेक्षा कमी असल्यास कुठलीही पूर्वसूचना न देता दुरुस्ती केली जाईल. तपासणी/आवक शुल्क-150/- दुरुस्त केलेल्या वस्तूंची कोणतीही हमी नसते. सॉफ्टवेअर इंस्टालेशनची कुठलीही वारंटी नसते. दुरुस्ती वेळी सिस्टम डेड होऊ शकतो, तसेच डेटा लॉस/करप्ट झाल्यास त्यास आम्ही जबाबदार नाही. कृपया महिण्याभरात आपल्या वस्तू घेऊन जाणे अन्यथा त्यासाठी आम्ही जबाबदार नाही.
+                </div>
+                <span class="terms-highlight">वस्तू घेताना पावती सोबत असल्यावरच वस्तू मिळेल.</span>
+            </div>
+
+            <div class="footer">
+                <div class="sig-block">Customer Sign</div>
+                <div class="sig-block" style="text-align: right;">Advance Cost: _________</div>
+                <div class="sig-block" style="text-align: center;">I Agree</div>
+            </div>
+        </div>
+        <script>
+            window.onload = function() { window.print(); }
+        </script>
+    </body>
+    </html>
+    `;
+
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+}
 
