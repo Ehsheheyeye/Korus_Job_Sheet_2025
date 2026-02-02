@@ -1165,36 +1165,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- IMPROVED PRINT RECEIPT FUNCTION ---
+// --- UPDATED PRINT RECEIPT FUNCTION (Matches Uploaded PDF) ---
 function printJobReceipt() {
-    // 1. Gather Data
+    // 1. Gather Data from the Dashboard inputs
     const jobNo = document.getElementById('job-sheet-no').value || '-';
-    // Format the date to be more readable (e.g., DD-MM-YYYY)
+    // Format Date
     const rawDate = document.getElementById('date').value;
     const dateObj = new Date(rawDate);
     const date = rawDate ? dateObj.toLocaleDateString('en-GB') : '-';
     
-    const oldNo = document.getElementById('old-job-sheet-no').value || '';
-    
-    // Capitalize names for better look
-    const nameRaw = document.getElementById('customer-name').value || '-';
-    const name = nameRaw.replace(/\b\w/g, l => l.toUpperCase());
-    
+    const oldNo = document.getElementById('old-job-sheet-no').value || '-';
+    const name = (document.getElementById('customer-name').value || '-').toUpperCase(); // Uppercase as per PDF style
     const mobile = document.getElementById('customer-mobile').value || '-';
     const estimate = document.getElementById('estimate-amount').value || '0';
     
     const deviceType = document.getElementById('device-type').value || '-';
     const brand = document.getElementById('brand-name').value || '-';
-    const serviceNote = document.getElementById('service-note').value || '';
+    const serviceNote = document.getElementById('service-note').value || '-';
 
-    // --- SMART PROBLEM GATHERING ---
-    // This looks at the checkbox AND the specific dropdown selected (e.g., Antivirus -> Quick Heal)
+    // Smart Problem Gathering
     const problems = [];
     document.querySelectorAll('#reported-problems .problem-item').forEach(item => {
         const checkbox = item.querySelector('input[type="checkbox"]');
         if (checkbox && checkbox.checked) {
             let problemText = checkbox.value;
-            // Check if there is a visible dropdown associated with this problem
             const subSelect = item.querySelector('select');
             if (subSelect && subSelect.style.display !== 'none' && subSelect.value) {
                 problemText += ` (${subSelect.value})`;
@@ -1202,9 +1196,9 @@ function printJobReceipt() {
             problems.push(problemText);
         }
     });
-    const problemString = problems.length > 0 ? problems.map(p => `• ${p}`).join('<br>') : '-';
+    const problemString = problems.length > 0 ? problems.join(', ') : '-';
 
-    // Get Materials
+    // Gather Materials
     const materials = [];
     document.querySelectorAll('#materials-table-body tr').forEach(row => {
         const pName = row.querySelector('.part-name').value;
@@ -1213,321 +1207,215 @@ function printJobReceipt() {
     });
     const materialString = materials.length > 0 ? materials.join(', ') : 'None';
 
-    // 2. Define the Attractive HTML Structure
+    // 2. Build the HTML
     const printWindow = window.open('', '', 'height=800,width=600');
     
     const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
-        <title>Job Sheet - ${jobNo}</title>
+        <title>Receipt - ${jobNo}</title>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
             
             :root { 
-                --primary-color: #c00000; 
-                --text-dark: #1f2937;
-                --border-color: #e5e7eb;
+                --primary-red: #d32f2f; /* Red from PDF */
+                --text-black: #000000;
+                --border-color: #000000;
             }
             
             * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             
             body { 
-                font-family: 'Open Sans', sans-serif; 
-                margin: 0; 
-                padding: 0; 
+                font-family: 'Roboto', sans-serif; 
+                margin: 0; padding: 0; 
                 background: white; 
-                color: var(--text-dark);
-                font-size: 13px; /* Slightly larger base font for readability */
+                color: var(--text-black);
+                font-size: 11px; /* Compact font for A5 */
             }
             
             @page { size: A5; margin: 0.5cm; }
             
-            .page { 
-                width: 100%; 
-                max-width: 210mm; 
-                margin: 0 auto; 
-                border: 2px solid var(--primary-color); 
-                height: 98vh; /* Ensure full height usage */
-                display: flex;
-                flex-direction: column;
+            .container { 
+                width: 100%; max-width: 100%; 
+                border: 1px solid var(--border-color);
+                height: 98vh; 
+                display: flex; flex-direction: column;
             }
             
             /* --- HEADER --- */
             header { 
                 display: flex; 
-                border-bottom: 2px solid var(--primary-color); 
+                border-bottom: 1px solid var(--border-color); 
+                padding: 10px;
             }
-            .header-left { 
-                width: 65%; 
-                padding: 15px; 
-                border-right: 1px solid var(--primary-color); 
-            }
-            .header-right { 
-                width: 35%; 
-                display: flex; 
-                flex-direction: column; 
-            }
+            .header-left { flex: 1.8; padding-right: 10px; }
+            .header-right { flex: 1; display: flex; flex-direction: column; gap: 5px; justify-content: center; }
             
-            .logo-section { display: flex; align-items: center; margin-bottom: 8px; }
-            .logo-img { width: 55px; height: 55px; margin-right: 12px; }
+            .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+            .logo-img { width: 50px; height: 50px; }
             
             h1 { 
-                font-size: 26px; 
-                margin: 0; 
-                font-weight: 800; 
-                color: var(--primary-color);
-                line-height: 1;
-                text-transform: uppercase;
-                letter-spacing: -0.5px;
+                font-size: 24px; font-weight: 900; margin: 0; 
+                color: var(--text-black); text-transform: uppercase; letter-spacing: -0.5px; 
             }
-            
-            .slogan {
-                font-size: 14px;
-                font-weight: 700;
-                color: var(--text-dark);
-                margin-top: 4px;
-                font-style: italic;
-            }
+            .slogan { font-size: 10px; font-weight: bold; color: var(--primary-red); margin-top: -2px; margin-bottom: 2px; }
+            .services { font-size: 9px; margin-bottom: 4px; line-height: 1.2; font-weight: 500; }
+            .address { font-size: 9px; line-height: 1.3; }
 
-            .sub-header { 
-                font-size: 11px; 
-                font-weight: 600; 
-                margin: 8px 0; 
-                color: #4b5563; 
-                line-height: 1.4;
+            /* Job Meta Box (Right Side) */
+            .meta-box { border: 1px solid var(--border-color); display: flex; flex-direction: column; }
+            .meta-row { display: flex; border-bottom: 1px solid var(--border-color); }
+            .meta-row:last-child { border-bottom: none; }
+            .meta-label { 
+                width: 40%; background-color: white; 
+                color: var(--primary-red); font-weight: 700; 
+                padding: 4px; border-right: 1px solid var(--border-color);
+                display: flex; align-items: center; font-size: 10px;
             }
-            .address { 
-                font-size: 10px; 
-                color: #6b7280; 
-                line-height: 1.4; 
+            .meta-value { 
+                width: 60%; padding: 4px; font-weight: 700; 
+                font-size: 12px; display: flex; align-items: center; justify-content: center;
             }
-            
-            /* Header Data Boxes */
-            .box-row { 
-                border-bottom: 1px solid var(--primary-color); 
-                padding: 0 12px; 
-                flex: 1;
-                display: flex; 
-                align-items: center; 
-                justify-content: space-between;
-                font-weight: 700; 
-                font-size: 12px; 
-                color: var(--primary-color);
-            }
-            .box-row:last-child { border-bottom: none; }
-            .val-large { 
-                font-size: 18px; 
-                color: #000; 
-                font-weight: 800;
-            }
-            .val-normal { color: #000; font-weight: 600; font-size: 14px; }
 
             /* --- CUSTOMER INFO --- */
-            .info-bar { 
-                display: flex; 
-                background-color: #f9fafb; /* Light gray background */
-                border-bottom: 2px solid var(--primary-color); 
-                font-size: 13px; 
+            .customer-strip { 
+                display: flex; border-bottom: 1px solid var(--border-color); 
+                padding: 6px 10px; font-size: 12px;
             }
-            .info-item { padding: 10px 15px; }
-            .info-name { 
-                flex: 1.5; 
-                border-right: 1px solid var(--primary-color); 
-                font-weight: 700; 
-                color: var(--primary-color);
-            }
-            .info-contact { 
-                flex: 1; 
-                font-weight: 700; 
-                color: var(--primary-color);
-            }
-            .info-val { color: #000; font-weight: 600; margin-left: 5px; }
+            .cust-group { flex: 1; display: flex; gap: 5px; }
+            .cust-label { font-weight: 700; }
+            .cust-val { font-weight: 500; text-transform: uppercase; }
 
             /* --- MAIN TABLE --- */
-            .data-section { 
-                width: 100%; 
-                border-collapse: collapse; 
-                flex-grow: 1; /* Pushes footer down */
-            }
-            .data-section td { 
-                border: 1px solid #e5e7eb; 
-                padding: 10px 15px; 
-                vertical-align: top; 
-            }
+            .main-table { width: 100%; border-collapse: collapse; flex-grow: 1; }
+            .main-table tr { border-bottom: 1px solid var(--border-color); }
+            .main-table td { padding: 6px 10px; vertical-align: top; }
             
-            .label-cell { 
-                width: 30%; 
-                background-color: #fff1f2; /* Very light red bg */
-                color: var(--primary-color);
-                font-weight: 700;
-                font-size: 12px;
-                text-transform: uppercase;
-                border-right: 2px solid var(--primary-color);
+            .col-label { 
+                width: 35%; font-weight: 700; color: var(--text-black); 
+                border-right: 1px solid var(--border-color);
+                text-transform: uppercase; font-size: 11px;
             }
-            
-            .value-cell { 
-                color: #111827; 
-                font-weight: 600; 
-                font-size: 13px;
-                line-height: 1.5;
-            }
+            .col-val { width: 65%; font-size: 11px; font-weight: 500; }
 
-            .device-detail-row {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 4px;
-                border-bottom: 1px dashed #e5e7eb;
-                padding-bottom: 4px;
-            }
-            .device-detail-row:last-child { border: none; margin: 0; padding: 0; }
-            .detail-label { color: #6b7280; font-size: 11px; font-weight: 600; }
+            /* Highlight Estimate */
+            .row-estimate { border-bottom: 1px solid var(--border-color); }
+            .row-estimate .col-label { color: var(--primary-red); font-size: 12px; }
+            .row-estimate .col-val { font-size: 14px; font-weight: 900; }
 
             /* --- TERMS --- */
-            .terms-section { 
-                padding: 10px 15px; 
-                border-top: 2px solid var(--primary-color); 
-                background-color: #fff;
-                margin-top: auto; /* Push to bottom */
-            }
+            .terms-section { padding: 8px 10px; font-size: 9px; border-bottom: 1px solid var(--border-color); }
             .terms-header { 
-                font-weight: 800; 
-                font-size: 11px; 
-                color: var(--primary-color); 
-                margin-bottom: 4px; 
-                text-transform: uppercase;
+                color: var(--primary-red); font-weight: 900; 
+                text-decoration: underline; margin-bottom: 4px;
             }
-            .terms-text { 
-                text-align: justify; 
-                line-height: 1.3; 
-                font-size: 9px; 
-                color: #4b5563;
-            }
-            .terms-highlight { 
-                text-align: center; 
-                font-weight: 700; 
-                font-size: 12px; 
-                margin-top: 8px; 
-                display: block; 
-                color: var(--primary-color);
-                border: 1px dashed var(--primary-color);
-                padding: 4px;
-                border-radius: 4px;
+            .terms-text { text-align: justify; line-height: 1.3; margin-bottom: 6px; }
+            .warning-line { 
+                color: var(--primary-red); font-weight: 700; text-align: center; 
+                font-size: 10px; border: 1px dashed var(--primary-red); padding: 3px;
             }
 
             /* --- FOOTER --- */
-            .footer { 
-                display: flex; 
-                border-top: 1px solid var(--primary-color); 
-                height: 50px; 
-                align-items: flex-end; 
-                font-size: 10px; 
-                font-weight: 700; 
-                background-color: #fff;
+            .footer { display: flex; height: 50px; }
+            .sig-box { 
+                flex: 1; border-right: 1px solid var(--border-color); 
+                display: flex; flex-direction: column; justify-content: flex-end; 
+                align-items: center; padding-bottom: 5px; font-weight: 700; font-size: 10px;
             }
-            .sig-block { 
-                padding: 8px; 
-                flex: 1; 
-                border-right: 1px solid var(--primary-color); 
-                color: #4b5563;
-            }
-            .sig-block:last-child { border-right: none; }
+            .sig-box:last-child { border-right: none; }
         </style>
     </head>
     <body>
-        <div class="page">
+        <div class="container">
             <header>
                 <div class="header-left">
-                    <div class="logo-section">
-                        <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" class="logo-img" alt="Logo">
+                    <div class="logo-row">
+                        <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" class="logo-img">
                         <div>
-                            <h1>KORUS ENTERPRISES</h1>
                             <div class="slogan">ध्यास तंत्रज्ञानाचा !</div>
+                            <h1>Korus Enterprises</h1>
                         </div>
                     </div>
-                    <div class="sub-header">
-                        Sales, Service, AMC, Repairing & CCTV Camera Installation.<br>
-                        Specialist in: New / Refurbished Laptop, Computer & Peripherals.
-                    </div>
+                    <div class="services">Sales, Service, AMC, Repairing & CCTV Camera Installation.<br>Specialist in: New / Refurbished Laptop, Computer & Peripherals.</div>
                     <div class="address">
                         39, 'Balchandra', Ashok Nagar, Satpur, Nashik - 422012<br>
-                        <strong>Contact:</strong> Sachin - 7841863517 | Kundan - 7841863518<br>
+                        Contact: Sachin - 7841863517 | Kundan - 7841863518<br>
                         Email: korus.sachin2018@gmail.com
                     </div>
                 </div>
                 <div class="header-right">
-                    <div class="box-row">
-                        <span>JOB NO.</span>
-                        <span class="val-large">${jobNo}</span>
-                    </div>
-                    <div class="box-row">
-                        <span>DATE</span>
-                        <span class="val-normal">${date}</span>
-                    </div>
-                    <div class="box-row">
-                        <span>OLD JOB NO.</span>
-                        <span class="val-normal">${oldNo}</span>
+                    <div class="meta-box">
+                        <div class="meta-row">
+                            <div class="meta-label">JOB NO</div>
+                            <div class="meta-value" style="font-size: 16px;">${jobNo}</div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-label">DATE</div>
+                            <div class="meta-value">${date}</div>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-label">OLD JOB NO</div>
+                            <div class="meta-value">${oldNo}</div>
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <div class="info-bar">
-                <div class="info-item info-name">
-                    CUSTOMER: <span class="info-val">${name}</span>
+            <div class="customer-strip">
+                <div class="cust-group">
+                    <span class="cust-label">NAME:</span>
+                    <span class="cust-val">${name}</span>
                 </div>
-                <div class="info-item info-contact">
-                    MOBILE: <span class="info-val">${mobile}</span>
+                <div class="cust-group" style="justify-content: flex-end;">
+                    <span class="cust-label">MOBILE:</span>
+                    <span class="cust-val">${mobile}</span>
                 </div>
             </div>
 
-            <table class="data-section">
+            <table class="main-table">
                 <tr>
-                    <td class="label-cell">Device Details</td>
-                    <td class="value-cell">
-                        <div class="device-detail-row">
-                            <span class="detail-label">DEVICE TYPE</span>
-                            <span>${deviceType}</span>
-                        </div>
-                        <div class="device-detail-row">
-                            <span class="detail-label">BRAND / COMPANY</span>
-                            <span>${brand}</span>
-                        </div>
-                    </td>
+                    <td class="col-label">Brand / Company</td>
+                    <td class="col-val">${brand}</td>
                 </tr>
                 <tr>
-                    <td class="label-cell">Reported Problems</td>
-                    <td class="value-cell" style="line-height: 1.6;">${problemString}</td>
+                    <td class="col-label">Device Type</td>
+                    <td class="col-val">${deviceType}</td>
                 </tr>
                 <tr>
-                    <td class="label-cell">Service Note</td>
-                    <td class="value-cell" style="font-style: italic; color: #555;">${serviceNote || '-'}</td>
+                    <td class="col-label">Reported Problems</td>
+                    <td class="col-val">${problemString}</td>
                 </tr>
                 <tr>
-                    <td class="label-cell">Parts / Materials</td>
-                    <td class="value-cell">${materialString}</td>
+                    <td class="col-label">Service Note</td>
+                    <td class="col-val">${serviceNote}</td>
                 </tr>
-                 <tr>
-                    <td class="label-cell" style="background-color: #fff; border-right: none; font-size: 14px;">Estimate Cost</td>
-                    <td class="value-cell" style="font-size: 18px; font-weight: 800; color: var(--primary-color);">₹ ${estimate}</td>
+                <tr>
+                    <td class="col-label">Parts / Materials</td>
+                    <td class="col-val">${materialString}</td>
                 </tr>
+                <tr class="row-estimate">
+                    <td class="col-label">ESTIMATE COST</td>
+                    <td class="col-val">₹ ${estimate}</td>
+                </tr>
+                 <tr style="height: 100%; border-bottom: none;"><td colspan="2"></td></tr>
             </table>
 
             <div class="terms-section">
-                <div class="terms-header">* नियम व अटी (Terms & Conditions) *</div>
+                <div class="terms-header">* नियम व अटी (TERMS & CONDITIONS) *</div>
                 <div class="terms-text">
-                    हा फक्त एक अंदाज आहे. करार नाही. आमच्या अंदाजानुसार वर वर्णन केलेल काम पूर्ण करण्यासाठी हि किंमत आहे. यात आवश्यक किंमतीतील वाढ किंवा अतिरिक्त कामगार शुल्क आणि समस्या उद्भवल्यास आवश्यक असलेल्या साहित्याचा समावेश नाही. जर दुरुस्तीची डेस्कटॉपसाठी किंमत रु.350/- लॅपटॉपसाठी रु.1800/- किंवा त्यापेक्षा कमी असल्यास कुठलीही पूर्वसूचना न देता दुरुस्ती केली जाईल. तपासणी/आवक शुल्क-150/- दुरुस्त केलेल्या वस्तूंची कोणतीही हमी नसते. सॉफ्टवेअर इंस्टालेशनची कुठलीही वारंटी नसते. दुरुस्ती वेळी सिस्टम डेड होऊ शकतो, तसेच डेटा लॉस/करप्ट झाल्यास त्यास आम्ही जबाबदार नाही. कृपया महिण्याभरात आपल्या वस्तू घेऊन जाणे अन्यथा त्यासाठी आम्ही जबाबदार नाही.
+                    हा फक्त एक अंदाज आहे. करार नाही. आमच्या अंदाजानुसार वर वर्णन केलेल काम पूर्ण करण्यासाठी हि किंमत आहे. यात आवश्यक किंमतीतील वाढ किंवा अतिरिक्त कामगार शुल्क आणि समस्या उद्भवल्यास आवश्यक असलेल्या साहित्याचा समावेश नाही. जर दुरुस्तीची डेस्कटॉपसाठी किंमत रु. 350/- लॅपटॉपसाठी रु.1800/- किंवा त्यापेक्षा कमी असल्यास कुठलीही पूर्वसूचना न देता दुरुस्ती केली जाईल. तपासणी/आवक शुल्क-150/- दुरुस्त केलेल्या वस्तूंची कोणतीही हमी नसते. सॉफ्टवेअर इंस्टालेशनची कुठलीही वारंटी नसते. दुरुस्ती वेळी सिस्टम डेड होऊ शकतो, तसेच डेटा लॉस / करप्ट झाल्यास त्यास आम्ही जबाबदार नाही. कृपया महिण्याभरात आपल्या वस्तू घेऊन जाणे अन्यथा त्यासाठी आम्ही जबाबदार नाही.
                 </div>
-                <span class="terms-highlight">वस्तू घेताना पावती सोबत असल्यावरच वस्तू मिळेल.</span>
+                <div class="warning-line">वस्तू घेताना पावती सोबत असल्यावरच वस्तू मिळेल.</div>
             </div>
 
             <div class="footer">
-                <div class="sig-block">Customer Sign</div>
-                <div class="sig-block" style="text-align: center;">Advance Received: _________</div>
-                <div class="sig-block" style="text-align: center;">Subject to Nashik Jurisdiction</div>
+                <div class="sig-box">Receiver Sign</div>
+                <div class="sig-box">Advance Received</div>
+                <div class="sig-box">I Agree</div>
             </div>
         </div>
         <script>
-            // Automatically print when window loads
             window.onload = function() { window.print(); }
         </script>
     </body>
