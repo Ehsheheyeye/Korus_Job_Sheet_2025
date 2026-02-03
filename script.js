@@ -1165,23 +1165,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// --- UPDATED PRINT RECEIPT FUNCTION (Matches Uploaded PDF) ---
 function printJobReceipt() {
-    // 1. Gather Data from the Dashboard inputs
-    const jobNo = document.getElementById('job-sheet-no').value || '-';
-    // Format Date
-    const rawDate = document.getElementById('date').value;
-    const dateObj = new Date(rawDate);
-    const date = rawDate ? dateObj.toLocaleDateString('en-GB') : '-';
+    // --- 1. GATHER DATA ---
+    const getText = (id) => document.getElementById(id)?.value || '-';
+    const getValue = (id) => document.getElementById(id)?.value || '';
+
+    const jobNo = getValue('job-sheet-no') || '-';
+    const oldJobNo = getValue('old-job-sheet-no') || '-';
     
-    const oldNo = document.getElementById('old-job-sheet-no').value || '-';
-    const name = (document.getElementById('customer-name').value || '-').toUpperCase(); // Uppercase as per PDF style
-    const mobile = document.getElementById('customer-mobile').value || '-';
-    const estimate = document.getElementById('estimate-amount').value || '0';
-    
-    const deviceType = document.getElementById('device-type').value || '-';
-    const brand = document.getElementById('brand-name').value || '-';
-    const serviceNote = document.getElementById('service-note').value || '-';
+    // Date Formatting
+    const rawDate = getValue('date');
+    const dateObj = rawDate ? new Date(rawDate) : new Date();
+    const date = dateObj.toLocaleDateString('en-GB'); // DD/MM/YYYY
+
+    const name = getText('customer-name').toUpperCase();
+    const mobile = getText('customer-mobile');
+    const brand = getText('brand-name');
+    const deviceType = getText('device-type');
+    const serviceNote = getText('service-note');
+    const estimate = getValue('estimate-amount') || '0';
 
     // Smart Problem Gathering
     const problems = [];
@@ -1198,16 +1200,17 @@ function printJobReceipt() {
     });
     const problemString = problems.length > 0 ? problems.join(', ') : '-';
 
-    // Gather Materials
+    // Materials Gathering
     const materials = [];
     document.querySelectorAll('#materials-table-body tr').forEach(row => {
-        const pName = row.querySelector('.part-name').value;
-        const pQty = row.querySelector('.part-qty').value;
-        if(pName) materials.push(`${pQty}x ${pName}`);
+        const pName = row.querySelector('.part-name')?.value;
+        const pQty = row.querySelector('.part-qty')?.value;
+        const pStatus = row.querySelector('.part-status')?.value;
+        if (pName) materials.push(`${pQty}x ${pName} [${pStatus}]`);
     });
     const materialString = materials.length > 0 ? materials.join(', ') : 'None';
 
-    // 2. Build the HTML
+    // --- 2. BUILD HTML ---
     const printWindow = window.open('', '', 'height=800,width=600');
     
     const htmlContent = `
@@ -1217,203 +1220,276 @@ function printJobReceipt() {
         <title>Receipt - ${jobNo}</title>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap');
-            
-            :root { 
-                --primary-red: #d32f2f; /* Red from PDF */
-                --text-black: #000000;
-                --border-color: #000000;
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap');
+
+            :root {
+                --border-color: #000;
+                --header-red: #d32f2f; /* Red Accent */
             }
-            
-            * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            
-            body { 
-                font-family: 'Roboto', sans-serif; 
-                margin: 0; padding: 0; 
-                background: white; 
-                color: var(--text-black);
-                font-size: 11px; /* Compact font for A5 */
+
+            body {
+                font-family: 'Roboto', sans-serif;
+                font-size: 11px;
+                color: #000;
+                margin: 0;
+                padding: 0;
+                background: #fff;
             }
-            
+
             @page { size: A5; margin: 0.5cm; }
-            
-            .container { 
-                width: 100%; max-width: 100%; 
+
+            .container {
+                width: 100%;
                 border: 1px solid var(--border-color);
-                height: 98vh; 
-                display: flex; flex-direction: column;
+                padding: 5px;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                min-height: 98vh; /* Fill the A5 page */
             }
-            
+
             /* --- HEADER --- */
-            header { 
-                display: flex; 
-                border-bottom: 1px solid var(--border-color); 
-                padding: 10px;
+            .header {
+                text-align: center;
+                border-bottom: 2px solid var(--border-color);
+                padding-bottom: 5px;
+                margin-bottom: 5px;
             }
-            .header-left { flex: 1.8; padding-right: 10px; }
-            .header-right { flex: 1; display: flex; flex-direction: column; gap: 5px; justify-content: center; }
-            
-            .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-            .logo-img { width: 50px; height: 50px; }
-            
-            h1 { 
-                font-size: 24px; font-weight: 900; margin: 0; 
-                color: var(--text-black); text-transform: uppercase; letter-spacing: -0.5px; 
+            .logo-section {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 15px;
+                margin-bottom: 4px;
             }
-            .slogan { font-size: 10px; font-weight: bold; color: var(--primary-red); margin-top: -2px; margin-bottom: 2px; }
-            .services { font-size: 9px; margin-bottom: 4px; line-height: 1.2; font-weight: 500; }
-            .address { font-size: 9px; line-height: 1.3; }
+            .logo-img {
+                width: 50px;
+                height: auto;
+            }
+            .company-title h1 {
+                font-size: 26px;
+                font-weight: 900;
+                margin: 0;
+                line-height: 1;
+                text-transform: uppercase;
+            }
+            .slogan {
+                font-family: 'Noto Sans Devanagari', sans-serif;
+                font-size: 12px;
+                color: var(--header-red);
+                font-weight: bold;
+                letter-spacing: 1px;
+                margin-bottom: 2px;
+            }
+            .sub-text {
+                font-size: 10px;
+                font-weight: 500;
+                margin-bottom: 4px;
+            }
+            .address {
+                font-size: 10px;
+                line-height: 1.3;
+            }
 
-            /* Job Meta Box (Right Side) */
-            .meta-box { border: 1px solid var(--border-color); display: flex; flex-direction: column; }
-            .meta-row { display: flex; border-bottom: 1px solid var(--border-color); }
-            .meta-row:last-child { border-bottom: none; }
-            .meta-label { 
-                width: 40%; background-color: white; 
-                color: var(--primary-red); font-weight: 700; 
-                padding: 4px; border-right: 1px solid var(--border-color);
-                display: flex; align-items: center; font-size: 10px;
+            /* --- INFO GRID (Replaces the split header) --- */
+            .info-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                border: 1px solid var(--border-color);
+                margin-bottom: 10px;
             }
-            .meta-value { 
-                width: 60%; padding: 4px; font-weight: 700; 
-                font-size: 12px; display: flex; align-items: center; justify-content: center;
+            .info-row {
+                display: contents;
+            }
+            .info-cell {
+                padding: 4px 8px;
+                border-bottom: 1px solid var(--border-color);
+                display: flex;
+                align-items: center;
+            }
+            .info-cell:nth-child(even) {
+                border-left: 1px solid var(--border-color);
+            }
+            .grid-full {
+                grid-column: 1 / -1;
+            }
+            .label {
+                font-weight: 700;
+                margin-right: 5px;
+                min-width: 60px;
+                color: #333;
+            }
+            .value {
+                font-weight: 600;
+                font-size: 12px;
+                text-transform: uppercase;
+            }
+            .job-highlight {
+                color: var(--header-red);
+                font-size: 14px;
             }
 
-            /* --- CUSTOMER INFO --- */
-            .customer-strip { 
-                display: flex; border-bottom: 1px solid var(--border-color); 
-                padding: 6px 10px; font-size: 12px;
+            /* --- DATA TABLE --- */
+            .data-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 10px;
+                flex-grow: 1; /* Pushes footer down */
             }
-            .cust-group { flex: 1; display: flex; gap: 5px; }
-            .cust-label { font-weight: 700; }
-            .cust-val { font-weight: 500; text-transform: uppercase; }
-
-            /* --- MAIN TABLE --- */
-            .main-table { width: 100%; border-collapse: collapse; flex-grow: 1; }
-            .main-table tr { border-bottom: 1px solid var(--border-color); }
-            .main-table td { padding: 6px 10px; vertical-align: top; }
-            
-            .col-label { 
-                width: 35%; font-weight: 700; color: var(--text-black); 
-                border-right: 1px solid var(--border-color);
-                text-transform: uppercase; font-size: 11px;
+            .data-table th, .data-table td {
+                border: 1px solid var(--border-color);
+                padding: 6px;
+                text-align: left;
+                vertical-align: top;
             }
-            .col-val { width: 65%; font-size: 11px; font-weight: 500; }
-
-            /* Highlight Estimate */
-            .row-estimate { border-bottom: 1px solid var(--border-color); }
-            .row-estimate .col-label { color: var(--primary-red); font-size: 12px; }
-            .row-estimate .col-val { font-size: 14px; font-weight: 900; }
-
-            /* --- TERMS --- */
-            .terms-section { padding: 8px 10px; font-size: 9px; border-bottom: 1px solid var(--border-color); }
-            .terms-header { 
-                color: var(--primary-red); font-weight: 900; 
-                text-decoration: underline; margin-bottom: 4px;
+            .data-table th {
+                background-color: #f0f0f0;
+                width: 35%;
+                font-weight: 700;
+                font-size: 10px;
+                text-transform: uppercase;
             }
-            .terms-text { text-align: justify; line-height: 1.3; margin-bottom: 6px; }
-            .warning-line { 
-                color: var(--primary-red); font-weight: 700; text-align: center; 
-                font-size: 10px; border: 1px dashed var(--primary-red); padding: 3px;
+            .data-table td {
+                font-size: 11px;
+                font-weight: 500;
+            }
+            .estimate-row th {
+                color: var(--header-red);
+                font-size: 12px;
+                border-top: 2px solid #000;
+            }
+            .estimate-row td {
+                font-size: 16px;
+                font-weight: 900;
+                border-top: 2px solid #000;
             }
 
             /* --- FOOTER --- */
-            .footer { display: flex; height: 50px; }
-            .sig-box { 
-                flex: 1; border-right: 1px solid var(--border-color); 
-                display: flex; flex-direction: column; justify-content: flex-end; 
-                align-items: center; padding-bottom: 5px; font-weight: 700; font-size: 10px;
+            .terms {
+                font-family: 'Noto Sans Devanagari', sans-serif;
+                font-size: 9px;
+                text-align: justify;
+                border: 1px solid var(--border-color);
+                padding: 5px;
+                margin-bottom: 5px;
+                line-height: 1.3;
             }
-            .sig-box:last-child { border-right: none; }
+            .terms-title {
+                color: var(--header-red);
+                font-weight: bold;
+                text-decoration: underline;
+                display: block;
+                margin-bottom: 3px;
+            }
+            
+            .signatures {
+                display: flex;
+                justify-content: space-between;
+                border: 1px solid var(--border-color);
+            }
+            .sig-box {
+                flex: 1;
+                text-align: center;
+                padding-top: 30px;
+                padding-bottom: 5px;
+                font-weight: 700;
+                font-size: 10px;
+                border-right: 1px solid var(--border-color);
+            }
+            .sig-box:last-child {
+                border-right: none;
+            }
+
+            /* Hiding Header/Footer URL in Print */
+            @media print {
+                @page { margin: 0.5cm; }
+            }
         </style>
     </head>
     <body>
         <div class="container">
-            <header>
-                <div class="header-left">
-                    <div class="logo-row">
-                        <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" class="logo-img">
-                        <div>
-                            <div class="slogan">ध्यास तंत्रज्ञानाचा !</div>
-                            <h1>Korus Enterprises</h1>
-                        </div>
-                    </div>
-                    <div class="services">Sales, Service, AMC, Repairing & CCTV Camera Installation.<br>Specialist in: New / Refurbished Laptop, Computer & Peripherals.</div>
-                    <div class="address">
-                        39, 'Balchandra', Ashok Nagar, Satpur, Nashik - 422012<br>
-                        Contact: Sachin - 7841863517 | Kundan - 7841863518<br>
-                        Email: korus.sachin2018@gmail.com
+            
+            <header class="header">
+                <div class="logo-section">
+                    <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" class="logo-img">
+                    <div class="company-title">
+                        <div class="slogan">ध्यास तंत्रज्ञानाचा !</div>
+                        <h1>Korus Enterprises</h1>
                     </div>
                 </div>
-                <div class="header-right">
-                    <div class="meta-box">
-                        <div class="meta-row">
-                            <div class="meta-label">JOB NO</div>
-                            <div class="meta-value" style="font-size: 16px;">${jobNo}</div>
-                        </div>
-                        <div class="meta-row">
-                            <div class="meta-label">DATE</div>
-                            <div class="meta-value">${date}</div>
-                        </div>
-                        <div class="meta-row">
-                            <div class="meta-label">OLD JOB NO</div>
-                            <div class="meta-value">${oldNo}</div>
-                        </div>
-                    </div>
+                <div class="sub-text">Sales, Service, AMC, Repairing & CCTV Camera Installation.<br>Specialist in: New / Refurbished Laptop, Computer & Peripherals.</div>
+                <div class="address">
+                    39, 'Balchandra', Ashok Nagar, Satpur, Nashik - 422012<br>
+                    Contact: Sachin - 7841863517 | Kundan - 7841863518<br>
+                    Email: korus.sachin2018@gmail.com
                 </div>
             </header>
 
-            <div class="customer-strip">
-                <div class="cust-group">
-                    <span class="cust-label">NAME:</span>
-                    <span class="cust-val">${name}</span>
+            <div class="info-grid">
+                <div class="info-cell grid-full">
+                    <span class="label">NAME:</span>
+                    <span class="value">${name}</span>
                 </div>
-                <div class="cust-group" style="justify-content: flex-end;">
-                    <span class="cust-label">MOBILE:</span>
-                    <span class="cust-val">${mobile}</span>
+                
+                <div class="info-cell">
+                    <span class="label">JOB NO:</span>
+                    <span class="value job-highlight">${jobNo}</span>
+                </div>
+                <div class="info-cell">
+                    <span class="label">DATE:</span>
+                    <span class="value">${date}</span>
+                </div>
+
+                <div class="info-cell">
+                    <span class="label">OLD JOB NO:</span>
+                    <span class="value">${oldJobNo}</span>
+                </div>
+                <div class="info-cell">
+                    <span class="label">MOBILE:</span>
+                    <span class="value">${mobile}</span>
                 </div>
             </div>
 
-            <table class="main-table">
+            <table class="data-table">
                 <tr>
-                    <td class="col-label">Brand / Company</td>
-                    <td class="col-val">${brand}</td>
-                </tr>
-                <tr>
-                    <td class="col-label">Device Type</td>
-                    <td class="col-val">${deviceType}</td>
+                    <th>Brand / Company</th>
+                    <td>${brand}</td>
                 </tr>
                 <tr>
-                    <td class="col-label">Reported Problems</td>
-                    <td class="col-val">${problemString}</td>
+                    <th>Device Type</th>
+                    <td>${deviceType}</td>
                 </tr>
                 <tr>
-                    <td class="col-label">Service Note</td>
-                    <td class="col-val">${serviceNote}</td>
+                    <th>Reported Problems</th>
+                    <td>${problemString}</td>
                 </tr>
                 <tr>
-                    <td class="col-label">Parts / Materials</td>
-                    <td class="col-val">${materialString}</td>
+                    <th>Service Note</th>
+                    <td>${serviceNote}</td>
                 </tr>
-                <tr class="row-estimate">
-                    <td class="col-label">ESTIMATE COST</td>
-                    <td class="col-val">₹ ${estimate}</td>
+                <tr style="height: 60px;"> <th>Parts / Materials</th>
+                    <td>${materialString}</td>
                 </tr>
-                 <tr style="height: 100%; border-bottom: none;"><td colspan="2"></td></tr>
+                <tr class="estimate-row">
+                    <th>ESTIMATE COST</th>
+                    <td>₹ ${estimate}</td>
+                </tr>
             </table>
 
-            <div class="terms-section">
-                <div class="terms-header">* नियम व अटी (TERMS & CONDITIONS) *</div>
-                <div class="terms-text">
-                    हा फक्त एक अंदाज आहे. करार नाही. आमच्या अंदाजानुसार वर वर्णन केलेल काम पूर्ण करण्यासाठी हि किंमत आहे. यात आवश्यक किंमतीतील वाढ किंवा अतिरिक्त कामगार शुल्क आणि समस्या उद्भवल्यास आवश्यक असलेल्या साहित्याचा समावेश नाही. जर दुरुस्तीची डेस्कटॉपसाठी किंमत रु. 350/- लॅपटॉपसाठी रु.1800/- किंवा त्यापेक्षा कमी असल्यास कुठलीही पूर्वसूचना न देता दुरुस्ती केली जाईल. तपासणी/आवक शुल्क-150/- दुरुस्त केलेल्या वस्तूंची कोणतीही हमी नसते. सॉफ्टवेअर इंस्टालेशनची कुठलीही वारंटी नसते. दुरुस्ती वेळी सिस्टम डेड होऊ शकतो, तसेच डेटा लॉस / करप्ट झाल्यास त्यास आम्ही जबाबदार नाही. कृपया महिण्याभरात आपल्या वस्तू घेऊन जाणे अन्यथा त्यासाठी आम्ही जबाबदार नाही.
+            <div class="terms">
+                <span class="terms-title">* नियम व अटी (TERMS & CONDITIONS) *</span>
+                हा फक्त एक अंदाज आहे. करार नाही. आमच्या अंदाजानुसार वर वर्णन केलेल काम पूर्ण करण्यासाठी हि किंमत आहे. यात आवश्यक किंमतीतील वाढ किंवा अतिरिक्त कामगार शुल्क आणि समस्या उद्भवल्यास आवश्यक असलेल्या साहित्याचा समावेश नाही. जर दुरुस्तीची डेस्कटॉपसाठी किंमत रु. 350/- लॅपटॉपसाठी रु.1800/- किंवा त्यापेक्षा कमी असल्यास कुठलीही पूर्वसूचना न देता दुरुस्ती केली जाईल. तपासणी/आवक शुल्क-150/- दुरुस्त केलेल्या वस्तूंची कोणतीही हमी नसते. सॉफ्टवेअर इंस्टालेशनची कुठलीही वारंटी नसते. दुरुस्ती वेळी सिस्टम डेड होऊ शकतो, तसेच डेटा लॉस / करप्ट झाल्यास त्यास आम्ही जबाबदार नाही. कृपया महिण्याभरात आपल्या वस्तू घेऊन जाणे अन्यथा त्यासाठी आम्ही जबाबदार नाही.<br>
+                <div style="text-align: center; margin-top: 5px; font-weight: bold; border-top: 1px dashed #ccc; padding-top: 2px;">
+                    वस्तू घेताना पावती सोबत असल्यावरच वस्तू मिळेल.
                 </div>
-                <div class="warning-line">वस्तू घेताना पावती सोबत असल्यावरच वस्तू मिळेल.</div>
             </div>
 
-            <div class="footer">
+            <div class="signatures">
                 <div class="sig-box">Receiver Sign</div>
                 <div class="sig-box">Advance Received</div>
                 <div class="sig-box">I Agree</div>
             </div>
+
         </div>
         <script>
             window.onload = function() { window.print(); }
