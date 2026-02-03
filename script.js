@@ -1167,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function printJobReceipt() {
     // --- 1. GATHER DATA ---
+    // Helper to safely get values
     const getText = (id) => document.getElementById(id)?.value || '-';
     const getValue = (id) => document.getElementById(id)?.value || '';
 
@@ -1180,6 +1181,8 @@ function printJobReceipt() {
 
     const name = getText('customer-name').toUpperCase();
     const mobile = getText('customer-mobile');
+    
+    // Table Data
     const brand = getText('brand-name');
     const deviceType = getText('device-type');
     const serviceNote = getText('service-note');
@@ -1205,13 +1208,12 @@ function printJobReceipt() {
     document.querySelectorAll('#materials-table-body tr').forEach(row => {
         const pName = row.querySelector('.part-name')?.value;
         const pQty = row.querySelector('.part-qty')?.value;
-        const pStatus = row.querySelector('.part-status')?.value;
-        if (pName) materials.push(`${pQty}x ${pName} [${pStatus}]`);
+        if (pName) materials.push(`${pQty}x ${pName}`);
     });
     const materialString = materials.length > 0 ? materials.join(', ') : 'None';
 
     // --- 2. BUILD HTML ---
-    const printWindow = window.open('', '', 'height=800,width=600');
+    const printWindow = window.open('', '', 'height=800,width=800');
     
     const htmlContent = `
     <!DOCTYPE html>
@@ -1224,7 +1226,7 @@ function printJobReceipt() {
 
             :root {
                 --border-color: #000;
-                --header-red: #d32f2f; /* Red Accent */
+                --header-red: #d32f2f;
             }
 
             body {
@@ -1233,261 +1235,291 @@ function printJobReceipt() {
                 color: #000;
                 margin: 0;
                 padding: 0;
-                background: #fff;
             }
 
+            /* A5 Page Setup */
             @page { size: A5; margin: 0.5cm; }
 
             .container {
                 width: 100%;
+                max-width: 100%;
                 border: 1px solid var(--border-color);
-                padding: 5px;
+                padding: 10px;
                 box-sizing: border-box;
                 display: flex;
                 flex-direction: column;
-                min-height: 98vh; /* Fill the A5 page */
+                min-height: 95vh; 
             }
 
-            /* --- HEADER --- */
-            .header {
-                text-align: center;
+            /* --- HEADER SECTION --- */
+            .header-wrapper {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
                 border-bottom: 2px solid var(--border-color);
-                padding-bottom: 5px;
+                padding-bottom: 10px;
                 margin-bottom: 5px;
             }
-            .logo-section {
+
+            /* LEFT SIDE: Branding */
+            .header-left {
+                width: 68%;
+                text-align: left;
+            }
+            .logo-row {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                gap: 15px;
-                margin-bottom: 4px;
+                gap: 10px;
+                margin-bottom: 5px;
             }
             .logo-img {
                 width: 50px;
                 height: auto;
             }
-            .company-title h1 {
-                font-size: 26px;
-                font-weight: 900;
-                margin: 0;
-                line-height: 1;
-                text-transform: uppercase;
+            .company-name-block {
+                display: flex;
+                flex-direction: column;
             }
             .slogan {
                 font-family: 'Noto Sans Devanagari', sans-serif;
-                font-size: 12px;
+                font-size: 11px;
                 color: var(--header-red);
                 font-weight: bold;
-                letter-spacing: 1px;
-                margin-bottom: 2px;
+                line-height: 1.2;
             }
-            .sub-text {
-                font-size: 10px;
-                font-weight: 500;
-                margin-bottom: 4px;
-            }
-            .address {
-                font-size: 10px;
-                line-height: 1.3;
-            }
-
-            /* --- INFO GRID (Replaces the split header) --- */
-            .info-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                border: 1px solid var(--border-color);
-                margin-bottom: 10px;
-            }
-            .info-row {
-                display: contents;
-            }
-            .info-cell {
-                padding: 4px 8px;
-                border-bottom: 1px solid var(--border-color);
-                display: flex;
-                align-items: center;
-            }
-            .info-cell:nth-child(even) {
-                border-left: 1px solid var(--border-color);
-            }
-            .grid-full {
-                grid-column: 1 / -1;
-            }
-            .label {
-                font-weight: 700;
-                margin-right: 5px;
-                min-width: 60px;
-                color: #333;
-            }
-            .value {
-                font-weight: 600;
-                font-size: 12px;
-                text-transform: uppercase;
-            }
-            .job-highlight {
-                color: var(--header-red);
-                font-size: 14px;
-            }
-
-            /* --- DATA TABLE --- */
-            .data-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-bottom: 10px;
-                flex-grow: 1; /* Pushes footer down */
-            }
-            .data-table th, .data-table td {
-                border: 1px solid var(--border-color);
-                padding: 6px;
-                text-align: left;
-                vertical-align: top;
-            }
-            .data-table th {
-                background-color: #f0f0f0;
-                width: 35%;
-                font-weight: 700;
-                font-size: 10px;
-                text-transform: uppercase;
-            }
-            .data-table td {
-                font-size: 11px;
-                font-weight: 500;
-            }
-            .estimate-row th {
-                color: var(--header-red);
-                font-size: 12px;
-                border-top: 2px solid #000;
-            }
-            .estimate-row td {
-                font-size: 16px;
+            .company-title {
+                font-size: 26px;
                 font-weight: 900;
-                border-top: 2px solid #000;
+                text-transform: uppercase;
+                line-height: 1;
             }
-
-            /* --- FOOTER --- */
-            .terms {
-                font-family: 'Noto Sans Devanagari', sans-serif;
-                font-size: 9px;
-                text-align: justify;
-                border: 1px solid var(--border-color);
-                padding: 5px;
+            .sub-services {
+                font-size: 10px;
+                font-weight: 600;
                 margin-bottom: 5px;
                 line-height: 1.3;
             }
-            .terms-title {
+            .contact-info {
+                font-size: 10px;
+                line-height: 1.4;
+            }
+
+            /* RIGHT SIDE: Job Details Box */
+            .header-right {
+                width: 30%;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+            .job-box-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1px solid var(--border-color);
+            }
+            .job-box-table td {
+                border: 1px solid var(--border-color);
+                padding: 4px;
+                font-size: 11px;
+            }
+            .jb-label {
+                font-weight: 700;
+                color: var(--header-red);
+                background-color: #fff;
+                width: 45%;
+            }
+            .jb-value {
+                font-weight: 700;
+                text-align: center;
+                background-color: #fff;
+            }
+
+            /* --- CUSTOMER ROW --- */
+            .customer-row {
+                display: flex;
+                justify-content: space-between;
+                border: 1px solid var(--border-color);
+                padding: 6px 10px;
+                margin-bottom: 10px;
+                font-size: 12px;
+                font-weight: 700;
+            }
+            .cust-label { color: #000; margin-right: 5px; }
+            .cust-val { text-transform: uppercase; }
+
+            /* --- MAIN DATA TABLE --- */
+            .main-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 15px;
+                flex-grow: 1; 
+            }
+            .main-table td {
+                border: 1px solid var(--border-color);
+                padding: 8px;
+                vertical-align: middle;
+            }
+            /* Left Column: Labels */
+            .mt-label {
+                width: 35%;
+                font-weight: 900;
+                font-size: 11px;
+                text-transform: uppercase;
+                background-color: #fff; 
+            }
+            /* Right Column: Values */
+            .mt-value {
+                width: 65%;
+                font-weight: 500;
+                font-size: 12px;
+            }
+            /* Estimate Cost Row */
+            .estimate-row td {
+                border-top: 2px solid #000;
+            }
+            .est-label { color: var(--header-red); font-size: 12px; }
+            .est-value { font-size: 16px; font-weight: 900; }
+
+            /* --- TERMS & FOOTER --- */
+            .terms-section {
+                text-align: center;
+                margin-bottom: 10px;
+                font-size: 9px;
+                font-family: 'Noto Sans Devanagari', sans-serif;
+                line-height: 1.4;
+            }
+            .terms-header {
                 color: var(--header-red);
                 font-weight: bold;
                 text-decoration: underline;
                 display: block;
-                margin-bottom: 3px;
-            }
-            
-            .signatures {
-                display: flex;
-                justify-content: space-between;
-                border: 1px solid var(--border-color);
-            }
-            .sig-box {
-                flex: 1;
-                text-align: center;
-                padding-top: 30px;
-                padding-bottom: 5px;
-                font-weight: 700;
+                margin-bottom: 5px;
                 font-size: 10px;
-                border-right: 1px solid var(--border-color);
             }
-            .sig-box:last-child {
-                border-right: none;
+            .warning-text {
+                margin-top: 5px;
+                font-weight: bold;
+                border-top: 1px dashed #999;
+                padding-top: 3px;
+                display: inline-block;
+                width: 100%;
             }
 
-            /* Hiding Header/Footer URL in Print */
+            .footer-boxes {
+                display: flex;
+                gap: 0;
+            }
+            .f-box {
+                flex: 1;
+                border: 1px solid var(--border-color);
+                height: 50px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 700;
+                font-size: 11px;
+                /* Prevent double borders */
+                border-right: none; 
+            }
+            .f-box:last-child {
+                border-right: 1px solid var(--border-color);
+            }
+
             @media print {
-                @page { margin: 0.5cm; }
+                 @page { margin: 0.5cm; }
             }
         </style>
     </head>
     <body>
         <div class="container">
             
-            <header class="header">
-                <div class="logo-section">
-                    <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" class="logo-img">
-                    <div class="company-title">
-                        <div class="slogan">ध्यास तंत्रज्ञानाचा !</div>
-                        <h1>Korus Enterprises</h1>
+            <div class="header-wrapper">
+                <div class="header-left">
+                    <div class="logo-row">
+                        <img src="https://i.postimg.cc/ZCX3wQwm/korus-logo.png" class="logo-img">
+                        <div class="company-name-block">
+                            <div class="slogan">ध्यास तंत्रज्ञानाचा !</div>
+                            <div class="company-title">Korus Enterprises</div>
+                        </div>
+                    </div>
+                    <div class="sub-services">
+                        Sales, Service, AMC, Repairing & CCTV Camera Installation.<br>
+                        Specialist in: New / Refurbished Laptop, Computer & Peripherals.
+                    </div>
+                    <div class="contact-info">
+                        Address: 39, 'Balchandra', Ashok Nagar, Satpur, Nashik - 422012<br>
+                        Contact: Sachin - 7841863517 | Kundan - 7841863518<br>
+                        Email: korus.sachin2018@gmail.com
                     </div>
                 </div>
-                <div class="sub-text">Sales, Service, AMC, Repairing & CCTV Camera Installation.<br>Specialist in: New / Refurbished Laptop, Computer & Peripherals.</div>
-                <div class="address">
-                    39, 'Balchandra', Ashok Nagar, Satpur, Nashik - 422012<br>
-                    Contact: Sachin - 7841863517 | Kundan - 7841863518<br>
-                    Email: korus.sachin2018@gmail.com
-                </div>
-            </header>
 
-            <div class="info-grid">
-                <div class="info-cell grid-full">
-                    <span class="label">NAME:</span>
-                    <span class="value">${name}</span>
-                </div>
-                
-                <div class="info-cell">
-                    <span class="label">JOB NO:</span>
-                    <span class="value job-highlight">${jobNo}</span>
-                </div>
-                <div class="info-cell">
-                    <span class="label">DATE:</span>
-                    <span class="value">${date}</span>
-                </div>
-
-                <div class="info-cell">
-                    <span class="label">OLD JOB NO:</span>
-                    <span class="value">${oldJobNo}</span>
-                </div>
-                <div class="info-cell">
-                    <span class="label">MOBILE:</span>
-                    <span class="value">${mobile}</span>
+                <div class="header-right">
+                    <table class="job-box-table">
+                        <tr>
+                            <td class="jb-label">JOB NO</td>
+                            <td class="jb-value" style="font-size: 14px; color: red;">${jobNo}</td>
+                        </tr>
+                        <tr>
+                            <td class="jb-label">DATE</td>
+                            <td class="jb-value">${date}</td>
+                        </tr>
+                        <tr>
+                            <td class="jb-label">OLD JOB NO</td>
+                            <td class="jb-value">${oldJobNo}</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
 
-            <table class="data-table">
+            <div class="customer-row">
+                <div>
+                    <span class="cust-label">Name:</span>
+                    <span class="cust-val">${name}</span>
+                </div>
+                <div>
+                    <span class="cust-label">Mobile:</span>
+                    <span class="cust-val">${mobile}</span>
+                </div>
+            </div>
+
+            <table class="main-table">
                 <tr>
-                    <th>Brand / Company</th>
-                    <td>${brand}</td>
+                    <td class="mt-label">BRAND / COMPANY</td>
+                    <td class="mt-value">${brand}</td>
                 </tr>
                 <tr>
-                    <th>Device Type</th>
-                    <td>${deviceType}</td>
+                    <td class="mt-label">DEVICE TYPE</td>
+                    <td class="mt-value">${deviceType}</td>
                 </tr>
                 <tr>
-                    <th>Reported Problems</th>
-                    <td>${problemString}</td>
+                    <td class="mt-label">REPORTED PROBLEMS</td>
+                    <td class="mt-value">${problemString}</td>
                 </tr>
                 <tr>
-                    <th>Service Note</th>
-                    <td>${serviceNote}</td>
+                    <td class="mt-label">SERVICE NOTE</td>
+                    <td class="mt-value">${serviceNote}</td>
                 </tr>
-                <tr style="height: 60px;"> <th>Parts / Materials</th>
-                    <td>${materialString}</td>
+                <tr style="height: 100px; vertical-align: top;">
+                    <td class="mt-label">PARTS / MATERIALS</td>
+                    <td class="mt-value" style="vertical-align: top;">${materialString}</td>
                 </tr>
                 <tr class="estimate-row">
-                    <th>ESTIMATE COST</th>
-                    <td>₹ ${estimate}</td>
+                    <td class="mt-label est-label">ESTIMATE COST</td>
+                    <td class="mt-value est-value">₹ ${estimate}</td>
                 </tr>
             </table>
 
-            <div class="terms">
-                <span class="terms-title">* नियम व अटी (TERMS & CONDITIONS) *</span>
-                हा फक्त एक अंदाज आहे. करार नाही. आमच्या अंदाजानुसार वर वर्णन केलेल काम पूर्ण करण्यासाठी हि किंमत आहे. यात आवश्यक किंमतीतील वाढ किंवा अतिरिक्त कामगार शुल्क आणि समस्या उद्भवल्यास आवश्यक असलेल्या साहित्याचा समावेश नाही. जर दुरुस्तीची डेस्कटॉपसाठी किंमत रु. 350/- लॅपटॉपसाठी रु.1800/- किंवा त्यापेक्षा कमी असल्यास कुठलीही पूर्वसूचना न देता दुरुस्ती केली जाईल. तपासणी/आवक शुल्क-150/- दुरुस्त केलेल्या वस्तूंची कोणतीही हमी नसते. सॉफ्टवेअर इंस्टालेशनची कुठलीही वारंटी नसते. दुरुस्ती वेळी सिस्टम डेड होऊ शकतो, तसेच डेटा लॉस / करप्ट झाल्यास त्यास आम्ही जबाबदार नाही. कृपया महिण्याभरात आपल्या वस्तू घेऊन जाणे अन्यथा त्यासाठी आम्ही जबाबदार नाही.<br>
-                <div style="text-align: center; margin-top: 5px; font-weight: bold; border-top: 1px dashed #ccc; padding-top: 2px;">
-                    वस्तू घेताना पावती सोबत असल्यावरच वस्तू मिळेल.
-                </div>
+            <div class="terms-section">
+                <span class="terms-header">* नियम व अटी (TERMS & CONDITIONS) *</span>
+                <p style="margin: 0; padding: 0;">
+                हा फक्त एक अंदाज आहे. करार नाही. आमच्या अंदाजानुसार वर वर्णन केलेल काम पूर्ण करण्यासाठी हि किंमत आहे. यात आवश्यक किंमतीतील वाढ किंवा अतिरिक्त कामगार शुल्क आणि समस्या उद्भवल्यास आवश्यक असलेल्या साहित्याचा समावेश नाही. जर दुरुस्तीची डेस्कटॉपसाठी किंमत रु. 350/- लॅपटॉपसाठी रु.1800/- किंवा त्यापेक्षा कमी असल्यास कुठलीही पूर्वसूचना न देता दुरुस्ती केली जाईल. तपासणी/आवक शुल्क-150/- दुरुस्त केलेल्या वस्तूंची कोणतीही हमी नसते. सॉफ्टवेअर इंस्टालेशनची कुठलीही वारंटी नसते. दुरुस्ती वेळी सिस्टम डेड होऊ शकतो, तसेच डेटा लॉस / करप्ट झाल्यास त्यास आम्ही जबाबदार नाही. कृपया महिण्याभरात आपल्या वस्तू घेऊन जाणे अन्यथा त्यासाठी आम्ही जबाबदार नाही.
+                </p>
+                <span class="warning-text">वस्तू घेताना पावती सोबत असल्यावरच वस्तू मिळेल.</span>
             </div>
 
-            <div class="signatures">
-                <div class="sig-box">Receiver Sign</div>
-                <div class="sig-box">Advance Received</div>
-                <div class="sig-box">I Agree</div>
+            <div class="footer-boxes">
+                <div class="f-box">Receiver Sign</div>
+                <div class="f-box">Advance Received</div>
+                <div class="f-box">I Agree</div>
             </div>
 
         </div>
