@@ -1273,7 +1273,7 @@ function printJobReceipt() {
                 margin-bottom: 5px;
             }
             .logo-img {
-                width: 80px;
+                width: 55px;
                 height: auto;
             }
             .company-name-block {
@@ -1533,4 +1533,5 @@ function printJobReceipt() {
     printWindow.document.write(htmlContent);
     printWindow.document.close();
 }
+
 
