@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Firebase Configuration ---
     const firebaseConfig = {
-        apiKey: "AIzaSyAlaRNwoERMLqCGvcSrAB9IHRK7GncKD4s",
-        authDomain: "korus-job-dashboard.firebaseapp.com",
-        projectId: "korus-job-dashboard",
-        storageBucket: "korus-job-dashboard.firebasestorage.app",
-        messagingSenderId: "433518743960",
-        appId: "1:433518743960:web:f33bf1af978b14e9f85bed"
+        apiKey: "xxxxxxxxxxxxxxxxxxxxxxx",
+        authDomain: "xxxxxxxxxxxxxxxxxxxxxxxx",
+        projectId: "xxxxxxxxxxxxxxxxxxxxxxxxx",
+        storageBucket: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        messagingSenderId: "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+        appId: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     };
 
     // --- Initialize Firebase ---
