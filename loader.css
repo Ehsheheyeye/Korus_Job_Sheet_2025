@@ -1,0 +1,84 @@
+/* --- Full-screen blur loader (see loader.js) --- */
+#app-blocker {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(15, 23, 42, 0.35);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    cursor: wait;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+#app-blocker.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+body.app-blocked {
+    overflow: hidden;
+}
+
+.app-blocker-card {
+    width: 100%;
+    max-width: 340px;
+    box-sizing: border-box;
+    padding: 2rem 1.75rem;
+    border-radius: 16px;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-secondary, #ffffff);
+    color: var(--text-primary, #111827);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* Spinner: logo in the middle of a rotating ring */
+.app-blocker-spinner {
+    position: relative;
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 1.25rem;
+}
+.app-blocker-spinner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 5px solid var(--border-color, #e5e7eb);
+    border-top-color: var(--accent-color, #3b82f6);
+    animation: app-blocker-spin 0.9s linear infinite;
+}
+.app-blocker-spinner img {
+    position: absolute;
+    inset: 16px;
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    animation: app-blocker-pulse 1.6s ease-in-out infinite;
+}
+
+.app-blocker-title {
+    margin: 0 0 0.35rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+.app-blocker-text {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+@keyframes app-blocker-spin {
+    to { transform: rotate(360deg); }
+}
+@keyframes app-blocker-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.88); opacity: 0.75; }
+}
